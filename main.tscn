@@ -63,5 +63,5 @@ mesh = SubResource("BoxMesh_0xm2m")
 transform = Transform3D(51.919796, 0, 0, 0, 1, 0, 0, 0, 35.512383, 6.528001, -0.101135254, 1.5829735)
 shape = SubResource("BoxShape3D_0xm2m")
 
-[node name="Sketchfab_Scene" parent="." unique_id=591109368 instance=ExtResource("2_0xm2m")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5936508, 1.0245645, -12.774025)
+[node name="Sketchfab_Scene" parent="." unique_id=770262235 instance=ExtResource("2_0xm2m")]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0.48701477, 0.5053875, -12.730688)
