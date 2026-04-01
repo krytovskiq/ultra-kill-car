@@ -60,4 +60,4 @@ func _on_body_entered(body: Node) -> void:
 	# Если врезались в кого-то, у кого есть функция die
 	if body.has_method("die"):
 		# Передаем вектор скорости машины, чтобы зомби отлетел по направлению движения
-		body.die(linear_velocity)
+		body.die()
