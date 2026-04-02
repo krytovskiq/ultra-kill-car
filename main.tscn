@@ -28,19 +28,19 @@ sdfgi_y_scale = 2
 glow_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
-albedo_color = Color(0.305, 0.322, 0.31, 1)
+albedo_color = Color(0.5970623, 0.30958122, 0.27539176, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
 material = SubResource("StandardMaterial3D_ground")
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
-size = Vector3(2.4311523, 1.2120361, 2.8651123)
+[sub_resource type="NavigationMesh" id="NavigationMesh_h2yge"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1bvp3"]
 
 [node name="Main" type="StaticBody3D" unique_id=1765345686]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.002931118, 0)
-collision_layer = 15
-collision_mask = 15
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.71017027, 0)
+collision_layer = 3
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
 environment = SubResource("Environment_8dxyn")
@@ -50,17 +50,24 @@ transform = Transform3D(1, 0, 0, 0, 0.8528408, 0.5221711, 0, -0.5221711, 0.85284
 shadow_enabled = true
 directional_shadow_max_distance = 200.0
 
-[node name="car" parent="." unique_id=1133104648 instance=ExtResource("1_mdet3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.564415, 0.57862556, -6.30866)
-engine_force_value = 200
+[node name="car" parent="." unique_id=1133104648 groups=["player"] instance=ExtResource("1_mdet3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.564415, 0.5828819, -1.762392)
+zombie_hit_min_speed_mps = 12.44
+zombie_damage_at_min_speed = 12.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1647250997]
 transform = Transform3D(100, 0, 0, 0, 1, 0, 0, 0, 100, -0.00038981438, 0, -0.005373001)
 mesh = SubResource("BoxMesh_0xm2m")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=931112579]
-transform = Transform3D(51.919796, 0, 0, 0, 1, 0, 0, 0, 35.512383, 6.528001, -0.101135254, 1.5829735)
-shape = SubResource("BoxShape3D_0xm2m")
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="MeshInstance3D" unique_id=1112171539]
+navigation_mesh = SubResource("NavigationMesh_h2yge")
 
-[node name="Sketchfab_Scene" parent="." unique_id=266110253 instance=ExtResource("3_h2yge")]
-transform = Transform3D(0.215, 0, 0, 0, 0.215, 0, 0, 0, 0.215, 0, 0.50690925, -9.987096)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=106199808]
+transform = Transform3D(100, 0, 0, 0, 1, 0, 0, 0, 100, -0.00038981438, -0.013793945, -0.005373001)
+shape = SubResource("BoxShape3D_1bvp3")
+
+[node name="Zombie" parent="." unique_id=266110253 instance=ExtResource("3_h2yge")]
+transform = Transform3D(0.02, 0, 0, 0, 0.02, 0, 0, 0, 0.02, 0, 1.5234218, -29.845707)
+safe_margin = 0.05
+speed = 4.0
+player_path = NodePath("../car")
