@@ -50,7 +50,7 @@ func _ready():
 	# Удаляем узел через 1.5 секунды, когда частицы исчезнут
 	await get_tree().create_timer(1.5).timeout
 	queue_free()
-func spawn_blood(pos: Vector3, impulse: Vector3):
+	func spawn_blood(pos: Vector3, impulse: Vector3):
 	var particles = GPUParticles3D.new()
 	get_tree().current_scene.add_child(particles)
 	particles.global_position = pos + Vector3.UP * 0.5
