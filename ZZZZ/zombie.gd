@@ -224,8 +224,6 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
 		if state == ZombieState.ATTACK:
 			state = ZombieState.CHASE
 
-	_spawn_flash(global_position + Vector3.UP * 0.9, Color(0.6, 1.0, 0.6), 0.6)
-
 	if current_hp <= 0.0:
 		die(knockback, knockback.length())
 
@@ -258,7 +256,6 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 	else:
 		play_anim("Idle")
 
-	_spawn_flash(global_position + Vector3.UP * 1.0, Color(0.3, 1.0, 0.4), 1.1)
 
 
 func _pick_attack_animation() -> String:

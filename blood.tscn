@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://5hq6nlmixw3c"]
+
+[ext_resource type="Script" uid="uid://dvefwwh0xha72" path="res://blood.gd" id="1_44s4y"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_44s4y"]
+color = Color(1, 0, 0, 1)
+
+[node name="Blood" type="GPUParticles3D" unique_id=950394449]
+process_material = SubResource("ParticleProcessMaterial_44s4y")
+script = ExtResource("1_44s4y")
