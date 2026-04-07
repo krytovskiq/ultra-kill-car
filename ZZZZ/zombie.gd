@@ -25,7 +25,7 @@ const ZOMBIE_LAYER := 4
 
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 @onready var attack_area: Area3D = $Hit
-@onready var root_collider: CollisionShape3D = $RootCollider
+@onready var root_collider: CollisionShape3D = $CollisionShape3D
 
 var player: Node3D
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")

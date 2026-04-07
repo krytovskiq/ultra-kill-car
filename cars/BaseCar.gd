@@ -75,7 +75,11 @@ func _physics_process(delta: float) -> void:
 		if has_node("wheal3"): $wheal3.wheel_friction_slip = 3.0
 
 	traction(speed_mps)
-
+	
+	if Input.is_action_pressed("esc"):
+		get_tree().paused = true
+		$"../Pause".show()
+		
 func traction(speed: float) -> void:
 	apply_central_force(Vector3.DOWN * speed * 5.0)
 
@@ -168,3 +172,4 @@ func _destroy_car():
 	destroyed = true
 	engine_force = 0
 	brake = 10
+	get_tree().reload_current_scene()

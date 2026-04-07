@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://ci52bv1m15cbs" path="res://cars/Doge.tscn" id="1_mdet3"]
 [ext_resource type="PackedScene" uid="uid://d208hi5mmjqnr" path="res://ZZZZ/Zombie.tscn" id="3_h2yge"]
 [ext_resource type="Script" uid="uid://bonkv8dcbndmf" path="res://node_3d.gd" id="4_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://dqxdryv8nnuyp" path="res://pause.tscn" id="5_lquwl"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_h2yge"]
 rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
@@ -56,7 +57,6 @@ mass = 1800.0
 STEER_SPEED = 5.0
 STEER_LIMIT = 0.5
 engine_force_value = 5000.0
-max_hp = 4.0
 zombie_impulse_at_min_speed = 40.0
 zombie_impulse_at_max_speed = 65.0
 wall_damage_min_speed_mps = 3.0
@@ -69,10 +69,9 @@ mesh = SubResource("BoxMesh_0xm2m")
 navigation_mesh = SubResource("NavigationMesh_h2yge")
 
 [node name="Zombie" parent="." unique_id=266110253 instance=ExtResource("3_h2yge")]
-transform = Transform3D(0.02, 0, 0, 0, 0.02, 0, 0, 0, 0.02, -6.581464, 1.5234218, -29.845707)
+transform = Transform3D(0.02, 0, 0, 0, 0.02, 0, 0, 0, 0.02, -1.9981929, 1.5096544, -13.733131)
 visible = false
 safe_margin = 0.05
-speed = 4.5
 player_path = NodePath("../car")
 hit_knockback_multiplier = 2.0
 
@@ -81,7 +80,7 @@ transform = Transform3D(500, 0, 0, 0, 1, 0, 0, 0, 500, -0.00038981438, 0, -0.005
 shape = SubResource("BoxShape3D_h2yge")
 
 [node name="Node3D" type="Node3D" parent="." unique_id=1197449312]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.047896, -15.39439)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9062071, -18.216696)
 script = ExtResource("4_1bvp3")
 enemy_scene = ExtResource("3_h2yge")
 enemy_scale = 0.028
@@ -90,4 +89,6 @@ enemy_scale = 0.028
 autostart = true
 
 [node name="Marker3D" type="Marker3D" parent="Node3D" unique_id=474156647]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -31.410267)
+
+[node name="Pause" parent="." unique_id=1664862517 instance=ExtResource("5_lquwl")]
+visible = false
