@@ -1,10 +1,12 @@
 [gd_scene format=3 uid="uid://dqfol88j7isaq"]
 
 [ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_272bh"]
 [ext_resource type="PackedScene" uid="uid://ci52bv1m15cbs" path="res://cars/Doge.tscn" id="1_mdet3"]
+[ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="2_5vw27"]
 [ext_resource type="PackedScene" uid="uid://d208hi5mmjqnr" path="res://ZZZZ/Zombie.tscn" id="3_h2yge"]
 [ext_resource type="Script" uid="uid://bonkv8dcbndmf" path="res://node_3d.gd" id="4_1bvp3"]
-[ext_resource type="PackedScene" uid="uid://dqxdryv8nnuyp" path="res://pause.tscn" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://pause.tscn" id="5_lquwl"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_h2yge"]
 rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
@@ -30,29 +32,21 @@ ssao_power = 32.7849
 sdfgi_y_scale = 2
 glow_enabled = true
 
-[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_lquwl"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
-material = SubResource("ORMMaterial3D_lquwl")
-
-[sub_resource type="NavigationMesh" id="NavigationMesh_h2yge"]
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_h2yge"]
-
-[node name="Main" type="StaticBody3D" unique_id=1765345686]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.71017027, 0)
-collision_layer = 3
+[node name="Main" type="Node3D" unique_id=1305401198 node_paths=PackedStringArray("car")]
+script = ExtResource("1_272bh")
+chunk_scene = ExtResource("2_5vw27")
+car = NodePath("car")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
 environment = SubResource("Environment_8dxyn")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=774830370]
-transform = Transform3D(1, 0, 0, 0, 0.78642863, 0.61768115, 0, -0.61768115, 0.78642863, 0, 92.97207, 22.312809)
-light_energy = 0.67
+transform = Transform3D(-4.371139e-08, -0.61703587, 0.78693503, 0, 0.78693503, 0.61703587, -1, 2.6971493e-08, -3.4398024e-08, 0, 92.97207, 22.312809)
 shadow_enabled = true
 
 [node name="car" parent="." unique_id=1133104648 groups=["player"] instance=ExtResource("1_mdet3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.564415, 0.5828819, -1.762392)
+collision_layer = 1
+collision_mask = 2
 mass = 1800.0
 STEER_SPEED = 5.0
 STEER_LIMIT = 0.5
@@ -61,26 +55,8 @@ zombie_impulse_at_min_speed = 40.0
 zombie_impulse_at_max_speed = 65.0
 wall_damage_min_speed_mps = 3.0
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1647250997]
-transform = Transform3D(500, 0, 0, 0, 1, 0, 0, 0, 500, -0.00038981438, 0, -0.005373001)
-mesh = SubResource("BoxMesh_0xm2m")
-
-[node name="NavigationRegion3D" type="NavigationRegion3D" parent="MeshInstance3D" unique_id=1112171539]
-navigation_mesh = SubResource("NavigationMesh_h2yge")
-
-[node name="Zombie" parent="." unique_id=266110253 instance=ExtResource("3_h2yge")]
-transform = Transform3D(0.02, 0, 0, 0, 0.02, 0, 0, 0, 0.02, -1.9981929, 1.5096544, -13.733131)
-visible = false
-safe_margin = 0.05
-player_path = NodePath("../car")
-hit_knockback_multiplier = 2.0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1469305476]
-transform = Transform3D(500, 0, 0, 0, 1, 0, 0, 0, 500, -0.00038981438, 0, -0.005373001)
-shape = SubResource("BoxShape3D_h2yge")
-
 [node name="Node3D" type="Node3D" parent="." unique_id=1197449312]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9062071, -18.216696)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24.25647)
 script = ExtResource("4_1bvp3")
 enemy_scene = ExtResource("3_h2yge")
 enemy_scale = 0.028

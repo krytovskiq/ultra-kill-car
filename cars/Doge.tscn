@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://cars/camera/camera_3d.tscn" id="3_y15c2"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mm2gk"]
-size = Vector3(2.0463917, 1.1210938, 2.08592)
+size = Vector3(2.0463917, 1.1210938, 2.5151324)
 
 [sub_resource type="LabelSettings" id="LabelSettings_yc8e5"]
 font_size = 32
@@ -25,7 +25,6 @@ collision_layer = 2
 center_of_mass_mode = 1
 center_of_mass = Vector3(0, -0.1, 0)
 contact_monitor = true
-max_contacts_reported = 8
 script = ExtResource("1_1n2xg")
 STEER_LIMIT = 0.4
 
@@ -88,14 +87,14 @@ suspension_max_force = 10000.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0775136, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1430023922]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.007856924, 0.78735894, 0.719927)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.007856924, 0.78735894, 0.50532085)
 shape = SubResource("BoxShape3D_mm2gk")
 
 [node name="look" type="Node3D" parent="." unique_id=1704104742]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 
 [node name="Camera3D" parent="look" unique_id=262920490 instance=ExtResource("3_y15c2")]
-transform = Transform3D(1, 0, 0, 0, 0.974347, 0.225053, 0, -0.225053, 0.974347, 0, 1.97324, 6.19962)
+transform = Transform3D(1, 0, 0, 0, 0.98582685, 0.16776662, 0, -0.16776662, 0.98582685, 0, 1.6428944, 4.2664847)
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=208649555]
 layer = 2

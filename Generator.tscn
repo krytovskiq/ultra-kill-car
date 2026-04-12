@@ -1,0 +1,127 @@
+[gd_scene format=3 uid="uid://hut6rtb4m5uh"]
+
+[ext_resource type="Script" uid="uid://qlfobs7v7t5o" path="res://world_chunk.gd" id="1_1mryt"]
+[ext_resource type="PackedScene" uid="uid://d208hi5mmjqnr" path="res://ZZZZ/Zombie.tscn" id="2_ihm32"]
+[ext_resource type="PackedScene" uid="uid://bqtirdl3ej85j" path="res://model/tree/tree.tscn" id="2_vh1cf"]
+[ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="3_1cr0a"]
+[ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="4_5sdx4"]
+[ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="7_brxuf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wjub3"]
+albedo_texture = ExtResource("3_1cr0a")
+normal_enabled = true
+normal_texture = ExtResource("4_5sdx4")
+uv1_scale = Vector3(0.13, 0.13, 0.13)
+uv1_triplanar = true
+texture_filter = 5
+
+[sub_resource type="BoxMesh" id="BoxMesh_80s8q"]
+resource_local_to_scene = true
+lightmap_size_hint = Vector2i(979, 616)
+material = SubResource("StandardMaterial3D_wjub3")
+size = Vector3(75, 1, 120)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vh1cf"]
+resource_local_to_scene = true
+size = Vector3(75, 0, 120)
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_nlgcw"]
+rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
+turbidity = 0.0
+ground_color = Color(0, 0, 0, 1)
+energy_multiplier = 1.7
+night_sky = ExtResource("7_brxuf")
+
+[sub_resource type="Sky" id="Sky_1bvp3"]
+sky_material = SubResource("PhysicalSkyMaterial_nlgcw")
+
+[sub_resource type="Environment" id="Environment_x7r45"]
+background_mode = 2
+sky = SubResource("Sky_1bvp3")
+ambient_light_sky_contribution = 0.15
+ambient_light_energy = 1.83
+tonemap_mode = 2
+tonemap_exposure = 1.1
+ssao_enabled = true
+ssao_radius = 1.5
+ssao_intensity = 0.6
+ssao_power = 32.7849
+sdfgi_y_scale = 2
+glow_enabled = true
+
+[node name="WorldChunk" type="Node3D" unique_id=560257719]
+script = ExtResource("1_1mryt")
+zombie_scene = ExtResource("2_ihm32")
+zombie_count = 10
+
+[node name="GroundBody" type="StaticBody3D" parent="." unique_id=1961299343]
+collision_layer = 2
+collision_mask = 5
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="GroundBody" unique_id=601567640]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0141716, -0.6117554, -0.21616364)
+mesh = SubResource("BoxMesh_80s8q")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody" unique_id=921476853]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.076254, -0.32381684, 0)
+shape = SubResource("BoxShape3D_vh1cf")
+
+[node name="ExitPoint" type="Marker3D" parent="." unique_id=1068824701]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -60.918995)
+
+[node name="Tree" parent="." unique_id=1218895186 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, -51.377575)
+
+[node name="Tree2" parent="." unique_id=1743976259 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, -38.73769)
+
+[node name="Tree3" parent="." unique_id=650915465 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, -24.471659)
+
+[node name="Tree4" parent="." unique_id=657591529 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, -11.019196)
+
+[node name="Tree5" parent="." unique_id=290320874 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, 2.4216785)
+
+[node name="Tree6" parent="." unique_id=389686774 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, 16.37058)
+
+[node name="Tree7" parent="." unique_id=562026910 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, 30.129932)
+
+[node name="Tree8" parent="." unique_id=1330745072 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, 43.483913)
+
+[node name="Tree9" parent="." unique_id=1167408429 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 32.095314, 0, 55.625343)
+
+[node name="Tree10" parent="." unique_id=1427781749 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, -51.377575)
+
+[node name="Tree11" parent="." unique_id=137768547 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, -38.73769)
+
+[node name="Tree12" parent="." unique_id=900353514 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, -24.471659)
+
+[node name="Tree13" parent="." unique_id=2139051299 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, -11.019196)
+
+[node name="Tree14" parent="." unique_id=1313905963 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, 2.4216785)
+
+[node name="Tree15" parent="." unique_id=1930640396 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, 16.37058)
+
+[node name="Tree16" parent="." unique_id=15007400 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, 30.129932)
+
+[node name="Tree17" parent="." unique_id=265169114 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, 43.483913)
+
+[node name="Tree18" parent="." unique_id=28222798 instance=ExtResource("2_vh1cf")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -31.373613, 0, 55.625343)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1424881713]
+environment = SubResource("Environment_x7r45")

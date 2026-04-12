@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="UltraKillCar"
-run/main_scene="uid://b20n7j7wv07e3"
+run/main_scene="uid://cb3frsqskfmc0"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 

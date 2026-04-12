@@ -103,7 +103,6 @@ func _on_body_entered(body: Node) -> void:
 		
 		# ЭФФЕКТ "ХИТ-СТОП" (замирание времени)
 		hit_stop(0.06)
-
 		body.take_damage(impact_damage, final_impulse)
 
 # ФУНКЦИЯ ДЛЯ КРОВИ (создает сочные брызги)
