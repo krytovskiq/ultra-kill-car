@@ -7,7 +7,7 @@ extends Node3D
 @export var surface_y: float = 0.0
 
 @export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
-@export var zombie_count: int = 3      # Сколько зомби на один кусок дороги
+@export var zombie_count: int = 2      # Сколько зомби на один кусок дороги
 
 @onready var _collision_shape: CollisionShape3D = $GroundBody/CollisionShape3D
 @onready var _mesh_instance: MeshInstance3D = $GroundBody/MeshInstance3D
