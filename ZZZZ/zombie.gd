@@ -11,7 +11,7 @@ const CAR_LAYER := 1
 const GROUND_LAYER := 2
 const ZOMBIE_LAYER := 4
 
-@export var speed: float = 14.0
+@export var speed: int = 8
 @export var damage: float = 15.0
 @export var player_path: NodePath
 @export var max_hp: float = 50.0

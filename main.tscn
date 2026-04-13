@@ -40,6 +40,7 @@ environment = SubResource("Environment_8dxyn")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=774830370]
 transform = Transform3D(-4.371139e-08, -0.61703587, 0.78693503, 0, 0.78693503, 0.61703587, -1, 2.6971493e-08, -3.4398024e-08, 0, 92.97207, 22.312809)
+shadow_enabled = true
 
 [node name="car" parent="." unique_id=1133104648 groups=["player"] instance=ExtResource("1_mdet3")]
 collision_layer = 1
