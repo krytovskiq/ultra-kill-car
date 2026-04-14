@@ -13,11 +13,18 @@ extends Node3D
 @onready var _mesh_instance: MeshInstance3D = $GroundBody/MeshInstance3D
 @onready var _exit_point: Marker3D = $ExitPoint
 
+@export_group("Декорации")
+@export var object1: PackedScene 
+@export var object2: PackedScene
+@export var object3: PackedScene
+@export var spawn_chance: float = 0.5 # Шанс появления объекта на чанке
+@export var object_scale: float = 0.009
+
 func _ready() -> void:
 	# Чтобы твои правки из инспектора применились при старте
 	_apply_chunk_geometry()
 	spawn_zombies() # Вызываем спавн при появлении чанка
-	
+	_spawn_random_objects()
 func spawn_zombies():
 	if not zombie_scene: return
 	
@@ -73,3 +80,30 @@ func _apply_chunk_geometry() -> void:
 		# Ставим маркер ровно на границу чанка. 
 		# Т.к. центр в 0, край будет на ДЛИНА / 2
 		_exit_point.position = Vector3(0.0, surface_y, -chunk_length / 2.0)
+		
+func _spawn_random_objects():
+	if randf() > spawn_chance:
+		return
+	
+	var objects = []
+	if object1: objects.append(object1)
+	if object2: objects.append(object2)
+	if object3: objects.append(object3)
+	
+	if objects.is_empty():
+		return
+		
+	var selected_scene = objects.pick_random()
+	var instance = selected_scene.instantiate()
+	add_child(instance)
+	
+	# --- ВОТ ЭТА СТРОЧКА УМЕНЬШАЕТ ОБЪЕКТ ---
+	instance.scale = Vector3(object_scale, object_scale, object_scale)
+	
+	var random_x = randf_range(-chunk_width / 3.0, chunk_width / 3.0)
+	var random_z = randf_range(-chunk_length / 2.5, chunk_length / 2.5)
+	
+	# Не забудь чуть приподнять по Y (например +0.5), 
+	# если объекты спавнятся наполовину в земле из-за уменьшения
+	instance.position = Vector3(random_x, surface_y, random_z)
+	instance.rotation.y = randf_range(0, TAU)

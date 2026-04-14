@@ -1,0 +1,67 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://bict7kvcm8afi"
+path="res://.godot/imported/Ambar.glb-8d2192ac05458926da084760af812997.scn"
+
+[deps]
+
+source_file="res://model/decor/Ambar/Ambar.glb"
+dest_files=["res://.godot/imported/Ambar.glb-8d2192ac05458926da084760af812997.scn"]
+
+[params]
+
+nodes/root_type=""
+nodes/root_name=""
+nodes/root_script=null
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
+_subresources={
+"nodes": {
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/BarnRoot_19/BarnBalcLadder_0/Object_5": {
+"physics/shape_type": 3
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/BarnRoot_19/BarnDoorL_5/Object_16": {
+"generate/physics": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/BarnRoot_19/BarnDoorR_6/Object_19": {
+"generate/physics": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/BarnRoot_19/BarnPillars_8/Object_23": {
+"generate/physics": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/BarnRoot_19/BarnSupportBeams_10/Object_28": {
+"generate/physics": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/BarnRoot_19/BarnWallPatchedHole_11/Object_30": {
+"generate/physics": true,
+"physics/shape_type": 1
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/BarnRoot_19/BarnWalls_12/Object_32": {
+"generate/physics": true
+}
+}
+}
+gltf/naming_version=2
+gltf/embedded_image_handling=1

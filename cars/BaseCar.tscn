@@ -15,8 +15,10 @@ center_of_mass = Vector3(0, -0.1, 0)
 contact_monitor = true
 max_contacts_reported = 8
 script = ExtResource("1_iqrfq")
-STEER_LIMIT = 0.8
-engine_force_value = 100
+STEER_SPEED = 3.4
+STEER_LIMIT = 0.58
+high_speed_steer_limit = 0.44
+engine_force_value = 3200.0
 
 [node name="wheal0" type="VehicleWheel3D" parent="." unique_id=1181664142]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.03343, 0.340338, -1.57977)
@@ -92,8 +94,8 @@ theme_override_font_sizes/font_size = 50
 [node name="Label" type="Label" parent="Hud" unique_id=1597093002]
 offset_right = 40.0
 offset_bottom = 23.0
-text = "Arow keys to drive
-Space to drift and break
+text = "WASD to drive
+Space to handbrake
 "
 label_settings = SubResource("LabelSettings_yc8e5")
 

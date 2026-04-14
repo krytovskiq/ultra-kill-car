@@ -23,10 +23,9 @@ radius = 0.46875
 [node name="car" type="VehicleBody3D" unique_id=657592845]
 collision_layer = 2
 center_of_mass_mode = 1
-center_of_mass = Vector3(0, -0.1, 0)
+center_of_mass = Vector3(0, -2, 0)
 contact_monitor = true
 script = ExtResource("1_1n2xg")
-STEER_LIMIT = 0.4
 
 [node name="wheal0" type="VehicleWheel3D" parent="." unique_id=1181664142]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.997421, 0.340338, -1.50006)
@@ -34,11 +33,13 @@ use_as_traction = true
 use_as_steering = true
 wheel_roll_influence = 0.5
 wheel_radius = 0.37
-wheel_rest_length = 0.095
+wheel_rest_length = 0.16
 wheel_friction_slip = 3.0
 suspension_travel = 0.357
-suspension_stiffness = 30.0
-suspension_max_force = 10000.0
+suspension_stiffness = 100.0
+suspension_max_force = 15000.0
+damping_compression = 10.0
+damping_relaxation = 10.0
 
 [node name="Wheel" parent="wheal0" unique_id=698522553 instance=ExtResource("2_eoiid")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.142656, 0, 0)
@@ -49,11 +50,13 @@ use_as_traction = true
 use_as_steering = true
 wheel_roll_influence = 0.5
 wheel_radius = 0.37
-wheel_rest_length = 0.095
+wheel_rest_length = 0.16
 wheel_friction_slip = 3.0
 suspension_travel = 0.357
-suspension_stiffness = 30.0
-suspension_max_force = 10000.0
+suspension_stiffness = 100.0
+suspension_max_force = 15000.0
+damping_compression = 10.0
+damping_relaxation = 10.0
 
 [node name="Wheel" parent="wheal1" unique_id=1486750362 instance=ExtResource("2_eoiid")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0775136, 0, 0)
@@ -63,25 +66,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.997421, 0.286814, 1.26411)
 use_as_traction = true
 wheel_roll_influence = 0.5
 wheel_radius = 0.37
-wheel_rest_length = 0.095
+wheel_rest_length = 0.16
 wheel_friction_slip = 3.0
 suspension_travel = 0.357
-suspension_stiffness = 30.0
-suspension_max_force = 10000.0
+suspension_stiffness = 100.0
+suspension_max_force = 15000.0
+damping_compression = 10.0
+damping_relaxation = 10.0
 
 [node name="Wheel" parent="wheal2" unique_id=733767577 instance=ExtResource("2_eoiid")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.142656, 0, 0)
+transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, -0.14265597, 0, 0)
 
 [node name="wheal3" type="VehicleWheel3D" parent="." unique_id=579173671]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.02668, 0.286814, 1.26411)
 use_as_traction = true
 wheel_roll_influence = 0.5
 wheel_radius = 0.37
-wheel_rest_length = 0.095
+wheel_rest_length = 0.16
 wheel_friction_slip = 3.0
 suspension_travel = 0.357
-suspension_stiffness = 30.0
-suspension_max_force = 10000.0
+suspension_stiffness = 100.0
+suspension_max_force = 15000.0
+damping_compression = 10.0
+damping_relaxation = 10.0
 
 [node name="Wheel" parent="wheal3" unique_id=1238332931 instance=ExtResource("2_eoiid")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0775136, 0, 0)
@@ -115,16 +122,16 @@ theme_override_font_sizes/font_size = 50
 [node name="Label" type="Label" parent="Hud" unique_id=1597093002]
 offset_right = 40.0
 offset_bottom = 23.0
-text = "Arow keys to drive
-Space to drift and break
+text = "WASD to drive
+Space to handbrake
 "
 label_settings = SubResource("LabelSettings_yc8e5")
 
 [node name="doge-body" parent="." unique_id=144310375 instance=ExtResource("3_om8jj")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, -0.06719363, 0)
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=1500628107]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0.590649, -2.08042)
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0.5092773, -2.08042)
 shape = SubResource("CapsuleShape3D_n7qdn")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=2094202981]
@@ -134,5 +141,19 @@ shape = SubResource("BoxShape3D_xaafv")
 [node name="CollisionShape3D4" type="CollisionShape3D" parent="." unique_id=266292374]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, -0.000778168, 0.653567, 2.0390816)
 shape = SubResource("CapsuleShape3D_7kmqy")
+
+[node name="Light_Right" type="OmniLight3D" parent="." unique_id=317670582]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.46782124, 0.7382735, 2.4287562)
+light_color = Color(1, 0, 0, 1)
+shadow_enabled = true
+omni_range = 0.226
+omni_attenuation = 1.864
+
+[node name="Light_Left" type="OmniLight3D" parent="." unique_id=669268281]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4810822, 0.7382735, 2.4287562)
+light_color = Color(1, 0, 0, 1)
+shadow_enabled = true
+omni_range = 0.226
+omni_attenuation = 1.864
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
