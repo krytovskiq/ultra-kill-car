@@ -47,7 +47,6 @@ collision_layer = 1
 collision_mask = 2
 mass = 1250.0
 STEER_SPEED = 5.0
-STEER_LIMIT = 0.5
 engine_force_value = 5000.0
 zombie_impulse_at_min_speed = 40.0
 zombie_impulse_at_max_speed = 65.0

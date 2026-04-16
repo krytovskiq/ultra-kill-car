@@ -17,7 +17,6 @@ max_contacts_reported = 8
 script = ExtResource("1_iqrfq")
 STEER_SPEED = 3.4
 STEER_LIMIT = 0.58
-high_speed_steer_limit = 0.44
 engine_force_value = 3200.0
 
 [node name="wheal0" type="VehicleWheel3D" parent="." unique_id=1181664142]
@@ -73,7 +72,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 transform = Transform3D(1, 0, 0, 0, 0.974347, 0.225053, 0, -0.225053, 0.974347, 0, 1.97324, 6.19962)
 target_distance = 7.0
 target_height = 2.6
-speed = 6.5
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=208649555]
 layer = 2
@@ -99,25 +97,22 @@ Space to handbrake
 "
 label_settings = SubResource("LabelSettings_yc8e5")
 
-[node name="HPControl" type="Control" parent="Hud"]
+[node name="HPControl" type="Control" parent="Hud" unique_id=201852073]
+layout_mode = 3
 anchors_preset = 0
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 336.0
 offset_bottom = 56.0
 
-[node name="HPBar" type="ProgressBar" parent="Hud/HPControl"]
-anchors_preset = 15
+[node name="HPBar" type="ProgressBar" parent="Hud/HPControl" unique_id=714220098]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
 show_percentage = false
 
-[node name="HPText" type="Label" parent="Hud/HPControl"]
-anchors_preset = 8
+[node name="HPText" type="Label" parent="Hud/HPControl" unique_id=1118272487]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -128,7 +123,7 @@ offset_right = 70.0
 offset_bottom = 12.0
 grow_horizontal = 2
 grow_vertical = 2
-horizontal_alignment = 1
-vertical_alignment = 1
 theme_override_font_sizes/font_size = 18
 text = "HP"
+horizontal_alignment = 1
+vertical_alignment = 1

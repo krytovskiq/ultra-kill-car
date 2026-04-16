@@ -5,17 +5,18 @@ const GROUND_LAYER := 2
 const ZOMBIE_LAYER := 4
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 1
-@export var STEER_LIMIT: float = 0.5
+@export var STEER_SPEED: float = 3.0 # Увеличил скорость возврата руля
+@export var STEER_LIMIT: float = 0.25 # Чуть уменьшил общий лимит
 @export var engine_force_value: float = 1800
 @export var brake_force: float = 50.0
 @export var handbrake_force: float = 200.0
+@export var MAX_SPEED_KMH: float = 240 # ЛИМИТ СКОРОСТИ (измени по вкусу)
 
 @export_group("Health")
 @export var max_hp: float = 260.0
 @export var collision_damage_multiplier: float = 0.35
 
-@export_group("Zombie Collision") # ВОТ ЭТОТ БЛОК НУЖНО ВЕРНУТЬ:
+@export_group("Zombie Collision")
 @export var zombie_hit_min_speed_mps: float = 0.8
 @export var zombie_hit_max_speed_mps: float = 24.0
 @export var zombie_damage_at_min_speed: float = 20.0
@@ -25,11 +26,8 @@ const ZOMBIE_LAYER := 4
 @export var zombie_upward_impulse: float = 15.0 
 @export var wall_damage_min_speed_mps: float = 20.0
 
-
 var current_hp: float = 0.0
 var destroyed: bool = false
-var stop_threshold_speed: float = 1.0 
-var friction_force: float = 5.0 
 
 func _ready() -> void:
 	add_to_group("player")
@@ -39,8 +37,8 @@ func _ready() -> void:
 	max_contacts_reported = 24
 	current_hp = max_hp
 	
-	# СМЕЩАЕМ ЦЕНТР МАСС НИЖЕ (чтобы не переворачивалась и меньше заносило)
-	center_of_mass = Vector3(0, -0.5, 0)
+	# МАКСИМАЛЬНО НИЗКИЙ ЦЕНТР МАСС (чтобы не переворачивалась)
+	center_of_mass = Vector3(0, -0.3, 0)
 
 func _physics_process(delta: float) -> void:
 	if destroyed: return
@@ -51,56 +49,65 @@ func _physics_process(delta: float) -> void:
 	if $Hud/speed:
 		$Hud/speed.text = str(round(speed_kmh)) + "  KM/H"
 
-	# 1. ГАЗ (W)
-	if Input.is_key_pressed(KEY_W):
-		engine_force = -engine_force_value
-		brake = 0.0 # ВАЖНО: обнуляем тормоз при нажатии газа
-	else:
-		engine_force = 0.0
+	if speed_kmh < 5.0 and engine_force != 0:
+		# Дополнительная логика: например, если скорость 0 больше 2 секунд — проигрыш
+		pass
 
-	# 2. ТОРМОЗ (S) И РУЧНИК (Space)
+		# Определяем целевую скорость
+	var target_max_speed = MAX_SPEED_KMH # Твой обычный предел (например, 100)
+	var auto_roll_speed = 20 # Скорость "ползущего" режима (15 км/ч)
+
+	# 1. ЛОГИКА ГАЗА
+	if Input.is_key_pressed(KEY_W):
+		# Если жмем W — разгоняемся до максимума
+		if speed_kmh < target_max_speed:
+			engine_force = -engine_force_value
+		else:
+			engine_force = 0.0
+		brake = 0.0
+	else:
+		if speed_kmh < auto_roll_speed:
+			engine_force = - (engine_force_value * 0.5) # Даем 20% тяги для "ползания"
+			brake = 0.0
+		else:
+			engine_force = 0.0
+
+	# 2. ТОРМОЗ (Клавиша S)
+	if Input.is_key_pressed(KEY_S):
+		brake = brake_force
+		engine_force = 0.0 # При торможении газ отключается полностью
+	elif not Input.is_key_pressed(KEY_W) and speed_kmh < 1.0:
+		# Чтобы машина не катилась бесконечно, когда почти остановилась
+		brake = 2.0 
+
+	# 2. РУЧНИК
 	if Input.is_key_pressed(KEY_SPACE):
 		brake = handbrake_force
 		engine_force = 0.0
-	elif Input.is_key_pressed(KEY_S):
-		brake = brake_force
-		engine_force = 0.0
-	elif not Input.is_key_pressed(KEY_W):
-		# Если ничего не нажато — катимся или медленно тормозим
-		if speed_mps < 1.0:
-			brake = 2.0 # Легкое удержание на месте
-		else:
-			brake = 0.0
+	elif not Input.is_key_pressed(KEY_W) and not Input.is_key_pressed(KEY_S):
+		brake = 2.0 if speed_mps < 1.0 else 0.0
 	
-	# Визуал фар стоп-сигналов
-	var show_lights = Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_SPACE)
-	$Light_Left.visible = show_lights
-	$Light_Right.visible = show_lights
-
-	# 3. РУЛЕЖКА (Динамическая)
+	# 3. УМНАЯ РУЛЕЖКА (Лимит на скорости)
 	var steer_input = Input.get_axis("D", "A")
-	var speed_factor = clamp(1.0 - (speed_kmh / 180.0), 0.25, 1.0) 
+	# На высокой скорости руль поворачивается ОЧЕНЬ мало (в 5 раз меньше)
+	var speed_factor = clamp(1.0 - (speed_kmh / (MAX_SPEED_KMH * 1.2)), 0.15, 1.0) 
 	var steer_target = steer_input * (STEER_LIMIT * speed_factor)
 	steering = move_toward(steering, steer_target, STEER_SPEED * delta)
 
-	# Обновляем трение колес
 	update_friction(Input.is_key_pressed(KEY_SPACE))
 	traction(speed_mps)
 
-
 func update_friction(handbrake: bool):
-	# Если нажат ручник — зад заносит, если нет — держим дорогу крепко
-	var stiffness = 0.8 if handbrake else 3.5 
+	# Увеличил зацеп, чтобы меньше заносило
+	var stiffness = 1.0 if handbrake else 6.0 
 	if has_node("wheal2"): $wheal2.wheel_friction_slip = stiffness
 	if has_node("wheal3"): $wheal3.wheel_friction_slip = stiffness
-	# Передние колеса всегда должны хорошо держать дорогу
-	if has_node("wheal0"): $wheal0.wheel_friction_slip = 4.0
-	if has_node("wheal1"): $wheal1.wheel_friction_slip = 4.0
+	if has_node("wheal0"): $wheal0.wheel_friction_slip = 6.0
+	if has_node("wheal1"): $wheal1.wheel_friction_slip = 6.0
 
 func traction(speed: float) -> void:
-	# Нажми Tab один раз перед этой строкой:
-	var downforce = clamp(speed * 40.0, 0, 5000)
-	# И здесь тоже Tab:
+	# Прижимная сила стала сильнее
+	var downforce = clamp(speed * 50.0, 0, 8000)
 	apply_central_force(Vector3.DOWN * downforce)
 
 
