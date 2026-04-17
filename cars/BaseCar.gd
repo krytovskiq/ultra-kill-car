@@ -30,6 +30,7 @@ var current_hp: float = 0.0
 var destroyed: bool = false
 
 func _ready() -> void:
+	linear_velocity = -global_transform.basis.z * (20.0 / 3.6)
 	add_to_group("player")
 	collision_layer = CAR_LAYER
 	collision_mask = GROUND_LAYER | ZOMBIE_LAYER
@@ -52,7 +53,7 @@ func _physics_process(delta: float) -> void:
 	if speed_kmh < 5.0 and engine_force != 0:
 		# Дополнительная логика: например, если скорость 0 больше 2 секунд — проигрыш
 		pass
-
+	rotation.y = lerp_angle(rotation.y, 0, delta * 3.0)
 		# Определяем целевую скорость
 	var target_max_speed = MAX_SPEED_KMH # Твой обычный предел (например, 100)
 	var auto_roll_speed = 20 # Скорость "ползущего" режима (15 км/ч)
@@ -96,7 +97,8 @@ func _physics_process(delta: float) -> void:
 
 	update_friction(Input.is_key_pressed(KEY_SPACE))
 	traction(speed_mps)
-
+	$Light_Right.visible = Input.is_key_pressed(KEY_S)
+	$Light_Left.visible = Input.is_key_pressed(KEY_S)
 func update_friction(handbrake: bool):
 	# Увеличил зацеп, чтобы меньше заносило
 	var stiffness = 1.0 if handbrake else 6.0 
