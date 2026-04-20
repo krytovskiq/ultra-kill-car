@@ -6,16 +6,13 @@
 [ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://cars/camera/camera_3d.tscn" id="3_y15c2"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mm2gk"]
-size = Vector3(2.0463917, 1.1210938, 2.5151324)
-
-[sub_resource type="LabelSettings" id="LabelSettings_yc8e5"]
-font_size = 32
+size = Vector3(1.8939211, 1.0353394, 2.4713113)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_n7qdn"]
 radius = 0.42138672
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xaafv"]
-size = Vector3(0.5785521, 1.8730397, 1.53265)
+size = Vector3(0.54171747, 1.8730397, 1.53265)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_7kmqy"]
 radius = 0.46875
@@ -94,7 +91,7 @@ damping_relaxation = 4.0
 transform = Transform3D(1.14, 0, 0, 0, 1.14, 0, 0, 0, 1.14, 0.101, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1430023922]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.007856924, 0.78735894, 0.50532085)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.003923457, 0.74448174, 0.4834103)
 shape = SubResource("BoxShape3D_mm2gk")
 
 [node name="look" type="Node3D" parent="." unique_id=1704104742]
@@ -119,27 +116,36 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_font_sizes/font_size = 50
 
-[node name="Label" type="Label" parent="Hud" unique_id=1597093002]
-offset_right = 40.0
-offset_bottom = 23.0
-text = "WASD to drive
-Space to handbrake
-"
-label_settings = SubResource("LabelSettings_yc8e5")
+[node name="FuelBar" type="ProgressBar" parent="Hud" unique_id=119597331]
+offset_right = 328.0
+offset_bottom = 63.0
+theme_override_font_sizes/font_size = 32
+
+[node name="Metr" type="Label" parent="Hud" unique_id=1859688649]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -120.0
+offset_top = -63.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 40
 
 [node name="doge-body" parent="." unique_id=144310375 instance=ExtResource("3_om8jj")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, -0.06719363, 0)
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=1500628107]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0.5092773, -2.08042)
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0.5092773, -1.93769)
 shape = SubResource("CapsuleShape3D_n7qdn")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=2094202981]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0.0042231977, 0.62195605, -1.11035)
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0.004223197, 0.64037335, -1.11035)
 shape = SubResource("BoxShape3D_xaafv")
 
 [node name="CollisionShape3D4" type="CollisionShape3D" parent="." unique_id=266292374]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, -0.000778168, 0.653567, 2.0390816)
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, -0.000778168, 0.653567, 1.9878776)
 shape = SubResource("CapsuleShape3D_7kmqy")
 
 [node name="Light_Right" type="OmniLight3D" parent="." unique_id=317670582]
@@ -157,3 +163,5 @@ omni_range = 0.226
 omni_attenuation = 1.864
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
+
+[editable path="doge-body"]

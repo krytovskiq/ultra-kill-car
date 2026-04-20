@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c1ntd0dy3acqr"]
 
-[ext_resource type="Texture2D" uid="uid://k1g71ofkpi7j" path="res://model/dirt trampline/gravel_road_diff_1k.jpg" id="1_nqm8l"]
+[ext_resource type="Texture2D" uid="uid://k1g71ofkpi7j" path="res://model/dirt trampline/texture/gravel_road_diff_1k.jpg" id="1_nqm8l"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bu6eu"]
 albedo_texture = ExtResource("1_nqm8l")

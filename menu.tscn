@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://cb3frsqskfmc0"]
 
-[ext_resource type="Script" path="res://control.gd" id="1_lti8b"]
+[ext_resource type="Script" uid="uid://bl38sws02lfg6" path="res://control.gd" id="1_lti8b"]
+[ext_resource type="Texture2D" uid="uid://vbs5jvp07yfa" path="res://TextureButton/Играть.png" id="2_4hy44"]
+[ext_resource type="Script" uid="uid://cx05c6ey2icc7" path="res://canvas_layer.gd" id="2_ouk20"]
+[ext_resource type="Texture2D" uid="uid://bhvy00de0vo67" path="res://TextureButton/играть2.png" id="3_ytr4m"]
 
 [node name="Menu" type="Control" unique_id=1301859710]
 process_mode = 3
@@ -12,7 +15,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lti8b")
 
-[node name="TextureButton" type="Button" parent="." unique_id=1405172656]
+[node name="Play" type="TextureButton" parent="." unique_id=1214199154]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -25,6 +28,24 @@ offset_right = 101.0
 offset_bottom = 55.5
 grow_horizontal = 2
 grow_vertical = 2
-text = "play"
+texture_normal = ExtResource("2_4hy44")
+texture_pressed = ExtResource("3_ytr4m")
+texture_hover = ExtResource("3_ytr4m")
 
-[connection signal="pressed" from="TextureButton" to="." method="_on_texture_button_pressed"]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=965634195]
+script = ExtResource("2_ouk20")
+
+[node name="Money" type="Label" parent="CanvasLayer" unique_id=846240893]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -134.0
+offset_top = -114.0
+offset_right = 134.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 50
+
+[connection signal="pressed" from="Play" to="." method="_on_texture_button_pressed"]
