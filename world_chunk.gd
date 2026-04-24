@@ -8,7 +8,7 @@ static var global_distance_counter: float = 0.0
 @export var surface_y: float = 0.0
 
 @export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
-@export var zombie_count: int = 10      # Сколько зомби на один кусок дороги
+@export var zombie_count: int = 5     # Сколько зомби на один кусок дороги
 
 @export var barn_scene: PackedScene # Сцена амбара
 @export var barn_interval: float = 1500.0 # Интервал в метрах
@@ -131,5 +131,5 @@ func _on_visible_on_screen_notifier_3d_screen_exited() -> void:
 		
 		# Если машина уехала дальше чем на 200 метров — удаляем чанк
 		# (200 метров достаточно, чтобы игрок не видел исчезновения)
-		if dist > 200.0:
+		if dist > 50.0:
 			queue_free()

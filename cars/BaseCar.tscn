@@ -6,18 +6,12 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_mm2gk"]
 size = Vector3(1.9717, 1, 2.08592)
 
-[sub_resource type="LabelSettings" id="LabelSettings_yc8e5"]
-font_size = 32
-
 [node name="car" type="VehicleBody3D" unique_id=112811420]
 center_of_mass_mode = 1
 center_of_mass = Vector3(0, -0.1, 0)
 contact_monitor = true
 max_contacts_reported = 8
 script = ExtResource("1_iqrfq")
-STEER_SPEED = 3.4
-STEER_LIMIT = 0.58
-engine_force_value = 3200.0
 
 [node name="wheal0" type="VehicleWheel3D" parent="." unique_id=1181664142]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.03343, 0.340338, -1.57977)
@@ -70,8 +64,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 
 [node name="Camera3D" parent="look" unique_id=262920490 instance=ExtResource("2_5wm5h")]
 transform = Transform3D(1, 0, 0, 0, 0.974347, 0.225053, 0, -0.225053, 0.974347, 0, 1.97324, 6.19962)
-target_distance = 7.0
-target_height = 2.6
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=208649555]
 layer = 2
@@ -89,30 +81,24 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_font_sizes/font_size = 50
 
-[node name="Label" type="Label" parent="Hud" unique_id=1597093002]
-offset_right = 40.0
-offset_bottom = 23.0
-text = "WASD to drive
-Space to handbrake
-"
-label_settings = SubResource("LabelSettings_yc8e5")
-
 [node name="HPControl" type="Control" parent="Hud" unique_id=201852073]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = 336.0
-offset_bottom = 56.0
+offset_right = 320.0
+offset_bottom = 40.0
 
 [node name="HPBar" type="ProgressBar" parent="Hud/HPControl" unique_id=714220098]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 show_percentage = false
 
 [node name="HPText" type="Label" parent="Hud/HPControl" unique_id=1118272487]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5

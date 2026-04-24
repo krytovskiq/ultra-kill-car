@@ -59,3 +59,6 @@ renderer/rendering_method.mobile="gl_compatibility"
 anti_aliasing/quality/screen_space_aa=1
 viewport/canvas_textures/default_texture_filter=1
 textures/quality/screen_space_aa=0
+environment/scale=1.0
+environment/mode.macos=0
+environment/mode=2

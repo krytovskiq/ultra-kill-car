@@ -2,7 +2,7 @@ extends Camera3D
 
 
 @export var target_distance := 6.5
-@export var target_height := 1
+@export var target_height := 1.5
 @export var look_ahead := 1.6
 @export var speed := 6.5
 var follow_this: Node3D

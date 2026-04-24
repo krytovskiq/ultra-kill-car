@@ -47,7 +47,7 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_gf3n7")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_rqiqh"]
-size = Vector3(14.807678, 34.96724, 47.414703)
+size = Vector3(14.807678, 59.726673, 47.414703)
 
 [node name="kanistr" type="Area3D" unique_id=183247914]
 transform = Transform3D(8.1407425e-06, 0.014999998, 6.5567074e-10, 0, -6.556708e-10, 0.015, 0.014999998, -8.1407425e-06, -3.5584315e-13, 0, 0, 0)
@@ -57,7 +57,7 @@ script = ExtResource("1_b2gs4")
 mesh = SubResource("ArrayMesh_2mlcj")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=400568655]
-transform = Transform3D(1, -3.4458935e-08, -1.7156415e-15, 3.4458935e-08, 1, 1.3984341e-12, -2.3245295e-16, 1.2875604e-14, 0.9999692, -0.05484025, 0.19867516, 23.691021)
+transform = Transform3D(1, -3.8708095e-08, -1.9272778e-15, 3.8708095e-08, 1, 1.5583063e-12, -2.584738e-16, 1.2875704e-14, 0.9999654, -0.0548402, -0.7408331, 23.691013)
 shape = SubResource("BoxShape3D_rqiqh")
 
 [node name="OmniLight3D2" type="OmniLight3D" parent="." unique_id=1903597393]
@@ -72,6 +72,6 @@ transform = Transform3D(66.66667, -4.4703484e-08, -3.330669e-16, 4.4703484e-08, 
 light_color = Color(0.36226454, 0.3966561, 0.3202017, 1)
 light_energy = 4.0
 light_bake_mode = 1
-omni_range = 0.44
+omni_range = 2.382
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

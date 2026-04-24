@@ -14,9 +14,8 @@ size = Vector3(0.54171747, 1.8730397, 2.043563)
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_7kmqy"]
 radius = 0.46875
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_n7qdn"]
-radius = 0.5751953
-height = 2.5471497
+[sub_resource type="BoxShape3D" id="BoxShape3D_1n2xg"]
+size = Vector3(1.184639, 2.0859985, 5.283264)
 
 [node name="car" type="VehicleBody3D" unique_id=657592845]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11309497, 0)
@@ -159,15 +158,15 @@ shadow_enabled = true
 omni_range = 0.226
 omni_attenuation = 1.864
 
-[node name="KillZone" type="Area3D" parent="." unique_id=567544369 groups=["zombie"]]
+[node name="Area3D" type="Area3D" parent="." unique_id=567544369]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94620615, -3.388571)
 collision_layer = 0
 collision_mask = 8
 
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="KillZone" unique_id=1500628107]
-transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -0.009660482, -0.4897045, 0.96593904)
-shape = SubResource("CapsuleShape3D_n7qdn")
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=1500628107]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -0.0038926625, -0.2772144, 3.2345853)
+shape = SubResource("BoxShape3D_1n2xg")
 
-[connection signal="body_entered" from="KillZone" to="." method="_on_kill_zone_body_entered"]
+[connection signal="body_entered" from="Area3D" to="." method="_on_kill_zone_body_entered"]
 
 [editable path="doge-body"]
