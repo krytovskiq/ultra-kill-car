@@ -53,8 +53,6 @@ func _process(_delta: float) -> void:
 
 	_last_checked_distance = distance
 	_ensure_chunks_for_index(_get_chunk_index(distance))
-
-
 func _resolve_car() -> void:
 	if car != null:
 		return
@@ -67,23 +65,25 @@ func _ensure_chunks_for_index(current_index: int) -> void:
 	var min_index: int = current_index - maxi(chunks_behind, 0)
 	var max_index: int = current_index + maxi(chunks_ahead, 1)
 
+	# 1. Спавним новые чанки
 	for index in range(min_index, max_index + 1):
 		if not _chunk_nodes.has(index):
 			_spawn_chunk(index)
 
+	# 2. ОЧИСТКА битых ссылок и старых индексов
 	var remove_list: Array[int] = []
 	for key in _chunk_nodes.keys():
 		var index := int(key)
-		if index < min_index or index > max_index:
+		var chunk = _chunk_nodes[index]
+		if not is_instance_valid(chunk) or index < min_index or index > max_index:
 			remove_list.append(index)
-
+			
 	for index in remove_list:
-		var chunk: Node = _chunk_nodes[index]
+		var chunk = _chunk_nodes[index]
 		if is_instance_valid(chunk):
 			chunk.queue_free()
 		_chunk_nodes.erase(index)
-
-
+		
 func _spawn_chunk(index: int) -> void:
 	var chunk := chunk_scene.instantiate() as Node3D
 	if chunk == null:

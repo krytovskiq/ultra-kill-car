@@ -4,9 +4,9 @@
 [ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_272bh"]
 [ext_resource type="PackedScene" uid="uid://ci52bv1m15cbs" path="res://cars/Doge.tscn" id="1_mdet3"]
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="2_5vw27"]
-[ext_resource type="PackedScene" uid="uid://d208hi5mmjqnr" path="res://ZZZZ/Zombie.tscn" id="3_h2yge"]
-[ext_resource type="Script" uid="uid://bonkv8dcbndmf" path="res://node_3d.gd" id="4_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://pause.tscn" id="5_lquwl"]
+[ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="8_kek77"]
+[ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="9_4c57u"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_h2yge"]
 rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
@@ -20,15 +20,53 @@ sky_material = SubResource("PhysicalSkyMaterial_h2yge")
 
 [sub_resource type="Environment" id="Environment_8dxyn"]
 background_mode = 2
+background_color = Color(0, 0, 0.43137255, 1)
+background_energy_multiplier = 0.85
 sky = SubResource("Sky_1bvp3")
-ambient_light_sky_contribution = 0.15
-ambient_light_energy = 1.83
-tonemap_mode = 2
-tonemap_exposure = 1.1
+sky_rotation = Vector3(0, 0.20245819, 0)
+ambient_light_color = Color(0.43137255, 0.44705883, 0.4745098, 1)
+ambient_light_sky_contribution = 0.42
+ambient_light_energy = 0.0
+reflected_light_source = 2
+tonemap_mode = 3
+tonemap_exposure = 0.4
 ssao_radius = 1.5
 ssao_intensity = 0.6
 ssao_power = 32.7849
 sdfgi_y_scale = 2
+glow_enabled = true
+glow_intensity = 1.65
+glow_bloom = 0.09
+fog_enabled = true
+fog_mode = 1
+fog_light_energy = 0.7
+fog_sun_scatter = 0.31
+fog_density = 1.0
+fog_depth_curve = 0.20000064
+fog_depth_begin = 0.0
+fog_depth_end = 350.0
+adjustment_enabled = true
+adjustment_contrast = 1.15
+adjustment_saturation = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wjub3"]
+albedo_texture = ExtResource("8_kek77")
+normal_enabled = true
+normal_scale = 0.79
+normal_texture = ExtResource("9_4c57u")
+uv1_scale = Vector3(0.085, 0.085, 0.085)
+uv1_triplanar = true
+texture_filter = 5
+
+[sub_resource type="BoxMesh" id="BoxMesh_efxa6"]
+resource_local_to_scene = true
+lightmap_size_hint = Vector2i(979, 616)
+material = SubResource("StandardMaterial3D_wjub3")
+size = Vector3(150, 1, 120)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dg77c"]
+resource_local_to_scene = true
+size = Vector3(150, 0, 120)
 
 [node name="Main" type="Node3D" unique_id=1305401198 node_paths=PackedStringArray("car")]
 script = ExtResource("1_272bh")
@@ -39,12 +77,12 @@ car = NodePath("car")
 environment = SubResource("Environment_8dxyn")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=774830370]
-transform = Transform3D(-4.371139e-08, -0.61703587, 0.78693503, 0, 0.78693503, 0.61703587, -1, 2.6971493e-08, -3.4398024e-08, 0, 92.97207, 22.312809)
+transform = Transform3D(1, 0, 0, 0, 0.21567275, 0.97646564, 0, -0.97646564, 0.21567275, 0, 70.56531, 0)
+light_color = Color(0.5609549, 0.5609549, 0.5609549, 1)
+light_energy = 0.02
 shadow_enabled = true
 
 [node name="car" parent="." unique_id=1133104648 groups=["player"] instance=ExtResource("1_mdet3")]
-collision_layer = 1
-collision_mask = 2
 mass = 1250.0
 STEER_SPEED = 5.0
 engine_force_value = 5000.0
@@ -52,16 +90,17 @@ zombie_impulse_at_min_speed = 40.0
 zombie_impulse_at_max_speed = 65.0
 wall_damage_min_speed_mps = 3.0
 
-[node name="Node3D" type="Node3D" parent="." unique_id=1197449312]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24.25647)
-script = ExtResource("4_1bvp3")
-enemy_scene = ExtResource("3_h2yge")
-enemy_scale = 0.028
-
-[node name="Timer" type="Timer" parent="Node3D" unique_id=2068982240]
-autostart = true
-
-[node name="Marker3D" type="Marker3D" parent="Node3D" unique_id=474156647]
-
 [node name="Pause" parent="." unique_id=1664862517 instance=ExtResource("5_lquwl")]
 visible = false
+
+[node name="GroundBody" type="StaticBody3D" parent="." unique_id=1111331730]
+collision_layer = 512
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="GroundBody" unique_id=1619474154]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0141716, -0.6117554, -0.21616364)
+mesh = SubResource("BoxMesh_efxa6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody" unique_id=1687321113]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.076254, -0.32381684, 0)
+shape = SubResource("BoxShape3D_dg77c")

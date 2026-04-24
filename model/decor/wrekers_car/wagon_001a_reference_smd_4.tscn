@@ -48,6 +48,7 @@ points = PackedVector3Array(-0.7716816, 0.55360514, -0.753833, -0.4977232, -0.54
 [node name="wagon001a_reference_smd_4" type="Node3D" unique_id=2061765371]
 
 [node name="Object_12" type="RigidBody3D" parent="." unique_id=376195279]
+collision_mask = 513
 mass = 400.0
 
 [node name="Object_12" type="MeshInstance3D" parent="Object_12" unique_id=1906713250]

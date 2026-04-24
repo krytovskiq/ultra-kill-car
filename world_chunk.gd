@@ -8,14 +8,13 @@ static var global_distance_counter: float = 0.0
 @export var surface_y: float = 0.0
 
 @export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
-@export var zombie_count: int = 2      # Сколько зомби на один кусок дороги
+@export var zombie_count: int = 10      # Сколько зомби на один кусок дороги
 
 @export var barn_scene: PackedScene # Сцена амбара
-@export var barn_interval: float = 3000.0 # Интервал в метрах
+@export var barn_interval: float = 1500.0 # Интервал в метрах
 
 @onready var _collision_shape: CollisionShape3D = $GroundBody/CollisionShape3D
 @onready var _mesh_instance: MeshInstance3D = $GroundBody/MeshInstance3D
-@onready var _exit_point: Marker3D = $ExitPoint
 
 @export_group("Декорации")
 @export var object1: PackedScene 
@@ -23,10 +22,13 @@ static var global_distance_counter: float = 0.0
 @export var object3: PackedScene
 @export var object4: PackedScene
 
-@export var spawn_chance: float = 0.5# Шанс появления объекта на чанке
-@export var object_scale: float = 1.0
 
 func _ready() -> void:
+	var notifier = VisibleOnScreenNotifier3D.new()
+	# Настраиваем размер зоны видимости (чуть больше самого чанка)
+	notifier.aabb = AABB(Vector3(-chunk_width/2, -5, -chunk_length/2), Vector3(chunk_width, 10, chunk_length))
+	add_child(notifier)
+	notifier.screen_exited.connect(_on_visible_on_screen_notifier_3d_screen_exited)
 	_apply_chunk_geometry()
 	spawn_zombies()
 	_spawn_random_objects()
@@ -37,14 +39,10 @@ func _ready() -> void:
 
 func spawn_zombies():
 	if not zombie_scene: return
-	
 	for i in range(zombie_count):
 		var zombie = zombie_scene.instantiate()
+		zombie.scale = Vector3(0.03, 0.03, 0.03) 
 		add_child(zombie)
-		
-		# --- ВОТ ЭТА СТРОЧКА УМЕНЬШАЕТ ЗОМБИ ---
-		# (0.3, 0.3, 0.3) — это 30% от оригинального размера. Подбери число под себя.
-		zombie.scale = Vector3(0.028, 0.028, 0.028) 
 		
 		# Генерируем случайную позицию на полотне дороги
 		var random_x = randf_range(-chunk_width / 2.5, chunk_width / 2.5)
@@ -52,7 +50,7 @@ func spawn_zombies():
 		
 		# Ставим зомби на поверхность (surface_y)
 		# Прибавляем 0.5 к высоте, чтобы они не спавнились "по пояс" в земле
-		zombie.position = Vector3(random_x, surface_y + 0.5, random_z)
+		zombie.position = Vector3(random_x, surface_y + 1.5, random_z)
 
 func _apply_chunk_geometry() -> void:
 	# 1. Настройка коллизии (физический пол)
@@ -85,14 +83,8 @@ func _apply_chunk_geometry() -> void:
 		mesh_res.size = Vector3(chunk_width, chunk_thickness, chunk_length)
 		_mesh_instance.position = Vector3(0.0, surface_y - chunk_thickness * 0.5, 0.0)
 
-	# 3. Точка стыковки (МАКСИМАЛЬНО ВАЖНО)
-	if _exit_point:
-		# Ставим маркер ровно на границу чанка. 
-		# Т.к. центр в 0, край будет на ДЛИНА / 2
-		_exit_point.position = Vector3(0.0, surface_y, -chunk_length / 2.0)
-		
 func _spawn_random_objects():
-	if randf() > spawn_chance:
+	if randf() > 100.0:
 		return
 	
 	var objects = []
@@ -101,18 +93,26 @@ func _spawn_random_objects():
 	if object3: objects.append(object3)
 	if object4: objects.append(object4)
 	
-	if objects.is_empty():
-		return
+	if objects.is_empty(): return
+		
 	var selected_scene = objects.pick_random()
 	var instance = selected_scene.instantiate()
+	
+	# Делаем ТАК ЖЕ, как в амбаре: просто добавляем дочерним узлом
 	add_child(instance)
+	
+	# Считаем только позицию и поворот
 	var random_x = randf_range(-chunk_width / 3.0, chunk_width / 3.0)
 	var random_z = randf_range(-chunk_length / 2.5, chunk_length / 2.5)
 	
-	# Не забудь чуть приподнять по Y (например +0.5), 
-	# если объекты спавнятся наполовину в земле из-за уменьшения
+	# Ставим позицию относительно Чанка (как в амбаре)
 	instance.position = Vector3(random_x, surface_y, random_z)
 	instance.rotation.y = randf_range(0, TAU)
+	
+	# НИКАКИХ instance.scale = ...
+	# НИКАКИХ set_as_top_level
+	# Объект просто берет размер из своей сцены .tscn, как это делает амбар.
+	print("Объект заспавнен аналогично амбару!")
 
 func spawn_barn(parent_chunk: Node3D):
 	if not barn_scene: return # Защита от вылета
@@ -122,3 +122,14 @@ func spawn_barn(parent_chunk: Node3D):
 	barn.position = Vector3(0, 0.1, 0) 
 	barn.rotation = Vector3.ZERO
 	print("Амбар заспавнен!")
+
+func _on_visible_on_screen_notifier_3d_screen_exited() -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		# Считаем расстояние между машиной и этим чанком
+		var dist = global_position.distance_to(player.global_position)
+		
+		# Если машина уехала дальше чем на 200 метров — удаляем чанк
+		# (200 метров достаточно, чтобы игрок не видел исчезновения)
+		if dist > 200.0:
+			queue_free()

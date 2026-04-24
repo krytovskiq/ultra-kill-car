@@ -50,7 +50,7 @@ transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 
 [node name="Object_4" type="RigidBody3D" parent="." unique_id=1700165015]
 collision_layer = 7
-collision_mask = 7
+collision_mask = 519
 mass = 5000.0
 gravity_scale = 1.2
 

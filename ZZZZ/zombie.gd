@@ -1,16 +1,7 @@
-extends CharacterBody3D
+extends RigidBody3D
 
-enum ZombieState {
-	IDLE,
-	CHASE,
-	ATTACK,
-	DEAD
-}
-
-const CAR_LAYER := 1
-const GROUND_LAYER := 2
-const ZOMBIE_LAYER := 4
-
+enum ZombieState { IDLE, CHASE, ATTACK, DEAD, FALLEN }
+@export var get_up_time: float = 0.5
 @export var speed: int = 8
 @export var damage: float = 15.0
 @export var player_path: NodePath
@@ -20,35 +11,30 @@ const ZOMBIE_LAYER := 4
 @export var attack_range: float = 2.8
 @export var attack_cooldown: float = 1.3
 @export var death_lifetime: float = 3.5
-@export var hit_knockback_multiplier: float = 1.0
-@export var hit_knockback_min_upward: float = 0.8
-
-# Новые переменные для настройки отлета
 @export var high_speed_threshold: float = 20.0 
 
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
-@onready var attack_area: Area3D = $Hit
 @onready var root_collider: CollisionShape3D = $CollisionShape3D
 
 var player: Node3D
-var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var state: ZombieState = ZombieState.IDLE
 var current_hp: float = 0.0
 var attack_timer: float = 0.0
 var attack_time_left: float = 0.0
-var attack_hit_time: float = 0.0
-var attack_has_landed: bool = false
-var death_timer: float = 0.0
-var death_velocity: Vector3 = Vector3.ZERO
 var hit_stun_timer: float = 0.0
 
+# Замена velocity для RigidBody
+var _internal_velocity: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	add_to_group("zombie")
-	collision_layer = ZOMBIE_LAYER
-	collision_mask = GROUND_LAYER | CAR_LAYER
-	floor_snap_length = 1.0
 	current_hp = max_hp
+	
+	# Настройка физики RigidBody
+	freeze = true
+	freeze_mode = RigidBody3D.FREEZE_MODE_KINEMATIC
+	contact_monitor = true
+	max_contacts_reported = 4
 
 	if player_path and has_node(player_path):
 		player = get_node(player_path) as Node3D
@@ -56,183 +42,148 @@ func _ready() -> void:
 		player = get_tree().get_first_node_in_group("player") as Node3D
 
 	play_anim("Idle")
+	# Подключаем сигнал столкновения
+	body_entered.connect(_on_body_entered)
 
-
-func set_player(target: Node3D) -> void:
-	player = target
-
-
-func set_spawn_position(pos: Vector3) -> void:
-	if state == ZombieState.IDLE:
-		global_position = pos
-
+func _on_body_entered(body: Node):
+	if state == ZombieState.DEAD or state == ZombieState.FALLEN: return
+	if body.is_in_group("player") or body is VehicleBody3D:
+		var car_vel = body.linear_velocity
+		var speed = car_vel.length()
+		if speed > 20.0: # Если летим быстро — смерть
+			die(car_vel, speed)
+		elif speed > 5.0: # Если средняя скорость — сбиваем с ног
+			knockdown(car_vel)
 
 func _physics_process(delta: float) -> void:
-	if attack_timer > 0.0:
-		attack_timer -= delta
-	if hit_stun_timer > 0.0:
-		hit_stun_timer -= delta
+	if state == ZombieState.DEAD or state == ZombieState.FALLEN: return
 
-	if state == ZombieState.DEAD:
-		_process_dead(delta)
-		return
+	if attack_timer > 0.0: attack_timer -= delta
+	if hit_stun_timer > 0.0: hit_stun_timer -= delta
 
 	if player == null or not is_instance_valid(player):
 		player = get_tree().get_first_node_in_group("player") as Node3D
 
-	_apply_gravity(delta)
 	_update_state()
 
 	match state:
-		ZombieState.IDLE:
-			_process_idle(delta)
-		ZombieState.CHASE:
-			_process_chase(delta)
-		ZombieState.ATTACK:
-			_process_attack(delta)
+		ZombieState.IDLE: _process_idle(delta)
+		ZombieState.CHASE: _process_chase(delta)
+		ZombieState.ATTACK: _process_attack(delta)
 
-	move_and_slide()
-	
-	# ПРОВЕРКА НА УДАР МАШИНОЙ
-	for i in get_slide_collision_count():
-		var collision = get_slide_collision(i)
-		var obj = collision.get_collider()
-		if obj.is_in_group("player") or obj is VehicleBody3D:
-			var car_vel = Vector3.ZERO
-			if obj is VehicleBody3D:
-				car_vel = obj.linear_velocity
-			die(car_vel, car_vel.length())
-
+	# Перемещение "замороженного" RigidBody
+	global_position += _internal_velocity * delta
 
 func _update_state() -> void:
 	if player == null or not is_instance_valid(player):
 		state = ZombieState.IDLE
 		return
+	if state == ZombieState.ATTACK: return
 
-	if state == ZombieState.ATTACK:
-		return
-
-	var distance_to_player := global_position.distance_to(player.global_position)
-	if distance_to_player <= attack_range and attack_timer <= 0.0 and hit_stun_timer <= 0.0:
+	var dist := global_position.distance_to(player.global_position)
+	if dist <= attack_range and attack_timer <= 0.0 and hit_stun_timer <= 0.0:
 		_start_attack()
-		return
-
-	if distance_to_player <= detection_radius or (state == ZombieState.CHASE and distance_to_player <= lose_target_radius):
+	elif dist <= detection_radius or (state == ZombieState.CHASE and dist <= lose_target_radius):
 		state = ZombieState.CHASE
-		return
-
-	state = ZombieState.IDLE
-
+	else:
+		state = ZombieState.IDLE
 
 func _process_idle(delta: float) -> void:
 	play_anim("Idle")
-	velocity.x = move_toward(velocity.x, 0.0, speed * 2.0 * delta)
-	velocity.z = move_toward(velocity.z, 0.0, speed * 2.0 * delta)
-
+	_internal_velocity = _internal_velocity.move_toward(Vector3.ZERO, speed * delta)
 
 func _process_chase(delta: float) -> void:
-	if player == null:
-		return
+	if !player: return
 	play_anim("Run")
-
-	var target_pos := player.global_position
-	target_pos.y = global_position.y
-	var direction := (target_pos - global_position)
-	if direction.length() <= 0.01:
-		velocity.x = 0.0
-		velocity.z = 0.0
-		return
-
-	direction = direction.normalized()
-	var chase_speed := speed * 1.8
-	velocity.x = move_toward(velocity.x, direction.x * chase_speed, chase_speed * delta)
-	velocity.z = move_toward(velocity.z, direction.z * chase_speed, chase_speed * delta)
+	var target_pos = player.global_position
+	var dir = (target_pos - global_position).normalized()
+	dir.y = 0
+	_internal_velocity = dir * speed
 	_face_to(target_pos)
-
 
 func _start_attack() -> void:
 	state = ZombieState.ATTACK
-	velocity.x = 0.0
-	velocity.z = 0.0
-	attack_has_landed = false
-	var attack_name := _pick_attack_animation()
-	play_anim(attack_name)
-	attack_time_left = 1.0 # Упростил для стабильности
-
+	_internal_velocity = Vector3.ZERO
+	play_anim("Attack")
+	attack_time_left = 1.0
 
 func _process_attack(delta: float) -> void:
 	attack_time_left -= delta
-	if attack_time_left <= 0.0:
-		state = ZombieState.CHASE
+	if attack_time_left <= 0.0: state = ZombieState.CHASE
 
+func _face_to(target: Vector3) -> void:
+	var look_pos = target
+	look_pos.y = global_position.y
+	if global_position.distance_to(look_pos) > 0.1:
+		look_at(look_pos, Vector3.UP)
 
-func _process_dead(delta: float) -> void:
-	death_velocity.y -= gravity * delta
-	velocity = death_velocity
-	move_and_slide()
-	death_timer -= delta
-	if death_timer <= 0.0:
-		queue_free()
-
+func play_anim(anim_name: String) -> void:
+	if anim_player.current_animation != anim_name:
+		anim_player.play(anim_name)
 
 func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> void:
-	if state == ZombieState.DEAD:
-		return
-
+	if state == ZombieState.DEAD: return
 	state = ZombieState.DEAD
-	death_timer = death_lifetime
-
-	# Выключаем коллизии с машиной, чтобы пролетала насквозь
-	collision_layer = 0
-	collision_mask = GROUND_LAYER 
+	set_collision_layer_value(3, false)
+	set_collision_mask_value(1, false)
+	# Даем импульс
+	apply_central_impulse(impact_force * 0.5) 
 	
 	if anim_player.has_animation("Dead"):
 		play_anim("Dead")
 
-	# ТВОЯ ХОТЕЛКА: ОТЛЕТ НАЗАД
-	var forward_dir = impact_force.normalized()
-	if impact_speed > high_speed_threshold:
-		# На большой скорости летит НАЗАД (инверсия) и сильно ВВЕРХ
-		death_velocity = (-forward_dir * impact_speed * 1.5) + (Vector3.UP * 12.0)
-	else:
-		# На малой - летит вперед
-		death_velocity = (forward_dir * impact_speed * 0.7) + (Vector3.UP * 5.0)
-	
-	# Добавляем рандом в бока
-	death_velocity += global_transform.basis.x * randf_range(-4.0, 4.0)
 
-
-func _face_to(target: Vector3) -> void:
-	var flat_target := target
-	flat_target.y = global_position.y
-	if flat_target.distance_to(global_position) < 0.1: return
-	look_at(flat_target, Vector3.UP)
-
-
-func play_anim(anim_name: String) -> void:
-	if anim_player.has_animation(anim_name):
-		anim_player.play(anim_name)
-
-func _pick_attack_animation() -> String:
-	return "Attack" # Упростил для примера
-	
-func _apply_gravity(delta: float) -> void:
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-	else:
-		# Небольшая прижимная сила, чтобы snap работал лучше
-		velocity.y = -0.1
-		
 func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
-	if state == ZombieState.DEAD:
-		return
-
+	if state == ZombieState.DEAD: return
 	current_hp -= amount
-	
-	# Если есть отдача, прикладываем её (для пушек на будущее)
-	if knockback != Vector3.ZERO:
-		velocity += knockback
-
 	if current_hp <= 0.0:
-		# Если здоровья нет — вызываем ту самую функцию смерти с отлетом
 		die(knockback, knockback.length())
+		
+func knockdown(impact_force: Vector3):
+	if state == ZombieState.DEAD or state == ZombieState.FALLEN: 
+		return
+	
+	state = ZombieState.FALLEN
+
+	# 2. Даем Godot один тик, чтобы он подготовил объект к полету
+	await get_tree().physics_frame
+	
+	# 3. ПРИНУДИТЕЛЬНО даем пинок
+	# Мы берем направление удара машины, усиливаем его и ОБЯЗАТЕЛЬНО подбрасываем вверх
+	var push_direction = impact_force.normalized()
+	var strength = impact_force.length()
+	
+	# Напрямую задаем линейную скорость (лучше, чем импульс для маленьких весов)
+	linear_velocity = (push_direction * strength * 1.5) + (Vector3.UP * 10.0)
+	# Добавляем хаотичное вращение в полете
+	angular_velocity = Vector3(randf_range(-5, 5), 0, randf_range(-5, 5))
+
+	if anim_player.has_animation("Dead"):
+		anim_player.play("Dead")
+	
+	# 4. Таймер вставания (без строчки freeze = true в конце)
+	await get_tree().create_timer(3.0).timeout
+	_get_up_simple()
+
+func _get_up_simple():
+	if state == ZombieState.DEAD: return
+	
+	if anim_player.has_animation("Dead"):
+		anim_player.play("Dead", -1, -1.0, true)
+		await anim_player.animation_finished
+	
+	state = ZombieState.CHASE
+
+func _get_up():
+	if state == ZombieState.DEAD: return
+	
+	# Чтобы он не вставал "в воздухе", сначала ставим его на землю
+	# (Здесь можно добавить проверку лучем RayCast вниз, если нужно)
+	
+	if anim_player.has_animation("Dead"):
+		anim_player.play("Dead", -1, -1.0, true)
+		await anim_player.animation_finished
+	
+	freeze = true
+	freeze_mode = RigidBody3D.FREEZE_MODE_KINEMATIC
+	state = ZombieState.CHASE
