@@ -1,0 +1,115 @@
+[gd_scene format=3 uid="uid://duy0dbkychify"]
+
+[ext_resource type="Script" uid="uid://chuym7s8v83s6" path="res://cars/Doge/BaseCar.gd" id="1_iqrfq"]
+[ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://cars/Doge/camera/camera_3d.tscn" id="2_5wm5h"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mm2gk"]
+size = Vector3(1.9717, 1, 2.08592)
+
+[node name="car" type="VehicleBody3D" unique_id=112811420]
+center_of_mass_mode = 1
+center_of_mass = Vector3(0, -0.1, 0)
+contact_monitor = true
+max_contacts_reported = 8
+script = ExtResource("1_iqrfq")
+
+[node name="wheal0" type="VehicleWheel3D" parent="." unique_id=1181664142]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.03343, 0.340338, -1.57977)
+use_as_traction = true
+use_as_steering = true
+wheel_roll_influence = 0.5
+wheel_radius = 0.431
+wheel_rest_length = 0.3
+wheel_friction_slip = 3.0
+suspension_stiffness = 30.0
+suspension_max_force = 10000.0
+
+[node name="wheal1" type="VehicleWheel3D" parent="." unique_id=629829653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.02622, 0.340338, -1.57977)
+use_as_traction = true
+use_as_steering = true
+wheel_roll_influence = 0.5
+wheel_radius = 0.431
+wheel_rest_length = 0.3
+wheel_friction_slip = 3.0
+suspension_stiffness = 30.0
+suspension_max_force = 10000.0
+
+[node name="wheal2" type="VehicleWheel3D" parent="." unique_id=651762959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.03343, 0.340338, 1.51869)
+use_as_traction = true
+wheel_roll_influence = 0.5
+wheel_radius = 0.431
+wheel_rest_length = 0.3
+wheel_friction_slip = 3.0
+suspension_stiffness = 30.0
+suspension_max_force = 10000.0
+
+[node name="wheal3" type="VehicleWheel3D" parent="." unique_id=579173671]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.02622, 0.340338, 1.51869)
+use_as_traction = true
+wheel_roll_influence = 0.5
+wheel_radius = 0.431
+wheel_rest_length = 0.3
+wheel_friction_slip = 3.0
+suspension_stiffness = 30.0
+suspension_max_force = 10000.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1430023922]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.689432, -0.062412)
+shape = SubResource("BoxShape3D_mm2gk")
+
+[node name="look" type="Node3D" parent="." unique_id=1704104742]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
+
+[node name="Camera3D" parent="look" unique_id=262920490 instance=ExtResource("2_5wm5h")]
+transform = Transform3D(1, 0, 0, 0, 0.974347, 0.225053, 0, -0.225053, 0.974347, 0, 1.97324, 6.19962)
+
+[node name="Hud" type="CanvasLayer" parent="." unique_id=208649555]
+layer = 2
+
+[node name="speed" type="Label" parent="Hud" unique_id=409778289]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -23.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 50
+
+[node name="HPControl" type="Control" parent="Hud" unique_id=201852073]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 40.0
+
+[node name="HPBar" type="ProgressBar" parent="Hud/HPControl" unique_id=714220098]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+show_percentage = false
+
+[node name="HPText" type="Label" parent="Hud/HPControl" unique_id=1118272487]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -70.0
+offset_top = -11.0
+offset_right = 70.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+text = "HP"
+horizontal_alignment = 1
+vertical_alignment = 1

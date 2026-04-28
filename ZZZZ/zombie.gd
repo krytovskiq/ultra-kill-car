@@ -3,15 +3,15 @@ extends RigidBody3D
 enum ZombieState { IDLE, CHASE, ATTACK, DEAD, FALLEN }
 @export var get_up_time: float = 0.5
 @export var speed: int = 8
-@export var damage: float = 15.0
+@export var damage: int = 0
 @export var player_path: NodePath
 @export var max_hp: float = 50.0
-@export var detection_radius: float = 32.0
-@export var lose_target_radius: float = 45.0
-@export var attack_range: float = 2.8
-@export var attack_cooldown: float = 1.3
-@export var death_lifetime: float = 3.5
-@export var high_speed_threshold: float = 20.0 
+@export var detection_radius: float = 500.0
+@export var lose_target_radius: float = 200.0
+@export var attack_range: float = 2.45
+@export var attack_coetime: float = 3.5
+@export var high_speoldown: float = 1.6
+@export var death_lifed_threshold: float = 20.0
 
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 @onready var root_collider: CollisionShape3D = $CollisionShape3D
@@ -104,8 +104,14 @@ func _process_chase(delta: float) -> void:
 func _start_attack() -> void:
 	state = ZombieState.ATTACK
 	_internal_velocity = Vector3.ZERO
-	play_anim("Attack")
-	attack_time_left = 1.0
+	
+	# Создаем список имен твоих анимаций атак
+	var attack_anims = ["Attack", "Attack_2"] # Замени на свои точные названия
+	var random_anim = attack_anims.pick_random() # Выбираем случайную
+	
+	play_anim(random_anim)
+	attack_time_left = 1.0 # Время блокировки состояния атаки
+
 
 func _process_attack(delta: float) -> void:
 	attack_time_left -= delta

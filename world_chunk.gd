@@ -8,10 +8,10 @@ static var global_distance_counter: float = 0.0
 @export var surface_y: float = 0.0
 
 @export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
-@export var zombie_count: int = 5     # Сколько зомби на один кусок дороги
+@export var zombie_count: int = 10     # Сколько зомби на один кусок дороги
 
 @export var barn_scene: PackedScene # Сцена амбара
-@export var barn_interval: float = 1500.0 # Интервал в метрах
+@export var barn_interval: float = 800.0 # Интервал в метрах
 
 @onready var _collision_shape: CollisionShape3D = $GroundBody/CollisionShape3D
 @onready var _mesh_instance: MeshInstance3D = $GroundBody/MeshInstance3D
@@ -84,8 +84,7 @@ func _apply_chunk_geometry() -> void:
 		_mesh_instance.position = Vector3(0.0, surface_y - chunk_thickness * 0.5, 0.0)
 
 func _spawn_random_objects():
-	if randf() > 100.0:
-		return
+	var objects_to_spawn = randi_range(3, 6) # Случайное число объектов от 3 до 6
 	
 	var objects = []
 	if object1: objects.append(object1)
@@ -94,24 +93,17 @@ func _spawn_random_objects():
 	if object4: objects.append(object4)
 	
 	if objects.is_empty(): return
+
+	for i in range(objects_to_spawn): # Запускаем цикл
+		var selected_scene = objects.pick_random()
+		var instance = selected_scene.instantiate()
+		add_child(instance)
 		
-	var selected_scene = objects.pick_random()
-	var instance = selected_scene.instantiate()
-	
-	# Делаем ТАК ЖЕ, как в амбаре: просто добавляем дочерним узлом
-	add_child(instance)
-	
-	# Считаем только позицию и поворот
-	var random_x = randf_range(-chunk_width / 3.0, chunk_width / 3.0)
-	var random_z = randf_range(-chunk_length / 2.5, chunk_length / 2.5)
-	
-	# Ставим позицию относительно Чанка (как в амбаре)
-	instance.position = Vector3(random_x, surface_y, random_z)
-	instance.rotation.y = randf_range(0, TAU)
-	
-	# НИКАКИХ instance.scale = ...
-	# НИКАКИХ set_as_top_level
-	# Объект просто берет размер из своей сцены .tscn, как это делает амбар.
+		var random_x = randf_range(-chunk_width / 3.0, chunk_width / 3.0)
+		var random_z = randf_range(-chunk_length / 2.5, chunk_length / 2.5)
+		
+		instance.position = Vector3(random_x, surface_y, random_z)
+		instance.rotation.y = randf_range(0, TAU)
 	print("Объект заспавнен аналогично амбару!")
 
 func spawn_barn(parent_chunk: Node3D):

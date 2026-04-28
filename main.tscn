@@ -2,9 +2,9 @@
 
 [ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_272bh"]
-[ext_resource type="PackedScene" uid="uid://ci52bv1m15cbs" path="res://cars/Doge.tscn" id="1_mdet3"]
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="2_5vw27"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://pause.tscn" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://dh0yyp3rpbcch" path="res://cars/Toyota_Apocalipsys/apocalipsys_car.tscn" id="7_272bh"]
 [ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="8_kek77"]
 [ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="9_4c57u"]
 
@@ -70,7 +70,7 @@ size = Vector3(150, 0, 120)
 [node name="Main" type="Node3D" unique_id=1305401198 node_paths=PackedStringArray("car")]
 script = ExtResource("1_272bh")
 chunk_scene = ExtResource("2_5vw27")
-car = NodePath("car")
+car = NodePath("Apocalipsys_Car")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
 environment = SubResource("Environment_8dxyn")
@@ -80,14 +80,6 @@ transform = Transform3D(1, 0, 0, 0, 0.21567275, 0.97646564, 0, -0.97646564, 0.21
 light_color = Color(0.5609549, 0.5609549, 0.5609549, 1)
 light_energy = 0.2
 shadow_enabled = true
-
-[node name="car" parent="." unique_id=1133104648 groups=["player"] instance=ExtResource("1_mdet3")]
-mass = 1250.0
-STEER_SPEED = 5.0
-engine_force_value = 5000.0
-zombie_impulse_at_min_speed = 40.0
-zombie_impulse_at_max_speed = 65.0
-wall_damage_min_speed_mps = 3.0
 
 [node name="Pause" parent="." unique_id=1664862517 instance=ExtResource("5_lquwl")]
 visible = false
@@ -103,3 +95,6 @@ mesh = SubResource("BoxMesh_efxa6")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody" unique_id=1687321113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.076254, -0.32381684, 0)
 shape = SubResource("BoxShape3D_dg77c")
+
+[node name="Apocalipsys_Car" parent="." unique_id=1907660138 instance=ExtResource("7_272bh")]
+transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0, 1.1721902, 0)

@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://bm52c2ry0p4yw"]
+
+[ext_resource type="Script" uid="uid://bt3i55n8bf2ix" path="res://shop_scene.gd" id="1_42hh6"]
+
+[sub_resource type="Environment" id="Environment_e2eif"]
+
+[node name="ShopScene" type="Node3D" unique_id=430265009]
+script = ExtResource("1_42hh6")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1863281194]
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1272946018]
+transform = Transform3D(1, 0, 0, 0, 0.78613746, 0.6180517, 0, -0.6180517, 0.78613746, 0, 3.5080867, 6.480711)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1434338869]
+environment = SubResource("Environment_e2eif")
+
+[node name="Spawn" type="Marker3D" parent="." unique_id=529103251]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1181844583]
+
+[node name="Next" type="Button" parent="CanvasLayer" unique_id=248394711]
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -4.0
+offset_right = 91.0
+offset_bottom = 51.0
+grow_vertical = 2
+
+[node name="Back" type="Button" parent="CanvasLayer" unique_id=1406648057]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -77.0
+offset_top = -13.0
+offset_bottom = 43.5
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Buy" type="Button" parent="CanvasLayer" unique_id=497820425]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -51.0
+offset_top = -80.0
+offset_right = 62.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Back_menu" type="Button" parent="CanvasLayer" unique_id=1095979950]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -55.0
+offset_bottom = 30.0
+grow_horizontal = 0
+
+[node name="CarName" type="Label" parent="CanvasLayer" unique_id=578881655]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -0.5
+offset_right = 126.0
+offset_bottom = 49.0
+grow_horizontal = 2
+
+[node name="Price" type="Label" parent="CanvasLayer" unique_id=1094284598]
+offset_left = 112.0
+offset_top = 1.0
+offset_right = 265.0
+offset_bottom = 66.0
+
+[node name="Money" type="Label" parent="CanvasLayer" unique_id=1813380852]
+offset_left = 187.0
+offset_top = 445.0
+offset_right = 366.0
+offset_bottom = 515.0
+
+[connection signal="pressed" from="CanvasLayer/Next" to="." method="_on_next_pressed"]
+[connection signal="pressed" from="CanvasLayer/Back" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="CanvasLayer/Buy" to="." method="_on_buy_pressed"]
+[connection signal="pressed" from="CanvasLayer/Back_menu" to="." method="_on_back_menu_pressed"]
