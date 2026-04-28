@@ -5,12 +5,12 @@ var start_z_position: float = 0.0
 var lights_tween: Tween
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 3.0
-@export var STEER_LIMIT: float = 1.0
-@export var engine_force_value: float = 3000.0
-@export var brake_force: float = 10.0
-@export var handbrake_force: float = 0.0
-@export var MAX_SPEED_KMH: int = 220
+@export var STEER_SPEED: float = 1.0
+@export var STEER_LIMIT: float = 0.6
+@export var engine_force_value: float = 2000.0
+@export var brake_force: float = 50.0
+@export var handbrake_force: float = 50.0
+@export var MAX_SPEED_KMH: int = 130
 
 @export_group("Health")
 @export var health: int = 100
@@ -53,6 +53,7 @@ func _ready() -> void:
 	max_contacts_reported = 24
 	current_hp = health
 	current_fuel = max_fuel
+	center_of_mass = Vector3(0, -0.1, 0)
 	if has_node("Hud/HpBar"):
 		$Hud/HpBar.max_value = health
 		$Hud/HpBar.value = current_hp
@@ -196,14 +197,11 @@ func _destroy_car():
 	if destroyed: return
 	destroyed = true
 	print("МАШИНА УНИЧТОЖЕНА!")
-
-	if has_node("AudioStreamPlayer3D"):
-		$AudioStreamPlayer3D.play()
-	
 	engine_force = 0
 	brake = brake_force
 	await get_tree().create_timer(3.0).timeout
 	get_tree().reload_current_scene()
+
 func shake_camera(amount: float):
 	var camera = get_node_or_null("look/Camera3D")
 	if camera:
