@@ -6,11 +6,11 @@ var lights_tween: Tween
 
 @export_group("Driving")
 @export var STEER_SPEED: float = 1.0
-@export var STEER_LIMIT: float = 0.3
-@export var engine_force_value: float = 800.0
+@export var STEER_LIMIT: float = 0.6
+@export var engine_force_value: float = 1000.0
 @export var brake_force: float = 50.0
 @export var handbrake_force: float = 50.0
-@export var MAX_SPEED_KMH: int = 100
+@export var MAX_SPEED_KMH: int = 130
 
 @export_group("Health")
 @export var health: int = 100

@@ -169,7 +169,7 @@ radius = 0.4633789
 
 [node name="1111" type="VehicleBody3D" unique_id=108287757]
 collision_mask = 517
-mass = 400.0
+mass = 600.0
 center_of_mass_mode = 1
 script = ExtResource("2_2krpi")
 
@@ -250,31 +250,6 @@ shape = SubResource("BoxShape3D_5rs8t")
 transform = Transform3D(-4.371139e-08, -1, -1.8119048e-13, 1, -4.371139e-08, -7.919965e-21, -1.2278462e-25, -1.8119048e-13, 1, 0.003950894, 0.79289067, -0.7084919)
 shape = SubResource("BoxShape3D_b84sy")
 
-[node name="Light_Right" type="OmniLight3D" parent="." unique_id=103432776]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.82762337, 0.82330835, 3.0315943)
-light_color = Color(1, 0, 0, 1)
-light_energy = 1.721
-light_specular = 0.8
-shadow_enabled = true
-shadow_bias = 0.3
-shadow_reverse_cull_face = true
-shadow_opacity = 0.85
-shadow_blur = 2.351
-distance_fade_begin = 0.0
-distance_fade_shadow = 184.5
-
-[node name="Light_Left" type="OmniLight3D" parent="." unique_id=1065952026]
-transform = Transform3D(1, 0, 0, 0, 0.9994623, -0.032788858, 0, 0.032788858, 0.9994623, -0.8201407, 0.8547571, 3.0329223)
-light_color = Color(1, 0, 0, 1)
-light_specular = 0.8
-shadow_enabled = true
-shadow_bias = 0.3
-shadow_reverse_cull_face = true
-shadow_opacity = 0.85
-shadow_blur = 2.351
-distance_fade_begin = 0.0
-distance_fade_shadow = 184.5
-
 [node name="look" type="Node3D" parent="." unique_id=870255254]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 
@@ -351,5 +326,30 @@ shadow_opacity = 0.85
 shadow_blur = 2.351
 distance_fade_begin = 0.0
 distance_fade_shadow = 184.5
+
+[node name="Light_Right" type="OmniLight3D" parent="." unique_id=1577091325]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.76707745, 0.82022285, 3.002625)
+light_color = Color(1, 0, 0, 1)
+light_energy = 1.721
+light_specular = 0.8
+shadow_bias = 0.3
+shadow_reverse_cull_face = true
+shadow_opacity = 0.85
+shadow_blur = 2.351
+distance_fade_begin = 0.0
+distance_fade_shadow = 184.5
+omni_range = 1.68
+
+[node name="Light_Left" type="OmniLight3D" parent="." unique_id=1050303364]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7847347, 0.82022285, 2.9846578)
+light_color = Color(1, 0, 0, 1)
+light_specular = 0.8
+shadow_bias = 0.3
+shadow_reverse_cull_face = true
+shadow_opacity = 0.85
+shadow_blur = 2.351
+distance_fade_begin = 0.0
+distance_fade_shadow = 184.5
+omni_range = 1.68
 
 [editable path="CarBody"]

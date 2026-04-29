@@ -3449,7 +3449,7 @@ height = 87.053116
 [node name="Zombie" type="RigidBody3D" unique_id=173185459 groups=["zombie"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.205729, 0)
 collision_layer = 8
-collision_mask = 512
+collision_mask = 520
 axis_lock_angular_x = true
 axis_lock_angular_z = true
 freeze = true

@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_272bh"]
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="2_5vw27"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://pause.tscn" id="5_lquwl"]
-[ext_resource type="PackedScene" uid="uid://dh0yyp3rpbcch" path="res://cars/Toyota_Apocalipsys/apocalipsys_car.tscn" id="7_272bh"]
+[ext_resource type="PackedScene" uid="uid://bqak8s7tmd742" path="res://cars/ZAporochec/Zaziktazik.tscn" id="7_272bh"]
 [ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="8_kek77"]
 [ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="9_4c57u"]
 
@@ -57,11 +57,11 @@ uv1_scale = Vector3(0.085, 0.085, 0.085)
 uv1_triplanar = true
 texture_filter = 5
 
-[sub_resource type="BoxMesh" id="BoxMesh_efxa6"]
+[sub_resource type="BoxMesh" id="BoxMesh_272bh"]
 resource_local_to_scene = true
 lightmap_size_hint = Vector2i(979, 616)
 material = SubResource("StandardMaterial3D_wjub3")
-size = Vector3(150, 1, 120)
+size = Vector3(150, 1, 128.095)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dg77c"]
 resource_local_to_scene = true
@@ -70,7 +70,7 @@ size = Vector3(150, 0, 120)
 [node name="Main" type="Node3D" unique_id=1305401198 node_paths=PackedStringArray("car")]
 script = ExtResource("1_272bh")
 chunk_scene = ExtResource("2_5vw27")
-car = NodePath("Apocalipsys_Car")
+car = NodePath("1111")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
 environment = SubResource("Environment_8dxyn")
@@ -90,11 +90,10 @@ collision_mask = 0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="GroundBody" unique_id=1619474154]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0141716, -0.6117554, -0.21616364)
-mesh = SubResource("BoxMesh_efxa6")
+mesh = SubResource("BoxMesh_272bh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody" unique_id=1687321113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.076254, -0.32381684, 0)
 shape = SubResource("BoxShape3D_dg77c")
 
-[node name="Apocalipsys_Car" parent="." unique_id=1907660138 instance=ExtResource("7_272bh")]
-transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0, 1.1721902, 0)
+[node name="1111" parent="." unique_id=108287757 instance=ExtResource("7_272bh")]
