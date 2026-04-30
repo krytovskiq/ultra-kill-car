@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://gvsv18ifcad7"
-path="res://.godot/imported/grendel_fps_creator.glb-a73571052f961860a5b0f456bee214ef.scn"
+path="res://.godot/imported/grendel_fps_creator.glb-4e5c05e99a9afb20841a0adaac508fda.scn"
 
 [deps]
 
-source_file="res://ZZZZ/grendel_fps_creator.glb"
-dest_files=["res://.godot/imported/grendel_fps_creator.glb-a73571052f961860a5b0f456bee214ef.scn"]
+source_file="res://Zombie/grendel_fps_creator.glb"
+dest_files=["res://.godot/imported/grendel_fps_creator.glb-4e5c05e99a9afb20841a0adaac508fda.scn"]
 
 [params]
 

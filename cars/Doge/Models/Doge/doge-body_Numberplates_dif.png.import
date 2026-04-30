@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bgd27im5ixl4i"
 path.s3tc="res://.godot/imported/doge-body_Numberplates_dif.png-b4040f1a631fe5d1d62c29ba35b8f3a4.s3tc.ctex"
+path.etc2="res://.godot/imported/doge-body_Numberplates_dif.png-b4040f1a631fe5d1d62c29ba35b8f3a4.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={}
@@ -13,7 +14,7 @@ generator_parameters={}
 [deps]
 
 source_file="res://cars/Doge/Models/Doge/doge-body_Numberplates_dif.png"
-dest_files=["res://.godot/imported/doge-body_Numberplates_dif.png-b4040f1a631fe5d1d62c29ba35b8f3a4.s3tc.ctex"]
+dest_files=["res://.godot/imported/doge-body_Numberplates_dif.png-b4040f1a631fe5d1d62c29ba35b8f3a4.s3tc.ctex", "res://.godot/imported/doge-body_Numberplates_dif.png-b4040f1a631fe5d1d62c29ba35b8f3a4.etc2.ctex"]
 
 [params]
 

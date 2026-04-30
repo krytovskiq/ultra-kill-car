@@ -29,7 +29,7 @@ func _ready() -> void:
 	var car_scene = load(car_path)
 	car = car_scene.instantiate()
 	add_child(car)
-	car.global_position = Vector3(0, 2, 0) # Поставь точку старта
+	car.global_position = Vector3(0, 0, 0) # Поставь точку старта
 	car.add_to_group("player") # ВАЖНО для работы генератора!
 	_resolve_car()
 	if chunk_scene == null:

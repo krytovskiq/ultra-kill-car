@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bfhet1a6qn8l6"
-path.s3tc="res://.godot/imported/grendel_fps_creator_0.png-4893e09d2ede564fad808d0461b09f7c.s3tc.ctex"
+path.s3tc="res://.godot/imported/grendel_fps_creator_0.png-a24aa953d70a64f56276049bb0877b81.s3tc.ctex"
+path.etc2="res://.godot/imported/grendel_fps_creator_0.png-a24aa953d70a64f56276049bb0877b81.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -14,8 +15,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://ZZZZ/grendel_fps_creator_0.png"
-dest_files=["res://.godot/imported/grendel_fps_creator_0.png-4893e09d2ede564fad808d0461b09f7c.s3tc.ctex"]
+source_file="res://Zombie/grendel_fps_creator_0.png"
+dest_files=["res://.godot/imported/grendel_fps_creator_0.png-a24aa953d70a64f56276049bb0877b81.s3tc.ctex", "res://.godot/imported/grendel_fps_creator_0.png-a24aa953d70a64f56276049bb0877b81.etc2.ctex"]
 
 [params]
 

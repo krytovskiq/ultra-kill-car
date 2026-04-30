@@ -2,24 +2,23 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://yrlm7l4gldev"
-path.s3tc="res://.godot/imported/grendel_fps_creator_1.png-40469fa27f1e9c31c5b630bc48eb17cb.s3tc.ctex"
+uid="uid://bbniriokc1ljr"
+path="res://.godot/imported/Zombiess_Image_4.png-79e18d77edbd17cbcd9da9269b5848d5.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
-"md5": "5245a2a0b093bb6ff79b7ebf5cff7e94"
+"md5": "625e316017e7294885a4f12a2ad1a7e3"
 }
 
 [deps]
 
-source_file="res://ZZZZ/grendel_fps_creator_1.png"
-dest_files=["res://.godot/imported/grendel_fps_creator_1.png-40469fa27f1e9c31c5b630bc48eb17cb.s3tc.ctex"]
+source_file="res://Zombie/Zombiess_Image_4.png"
+dest_files=["res://.godot/imported/Zombiess_Image_4.png-79e18d77edbd17cbcd9da9269b5848d5.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -29,8 +28,8 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=8
-roughness/src_normal="res://ZZZZ/grendel_fps_creator_3.png"
+roughness/mode=0
+roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2
@@ -41,4 +40,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

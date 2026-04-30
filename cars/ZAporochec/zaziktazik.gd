@@ -7,13 +7,13 @@ var lights_tween: Tween
 @export_group("Driving")
 @export var STEER_SPEED: float = 1.6
 @export var STEER_LIMIT: float = 0.6
-@export var engine_force_value: float = 1000.0
+@export var engine_force_value: float = 1200.0
 @export var brake_force: float = 10.0
 @export var handbrake_force: float = 10.0
-@export var MAX_SPEED_KMH: int = 70
+@export var MAX_SPEED_KMH: int = 110
 
 @export_group("Health")
-@export var health: int = 100
+@export var health: int = 10
 @export var collision_damage_multiplier: float = 0.35
 
 @export_group("Zombie Collision")
@@ -194,6 +194,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 			print("УДАР ОБ ОБЪЕКТ! Урон машине: ", round(damage_to_car))
 
 func _destroy_car():
+	position.y = 2.5
 	if destroyed: return
 	destroyed = true
 	print("МАШИНА УНИЧТОЖЕНА!")

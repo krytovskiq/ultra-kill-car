@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://ctluyesgj2u1x"
 path.s3tc="res://.godot/imported/doge-body_Riverside88_lights_dif.png-92fc1b358caca22ab77f15927a4b0481.s3tc.ctex"
+path.etc2="res://.godot/imported/doge-body_Riverside88_lights_dif.png-92fc1b358caca22ab77f15927a4b0481.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={}
@@ -13,7 +14,7 @@ generator_parameters={}
 [deps]
 
 source_file="res://cars/Doge/Models/Doge/doge-body_Riverside88_lights_dif.png"
-dest_files=["res://.godot/imported/doge-body_Riverside88_lights_dif.png-92fc1b358caca22ab77f15927a4b0481.s3tc.ctex"]
+dest_files=["res://.godot/imported/doge-body_Riverside88_lights_dif.png-92fc1b358caca22ab77f15927a4b0481.s3tc.ctex", "res://.godot/imported/doge-body_Riverside88_lights_dif.png-92fc1b358caca22ab77f15927a4b0481.etc2.ctex"]
 
 [params]
 

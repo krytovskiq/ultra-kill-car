@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://d208hi5mmjqnr"]
 
-[ext_resource type="Script" uid="uid://bvooyvo4fp0bs" path="res://ZZZZ/zombie.gd" id="1_qxua0"]
-[ext_resource type="Texture2D" uid="uid://bfhet1a6qn8l6" path="res://ZZZZ/grendel_fps_creator_0.png" id="1_raymw"]
-[ext_resource type="Texture2D" uid="uid://yrlm7l4gldev" path="res://ZZZZ/grendel_fps_creator_1.png" id="2_qxua0"]
-[ext_resource type="Texture2D" uid="uid://bun5mplipb7rt" path="res://ZZZZ/grendel_fps_creator_2.png" id="3_tv0kh"]
-[ext_resource type="Texture2D" uid="uid://b7ony4rxllsea" path="res://ZZZZ/grendel_fps_creator_3.png" id="4_8v0vg"]
+[ext_resource type="Script" uid="uid://bvooyvo4fp0bs" path="res://Zombie/zombie.gd" id="1_qxua0"]
+[ext_resource type="Texture2D" uid="uid://bfhet1a6qn8l6" path="res://Zombie/grendel_fps_creator_0.png" id="1_raymw"]
+[ext_resource type="Texture2D" uid="uid://yrlm7l4gldev" path="res://Zombie/grendel_fps_creator_1.png" id="2_qxua0"]
+[ext_resource type="Texture2D" uid="uid://bun5mplipb7rt" path="res://Zombie/grendel_fps_creator_2.png" id="3_tv0kh"]
+[ext_resource type="Texture2D" uid="uid://ggc1saroqc55" path="res://Zombie/grendel_fps_creator_3.png" id="4_8v0vg"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gk2np"]
 resource_name = "Grendel"
@@ -251,8 +251,8 @@ bind/66/bone = -1
 bind/66/pose = Transform3D(0.19261886, -1.3750315e-06, 0.98127365, 0.9812737, -3.3119602e-07, -0.192619, 3.8142252e-07, 1.0000014, 1.943111e-06, -11.0409355, -13.140403, 46.40617)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_tv0kh"]
-radius = 16.416504
-height = 56.255005
+radius = 29.948242
+height = 69.76477
 
 [sub_resource type="Animation" id="Animation_3ovfs"]
 resource_name = "Attack"
@@ -3950,7 +3950,7 @@ skeleton = NodePath("..")
 [node name="Hit" type="Area3D" parent="." unique_id=128503375]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Hit" unique_id=124732953]
-transform = Transform3D(1, 0, 0, 0, -0.07630142, 0.9970848, 0, -0.9970848, -0.07630142, -1.3482399, 3.2012386, -21.53226)
+transform = Transform3D(1, 0, 0, 0, -0.023263182, 0.9997294, 0, -0.9997294, -0.023263182, -1.3482399, -3.7617931, -27.58118)
 shape = SubResource("CapsuleShape3D_tv0kh")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=934831682]

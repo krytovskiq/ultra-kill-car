@@ -3,12 +3,12 @@ extends RigidBody3D
 enum ZombieState { IDLE, CHASE, ATTACK, DEAD, FALLEN }
 @export var get_up_time: float = 0.5
 @export var speed: int = 8
-@export var damage: int = 0
+@export var damage: int = 100
 @export var player_path: NodePath
 @export var max_hp: float = 50.0
 @export var detection_radius: float = 500.0
 @export var lose_target_radius: float = 200.0
-@export var attack_range: float = 2.45
+@export var attack_range: float = 3.0
 @export var attack_coetime: float = 3.5
 @export var high_speoldown: float = 1.6
 @export var death_lifed_threshold: float = 20.0

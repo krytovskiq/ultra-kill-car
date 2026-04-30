@@ -171,9 +171,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7200355, -0.45, 1.2040869)
 engine_force = 25.0
 use_as_traction = true
 wheel_radius = 0.41
-wheel_rest_length = 0.3
-wheel_friction_slip = 1.0
-suspension_stiffness = 50.0
+suspension_stiffness = 30.0
 suspension_max_force = 15000.0
 
 [node name="Wheel3" parent="Wheel_05" unique_id=909214899 instance=ExtResource("2_3m5ld")]
@@ -184,9 +182,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7245026, -0.45, 1.2040869)
 engine_force = 25.0
 use_as_traction = true
 wheel_radius = 0.41
-wheel_rest_length = 0.3
-wheel_friction_slip = 1.0
-suspension_stiffness = 50.0
+suspension_stiffness = 30.0
 suspension_max_force = 15000.0
 
 [node name="Wheel3" parent="Wheel_06" unique_id=1948870262 instance=ExtResource("2_3m5ld")]
@@ -198,9 +194,7 @@ engine_force = 25.0
 use_as_traction = true
 use_as_steering = true
 wheel_radius = 0.41
-wheel_rest_length = 0.3
-wheel_friction_slip = 1.0
-suspension_stiffness = 50.0
+suspension_stiffness = 30.0
 suspension_max_force = 15000.0
 
 [node name="Wheel3" parent="Wheel_07" unique_id=1708744304 instance=ExtResource("2_3m5ld")]
@@ -212,9 +206,7 @@ engine_force = 25.0
 use_as_traction = true
 use_as_steering = true
 wheel_radius = 0.41
-wheel_rest_length = 0.3
-wheel_friction_slip = 1.0
-suspension_stiffness = 50.0
+suspension_stiffness = 30.0
 suspension_max_force = 15000.0
 
 [node name="Wheel3" parent="Wheel_04" unique_id=561601027 instance=ExtResource("2_3m5ld")]

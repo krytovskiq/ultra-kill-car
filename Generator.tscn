@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://hut6rtb4m5uh"]
+[gd_scene format=4 uid="uid://hut6rtb4m5uh"]
 
 [ext_resource type="Script" uid="uid://qlfobs7v7t5o" path="res://world_chunk.gd" id="1_1mryt"]
-[ext_resource type="PackedScene" uid="uid://d208hi5mmjqnr" path="res://ZZZZ/Zombie.tscn" id="2_ihm32"]
+[ext_resource type="PackedScene" uid="uid://d208hi5mmjqnr" path="res://Zombie/Zombie.tscn" id="2_ihm32"]
 [ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="3_1cr0a"]
 [ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="4_5sdx4"]
 [ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="4_8g4c3"]
@@ -10,7 +10,9 @@
 [ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="6_6cu7m"]
 [ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="7_brxuf"]
 [ext_resource type="PackedScene" uid="uid://jnww6pucqdll" path="res://model/decor/Ambar/ambar.tscn" id="8_x7r45"]
-[ext_resource type="PackedScene" uid="uid://bqtirdl3ej85j" path="res://model/tree/tree.tscn" id="11_8g4c3"]
+[ext_resource type="ArrayOccluder3D" uid="uid://dut67mfwfmugq" path="res://Generator.occ" id="12_6cu7m"]
+[ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
+[ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="13_ua3rv"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wjub3"]
 albedo_texture = ExtResource("3_1cr0a")
@@ -25,11 +27,14 @@ texture_filter = 5
 resource_local_to_scene = true
 lightmap_size_hint = Vector2i(979, 616)
 material = SubResource("StandardMaterial3D_wjub3")
-size = Vector3(150, 1, 120)
+size = Vector3(150, 1, 124.555)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vh1cf"]
 resource_local_to_scene = true
 size = Vector3(150, 0, 120)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_j2hus"]
+size = Vector3(0, 15.921, 120)
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_nlgcw"]
 rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
@@ -53,6 +58,51 @@ ssao_intensity = 0.6
 ssao_power = 32.7849
 sdfgi_y_scale = 2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hju8v"]
+resource_name = "Tree_Pine"
+transparency = 4
+cull_mode = 2
+albedo_texture = ExtResource("12_j2hus")
+roughness = 0.8040408
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_y2q7l"]
+_surfaces = [{
+"aabb": AABB(-5.0612698, -4.218869, 0, 9.969265, 9.674352, 17.92315),
+"format": 34896613377,
+"index_count": 300,
+"index_data": PackedByteArray("VwBYAFkAVwBaAFgAWwBcAF0AWwBeAFwAXwBgAGEAXwBiAGAAGwAcAB0AGwAeABwAHwAgACEAHwAiACAAIwAkACUAIwAmACQAJwAoACkAJwAqACgAKwAsAC0AKwAuACwALwAwADEALwAyADAAYwBkAGUAYwBmAGQAZwBoAGkAZwBqAGgAMwA0ADUAMwA2ADQANwA4ADkANwA6ADgAOwA8AD0AOwA+ADwAPwBAAEEAPwBCAEAAQwBEAEUAQwBGAEQAAAABAAIAAAADAAEARwBIAEkARwBKAEgABAAFAAYABAAHAAUACAAJAAoACAALAAkADAANAA4ADAAPAA0ASwBMAE0ASwBOAEwATwBQAFEATwBSAFAAUwBUAFUAUwBWAFQAawBsAG0AawBuAGwAbwAZABEAbwBwABkAFgAZAHAAcQBvABEAcQARABIAFgBwAHIAcgATABYAcwASABMAcgBzABMAcwBxABIAcgBwAHQAcwByAHUAcgB0AHUAdgB0AHAAdgBwAG8AdwBxAHMAcwB1AHcAeABvAHEAeAB2AG8AdwB4AHEAeQB0AHYAdQB0AHoAeQB6AHQAdQB6AHsAdwB1AHsAfAB2AHgAfAB5AHYAfQB4AHcAfQB8AHgAdwB7AH0AfgB5AHwAfwB6AHkAfgB/AHkAewB6AIAAfwCAAHoAfgAUAH8AfwAUABcAfwAXAIAAfgAQABQAgAAXABoAgQAQAH4AfACBAH4AfAB9AIEAgQAYABAAgAAaABUAFQAaABgAFQAYAIEAfQAVAIEAewCAABUAfQB7ABUA"),
+"lods": [3.3206878, PackedByteArray("GwAcAB0AGwAeABwAHwAgACEAHwAiACAAIwAkACUAIwAmACQAJwAoACkAJwAqACgAKwAsAC0AKwAuACwALwAwADEALwAyADAAMwA0ADUAMwA2ADQANwA4ADkANwA6ADgAOwA8AD0AOwA+ADwAPwBAAEEAPwBCAEAAQwBEAEUAQwBGAEQAAAABAAIAAAADAAEARwBIAEkARwBKAEgABAAFAAYABAAHAAUACAAJAAoACAALAAkADAANAA4ADAAPAA0ASwBMAE0ASwBOAEwATwBQAFEATwBSAFAAUwBUAFUAUwBWAFQAEAARABIAEgATABAAEAAUABEAEwAVABAAFAAVABEAEwAWABUAFAAXABUAFQAYABAAEQAVABkAFgAZABUAFQAaABgAFQAXABoA"), 4.981032, PackedByteArray("AAABAAIAAAADAAEABAAFAAYABAAHAAUACAAJAAoACAALAAkADAANAA4ADAAPAA0AEAARABIAEgATABAAEAAUABEAEwAVABAAFAAVABEAEwAWABUAFAAXABUAFQAYABAAEQAVABkAFgAZABUAFQAaABgAFQAXABoA")],
+"name": "Tree_Pine",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 130,
+"vertex_data": PackedByteArray("l3JQes+iAADd1QAAEnEAAL5IZyTPXwAAz8JStztxAAACict86YEAAAAAejH2VgAAD1J8meA8AACXpmcoPGIAAMRpP3PukQAA//+vH3FTAACwYwgN0TQAANekQ9A6SwAAfHoMWCCOAADzwP//UFQAAFjf2HTQKwAALBu3g1VNAAB+g113CusAANiL73IAAAAAFoj2ZgAAAADYe/ZmAAAAAHCEWHoK6wAAMnvacu1zAAAWeO9yAAAAAPSBNXwK6wAAcIBddwrrAAD0gVh6AAAAAH5/WHoK6wAA94pre2izAABoHylDSZsAANBQ+4lrbwAAkJ9EKq+FAADWcVtzIbwAADLcCTaHjwAAa2x3Kqt5AAD4nBy1q4kAAMiAC2EHuwAAtK4Z2ViQAADRvwh2QnIAAEI3e4GzjwAAD4iVdYrSAAC9OHl2pbcAAGNsDZUbpAAAJIYyQXm4AAAJeEd3z9QAAMqm+zjZuAAAjGOXTiSrAACZoEuSKrUAAE588Gge1AAAb7OPoly5AACnpRhlfqYAAKFZQY70uAAAoXhac1LkAAABq7hfKMkAALZvUE7ZywAATY12kpLIAAA5iEpwa8EAAOdHBqAgpQAAjIRKm82SAAAXaj1GR6cAAFx8ynrrwgAAR38VK8OqAABVXZtfn5YAAKCtgnlgpgAAAncPbSvCAACuv75+u64AAAiUGVGimAAAjHMSnWiiAABJlLV4MpsAAOUA/mRHhgAAdFf1pSJZAABHh6sS/GoAACJ9010EowAAy9VG28+AAAC1zzJQvGIAACw82qFrbgAAkIUcfUFcAADMR80hWE4AALhRN28GNQAALLcRRuBBAAAkiHNjal4AAPx0EdCjTgAATKkDkGU3AAC3Qh5jrkIAALd0N20KWQAAZdswcZBMAAC7llxBHTQAALSEG65pOgAAaICkfo/xAADDZ0Bd39wAAHBnNIsK1wAAfZnmdcjcAACPgjd7Z+8AAGqa62VH2QAARnUSZELdAACIkp+Obd8AACOFoHd98gAACHihmdPPAADPpdKCQNsAAIthQ2wX3AAAmoSQbmLkAACheEKlOswAAKeheYEZxwAALGE3aYHNAAD0gjR6DeIAADJfClAqzgAAmmReg2zEAADRmsdgjMsAABmALX0g5wAAeIIkfP//AAA2clBnj/MAANGauXr68gAA2IvjdRwYAAD0gUt9HBgAABaI6WkcGAAAFnjjdRwYAADYe+lpHBgAAFuDs3goJwAAOXxoc5QnAAB+imhzlCcAAPR+3GpFKAAAw4fcakUoAAAdiaFyPDQAAFuD5HbnMwAAmn2hcjw0AADthrlryjQAAMp/uWvKNAAAYoKBbe1zAAAPhNpy7XMAAKF/MXbtcwAA5nyBbe1zAAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_5nrek"]
+resource_name = "Sketchfab_Scene_Tree_Pine_T2_Tree_Pine_0"
+_surfaces = [{
+"aabb": AABB(-5.0612698, -4.218869, 0, 9.969265, 9.674352, 17.92315),
+"attribute_data": PackedByteArray("//8LonfAKIB3wAui//8ogP//C6J3wCiAd8ALov//KID//wuid8AogHfAC6L//yiA//8LonfAKIB3wAui//8ogFCe/v85pBUiD5gVIt6LFSLYhJuPs38VIjWU/v8fiv//Zaj+/5W8m49psBUilbwVIn+y/v+VvP7///8LonfAKIB3wAui//8ogP//C6J3wCiAd8ALov//KID//wuid8AogHfAC6L//yiA//8LonfAKIB3wAui//8ogP//C6J3wCiAd8ALov//KID//wuid8AogHfAC6L//yiA//8LonfAKIB3wAui//8ogP//C6J3wCiAd8ALov//KID//wuid8AogHfAC6L//yiA//8LonfAKIB3wAui//8ogP//C6J3wCiAd8ALov//KID//wuid8AogHfAC6L//yiA//8LonfAKIB3wAui//8ogP//C6J3wCiAd8ALov//KID//wuid8AogHfAC6L//yiA//8LonfAKIB3wAui//8ogP//C6J3wCiAd8ALov//KID//wuid8AogHfAC6L//yiA//8LonfAKIB3wAui//8ogP//C6J3wCiAd8ALov//KID//wuid8AogHfAC6L//yiAp6TdOKCw3TiVvN04s5jdOMSwv0eVvL9H7qS/Rx+Zv0e5jN04xYDdOHiBv0dIjb9HB4KsU7uNrFN1maxT/I+bjyWbm48opaxTSKabj+GwrFOVvKxTcbGbjw=="),
+"format": 34896613399,
+"index_count": 300,
+"index_data": PackedByteArray("WgBbAFwAWgBdAFsAXgBfAGAAXgBhAF8AYgBjAGQAYgBlAGMAHgAfACAAHgAhAB8AIgAjACQAIgAlACMAJgAnACgAJgApACcAKgArACwAKgAtACsALgAvADAALgAxAC8AMgAzADQAMgA1ADMAZgBnAGgAZgBpAGcAagBrAGwAagBtAGsANgA3ADgANgA5ADcAOgA7ADwAOgA9ADsAPgA/AEAAPgBBAD8AQgBDAEQAQgBFAEMARgBHAEgARgBJAEcAAAABAAIAAAADAAEASgBLAEwASgBNAEsABAAFAAYABAAHAAUACAAJAAoACAALAAkADAANAA4ADAAPAA0ATgBPAFAATgBRAE8AUgBTAFQAUgBVAFMAVgBXAFgAVgBZAFcAbgBvAHAAbgBxAG8AcgAaABEAcgBzABoAGwAaAHMAGwBzAHQAdQByABEAdQARABIAdABzAHYAdAB2AHcAeABzAHIAeAB2AHMAeQByAHUAeQB4AHIAegB1ABIAegASABMAewB6ABMAewATABUAegB7AHwAfQB1AHoAegB8AH0AfQB5AHUAfQB8AH4AfQB+AH8AfwB5AH0AfwB+ABQAfwCAAHkAgAB4AHkAfwAUAIEAgAB/AIEAFAAWAIEAFAAXABYAgQAWABAAgQAQAIIAgACBAIIAggAQABgAgACDAHgAggCDAIAAgwB2AHgAggAYAIQAggCEAIMAhAAYABwAgwCFAHYAhACFAIMAdwB2AIUAdwCFAIYAhACHAIUAhAAcAIcAhgCFAIcAhwAcAB0AhgCHABkAhwAdABkA"),
+"lods": [3.3206878, PackedByteArray("HgAfACAAHgAhAB8AIgAjACQAIgAlACMAJgAnACgAJgApACcAKgArACwAKgAtACsALgAvADAALgAxAC8AMgAzADQAMgA1ADMANgA3ADgANgA5ADcAOgA7ADwAOgA9ADsAPgA/AEAAPgBBAD8AQgBDAEQAQgBFAEMARgBHAEgARgBJAEcAAAABAAIAAAADAAEASgBLAEwASgBNAEsABAAFAAYABAAHAAUACAAJAAoACAALAAkADAANAA4ADAAPAA0ATgBPAFAATgBRAE8AUgBTAFQAUgBVAFMAVgBXAFgAVgBZAFcAEAARABIAEgATABAAEwAUABAAEwAVABQAFAAWABAAFAAXABYAEAAYABEAGAAZABEAEQAZABoAGwAaABkAGAAcABkAGQAcAB0A"), 4.981032, PackedByteArray("AAABAAIAAAADAAEABAAFAAYABAAHAAUACAAJAAoACAALAAkADAANAA4ADAAPAA0AEAARABIAEgATABAAEwAUABAAEwAVABQAFAAWABAAFAAXABYAEAAYABEAGAAZABEAEQAZABoAGwAaABkAGAAcABkAGQAcAB0A")],
+"material": SubResource("StandardMaterial3D_hju8v"),
+"name": "Tree_Pine",
+"primitive": 3,
+"uv_scale": Vector4(1.9950855, 7.4802356, 0, 0),
+"vertex_count": 136,
+"vertex_data": PackedByteArray("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")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_y2q7l")
+
+[sub_resource type="MultiMesh" id="MultiMesh_dc0kt"]
+transform_format = 1
+mesh = SubResource("ArrayMesh_5nrek")
+
 [node name="WorldChunk" type="Node3D" unique_id=560257719]
 script = ExtResource("1_1mryt")
 zombie_scene = ExtResource("2_ihm32")
@@ -74,6 +124,14 @@ mesh = SubResource("BoxMesh_80s8q")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.076254, -0.32381684, 0)
 shape = SubResource("BoxShape3D_vh1cf")
 
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="GroundBody" unique_id=273603427]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.01075, 7.831604, -0.6683655)
+shape = SubResource("BoxShape3D_j2hus")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="GroundBody" unique_id=990953607]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.895836, 7.831604, -0.6683655)
+shape = SubResource("BoxShape3D_j2hus")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1424881713]
 environment = SubResource("Environment_x7r45")
 
@@ -81,52 +139,12 @@ environment = SubResource("Environment_x7r45")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18412277, -0.22340393)
 aabb = AABB(-78.026, -0.96, -60.045, 155.31, 17.13, 120.091)
 
-[node name="Tree" parent="." unique_id=1330745072 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, -72.64624, 0, 51.339462)
+[node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=337661843]
+occluder = ExtResource("12_6cu7m")
+bake_simplification_distance = 0.0
 
-[node name="Tree2" parent="." unique_id=1263194655 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, -72.64624, 0, 36.241554)
-
-[node name="Tree3" parent="." unique_id=1754277988 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, -72.64624, 0, 21.310537)
-
-[node name="Tree4" parent="." unique_id=1275045947 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, -72.64624, 0, 6.9813585)
-
-[node name="Tree5" parent="." unique_id=1354617443 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, -72.64624, 0, -9.519365)
-
-[node name="Tree6" parent="." unique_id=1393550632 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, -72.64624, 0, -22.42443)
-
-[node name="Tree7" parent="." unique_id=1405577672 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, -72.64624, 0, -37.009583)
-
-[node name="Tree8" parent="." unique_id=623083062 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, -72.64624, 0, -51.7126)
-
-[node name="Tree9" parent="." unique_id=164103526 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, 71.61423, 0, 51.339462)
-
-[node name="Tree10" parent="." unique_id=987997743 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, 71.61423, 0, 36.241554)
-
-[node name="Tree11" parent="." unique_id=1350480826 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, 71.61423, 0, 21.310537)
-
-[node name="Tree12" parent="." unique_id=903248231 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, 71.61423, 0, 6.9813585)
-
-[node name="Tree13" parent="." unique_id=48687267 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, 71.61423, 0, -9.519365)
-
-[node name="Tree14" parent="." unique_id=1353263245 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, 71.61423, 0, -22.42443)
-
-[node name="Tree15" parent="." unique_id=1068457256 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, 71.61423, 0, -37.009583)
-
-[node name="Tree16" parent="." unique_id=589837052 instance=ExtResource("11_8g4c3")]
-transform = Transform3D(-0.06813719, 0, 0.99767596, 0, 1, 0, -0.99767596, 0, -0.06813719, 71.61423, 0, -51.7126)
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=1645147157]
+multimesh = SubResource("MultiMesh_dc0kt")
+script = ExtResource("13_ua3rv")
 
 [connection signal="screen_exited" from="VisibleOnScreenNotifier3D" to="." method="_on_visible_on_screen_notifier_3d_screen_exited"]

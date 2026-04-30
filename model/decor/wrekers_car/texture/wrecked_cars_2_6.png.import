@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dr56e4lfi76nl"
 path.s3tc="res://.godot/imported/wrecked_cars_2_6.png-d829e8a9d32e12aa9e4ba28f977c6ba8.s3tc.ctex"
+path.etc2="res://.godot/imported/wrecked_cars_2_6.png-d829e8a9d32e12aa9e4ba28f977c6ba8.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://model/decor/wrekers_car/texture/wrecked_cars_2_6.png"
-dest_files=["res://.godot/imported/wrecked_cars_2_6.png-d829e8a9d32e12aa9e4ba28f977c6ba8.s3tc.ctex"]
+dest_files=["res://.godot/imported/wrecked_cars_2_6.png-d829e8a9d32e12aa9e4ba28f977c6ba8.s3tc.ctex", "res://.godot/imported/wrecked_cars_2_6.png-d829e8a9d32e12aa9e4ba28f977c6ba8.etc2.ctex"]
 
 [params]
 

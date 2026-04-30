@@ -115,12 +115,15 @@ shadow_mesh = SubResource("ArrayMesh_qtxi8")
 
 [node name="Tree_Pine_T1_Tree_Pine_0" type="MeshInstance3D" parent="." unique_id=745379605]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 5.319296, 0, 0)
+lod_bias = 0.15
 mesh = SubResource("ArrayMesh_ge4cn")
 
 [node name="Tree_Pine_T2_Tree_Pine_0" type="MeshInstance3D" parent="." unique_id=1122321205]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 8.937294, 0, 0)
+lod_bias = 0.15
 mesh = SubResource("ArrayMesh_5nrek")
 
 [node name="Tree_Pine_T3_Tree_Pine_0" type="MeshInstance3D" parent="." unique_id=2067187979]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 12.832659, 0, 0)
+lod_bias = 0.15
 mesh = SubResource("ArrayMesh_w7r58")

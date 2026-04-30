@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://svxw1gmr6k62"
 path.s3tc="res://.godot/imported/old_metal_canister_0.png-739337c15a22a22442b4921d0dc683c5.s3tc.ctex"
+path.etc2="res://.godot/imported/old_metal_canister_0.png-739337c15a22a22442b4921d0dc683c5.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://model/decor/gas/texture/old_metal_canister_0.png"
-dest_files=["res://.godot/imported/old_metal_canister_0.png-739337c15a22a22442b4921d0dc683c5.s3tc.ctex"]
+dest_files=["res://.godot/imported/old_metal_canister_0.png-739337c15a22a22442b4921d0dc683c5.s3tc.ctex", "res://.godot/imported/old_metal_canister_0.png-739337c15a22a22442b4921d0dc683c5.etc2.ctex"]
 
 [params]
 

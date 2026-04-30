@@ -66,10 +66,9 @@ size = Vector3(150, 1, 128.095)
 resource_local_to_scene = true
 size = Vector3(150, 0, 120)
 
-[node name="Main" type="Node3D" unique_id=1305401198 node_paths=PackedStringArray("car")]
+[node name="Main" type="Node3D" unique_id=1305401198]
 script = ExtResource("1_272bh")
 chunk_scene = ExtResource("2_5vw27")
-car = NodePath("")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
 environment = SubResource("Environment_8dxyn")

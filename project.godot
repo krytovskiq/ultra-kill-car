@@ -23,6 +23,10 @@ Game="*uid://ilfv05hv7cnm"
 
 player=""
 
+[gui]
+
+theme/default_font_generate_mipmaps=true
+
 [input]
 
 A={
@@ -60,9 +64,12 @@ esc={
 textures/canvas_textures/default_texture_filter=3
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_s3tc_bptc=true
+textures/vram_compression/import_etc2_astc=true
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
 anti_aliasing/quality/msaa_3d=1
 anti_aliasing/quality/screen_space_aa=1
+occlusion_culling/use_occlusion_culling=true
 viewport/canvas_textures/default_texture_filter=1
 textures/quality/screen_space_aa=0
 environment/scale=1.0

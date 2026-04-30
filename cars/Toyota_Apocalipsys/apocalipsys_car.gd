@@ -6,7 +6,7 @@ var lights_tween: Tween
 
 @export_group("Driving")
 @export var STEER_SPEED: float = 1.6
-@export var STEER_LIMIT: float = 0.6
+@export var STEER_LIMIT: float = 0.3
 @export var engine_force_value: float = 2000.0
 @export var brake_force: float = 50.0
 @export var handbrake_force: float = 50.0
@@ -137,8 +137,6 @@ func _physics_process(delta: float) -> void:
 				damage_timer = 0.0
 		else:
 			damage_timer = 0.0
-
-
 func refuel(amount: float):
 	current_fuel = clamp(current_fuel + amount, 0, max_fuel)
 

@@ -2,7 +2,7 @@ extends Node3D
 static var global_distance_counter: float = 0.0
 
 @export_group("Размеры чанка")
-@export var chunk_width: float = 150.0
+@export var chunk_width: float = 250.0
 @export var chunk_length: float = 120.0
 @export var chunk_thickness: float = 8.0
 @export var surface_y: float = 0.0
@@ -21,7 +21,6 @@ static var global_distance_counter: float = 0.0
 @export var object2: PackedScene
 @export var object3: PackedScene
 @export var object4: PackedScene
-
 
 func _ready() -> void:
 	var notifier = VisibleOnScreenNotifier3D.new()

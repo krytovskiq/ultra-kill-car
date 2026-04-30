@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dvdqi5v61fb2j"
 path.s3tc="res://.godot/imported/1111_Image_14.jpg-9cc1560be119483f34de3bc6a2d783d2.s3tc.ctex"
+path.etc2="res://.godot/imported/1111_Image_14.jpg-9cc1560be119483f34de3bc6a2d783d2.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://cars/ZAporochec/1111_Image_14.jpg"
-dest_files=["res://.godot/imported/1111_Image_14.jpg-9cc1560be119483f34de3bc6a2d783d2.s3tc.ctex"]
+dest_files=["res://.godot/imported/1111_Image_14.jpg-9cc1560be119483f34de3bc6a2d783d2.s3tc.ctex", "res://.godot/imported/1111_Image_14.jpg-9cc1560be119483f34de3bc6a2d783d2.etc2.ctex"]
 
 [params]
 

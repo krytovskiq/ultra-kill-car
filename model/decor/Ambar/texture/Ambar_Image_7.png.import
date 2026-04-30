@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://crr3f5ojva3mj"
 path.s3tc="res://.godot/imported/Ambar_Image_7.png-68b56e9398d93a8cce43de0ac46c0041.s3tc.ctex"
+path.etc2="res://.godot/imported/Ambar_Image_7.png-68b56e9398d93a8cce43de0ac46c0041.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://model/decor/Ambar/texture/Ambar_Image_7.png"
-dest_files=["res://.godot/imported/Ambar_Image_7.png-68b56e9398d93a8cce43de0ac46c0041.s3tc.ctex"]
+dest_files=["res://.godot/imported/Ambar_Image_7.png-68b56e9398d93a8cce43de0ac46c0041.s3tc.ctex", "res://.godot/imported/Ambar_Image_7.png-68b56e9398d93a8cce43de0ac46c0041.etc2.ctex"]
 
 [params]
 

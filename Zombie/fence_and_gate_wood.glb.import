@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ddbau5kubc7ll"
-path="res://.godot/imported/fence_and_gate_wood.glb-3e8bf60b299044562cb2b02463f19d10.scn"
+path="res://.godot/imported/fence_and_gate_wood.glb-f74fa294eb8eb3795a453491fdbde35d.scn"
 
 [deps]
 
-source_file="res://ZZZZ/fence_and_gate_wood.glb"
-dest_files=["res://.godot/imported/fence_and_gate_wood.glb-3e8bf60b299044562cb2b02463f19d10.scn"]
+source_file="res://Zombie/fence_and_gate_wood.glb"
+dest_files=["res://.godot/imported/fence_and_gate_wood.glb-f74fa294eb8eb3795a453491fdbde35d.scn"]
 
 [params]
 

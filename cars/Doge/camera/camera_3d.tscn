@@ -6,4 +6,5 @@
 transform = Transform3D(-0.99980897, 0, -0.01954637, 0, 1, 0, 0.01954637, 0, -0.99980897, 0, 0, 0)
 top_level = true
 current = true
+far = 220.0
 script = ExtResource("1_wiw5r")
