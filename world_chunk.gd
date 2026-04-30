@@ -123,5 +123,5 @@ func _on_visible_on_screen_notifier_3d_screen_exited() -> void:
 		
 		# Если машина уехала дальше чем на 200 метров — удаляем чанк
 		# (200 метров достаточно, чтобы игрок не видел исчезновения)
-		if dist > 50.0:
+		if dist > 200.0:
 			queue_free()

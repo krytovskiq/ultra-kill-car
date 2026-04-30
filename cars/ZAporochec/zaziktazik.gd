@@ -5,12 +5,12 @@ var start_z_position: float = 0.0
 var lights_tween: Tween
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 1.0
+@export var STEER_SPEED: float = 1.6
 @export var STEER_LIMIT: float = 0.6
 @export var engine_force_value: float = 1000.0
-@export var brake_force: float = 50.0
-@export var handbrake_force: float = 50.0
-@export var MAX_SPEED_KMH: int = 130
+@export var brake_force: float = 10.0
+@export var handbrake_force: float = 10.0
+@export var MAX_SPEED_KMH: int = 70
 
 @export_group("Health")
 @export var health: int = 100
@@ -28,7 +28,7 @@ var lights_tween: Tween
 
 @export_group("Fuel")
 @export var max_fuel: int = 100
-@export var fuel_consumption: float = 4.5
+@export var fuel_consumption: float = 1.0
 var current_fuel: float = 0.0
 var current_hp: int = 0
 var destroyed: bool = false
@@ -53,7 +53,7 @@ func _ready() -> void:
 	max_contacts_reported = 24
 	current_hp = health
 	current_fuel = max_fuel
-	center_of_mass = Vector3(0, -0.1, 0)
+	center_of_mass = Vector3(0, 0, 0)
 	if has_node("Hud/HpBar"):
 		$Hud/HpBar.max_value = health
 		$Hud/HpBar.value = current_hp

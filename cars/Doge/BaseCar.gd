@@ -5,12 +5,12 @@ var start_z_position: float = 0.0
 var lights_tween: Tween
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 1.0
-@export var STEER_LIMIT: float = 0.5
-@export var engine_force_value: float = 32000.0
+@export var STEER_SPEED: float = 1.6
+@export var STEER_LIMIT: float = 0.6
+@export var engine_force_value: float = 3000.0
 @export var brake_force: float = 50.0
-@export var handbrake_force: float = 200.0
-@export var MAX_SPEED_KMH: int = 150
+@export var handbrake_force: float = 50.0
+@export var MAX_SPEED_KMH: int = 220
 
 @export_group("Health")
 @export var health: int = 100
@@ -41,7 +41,7 @@ func _ready() -> void:
 	# ИСПРАВЛЕННАЯ ПРОВЕРКА И ПОДКЛЮЧЕНИЕ
 	var kill_zone = get_node_or_null("Area3D")
 	if kill_zone:
-		kill_zone.connect("body_entered", _on_kill_zone_body_entered)
+		kill_zone.connect("body_entered", _on_area_3d_body_entered)
 	else:
 		push_error("ОШИБКА: Узел Area3D не найден! Создай его внутри машины.")
 
@@ -53,7 +53,7 @@ func _ready() -> void:
 	max_contacts_reported = 24
 	current_hp = health
 	current_fuel = max_fuel
-	center_of_mass = Vector3(0, -0.2, 0)
+	center_of_mass = Vector3(0, -0.1, 0)
 	if has_node("Hud/HpBar"):
 		$Hud/HpBar.max_value = health
 		$Hud/HpBar.value = current_hp
@@ -74,7 +74,6 @@ func _physics_process(delta: float) -> void:
 	if has_node("Hud/speed"):
 		$Hud/speed.text = str(round(speed_kmh)) + "  KM/H"
 	
-	rotation.y = lerp_angle(rotation.y, 0, delta * 3.0)
 	
 	var target_max_speed = MAX_SPEED_KMH
 	var auto_roll_speed = 0
@@ -107,8 +106,8 @@ func _physics_process(delta: float) -> void:
 
 	traction(speed_mps)
 	
-	$Light_Right.light_energy = lerp($Light_Right.light_energy, 2.0 if Input.is_key_pressed(KEY_S) else 0.0, 0.2)
-	$Light_Left.light_energy = lerp($Light_Left.light_energy, 2.0 if Input.is_key_pressed(KEY_S) else 0.0, 0.2)
+	$Light_Right.light_energy = lerp($Light_Right.light_energy, 2.0 if Input.is_key_pressed(KEY_S) else 0.1, 0.2)
+	$Light_Left.light_energy = lerp($Light_Left.light_energy, 2.0 if Input.is_key_pressed(KEY_S) else 0.1, 0.2)
 
 	
 	if not destroyed and speed_mps > 0.1:
@@ -159,9 +158,28 @@ func take_damage(amount: int) -> void:
 		$Hud/HpBar.value = current_hp
 		print("ХП Машины: ", current_hp)
 		if current_hp <= 0: _destroy_car()
-		
 
-func _on_kill_zone_body_entered(body: Node3D) -> void:
+func _destroy_car():
+	if destroyed: return
+	destroyed = true
+	print("МАШИНА УНИЧТОЖЕНА!")
+	engine_force = 0
+	brake = brake_force
+	await get_tree().create_timer(3.0).timeout
+	get_tree().reload_current_scene()
+
+func shake_camera(amount: float):
+	var camera = get_node_or_null("look/Camera3D")
+	if camera:
+		var tween = create_tween()
+		for i in range(5):
+			var rand_offset = Vector2(randf_range(-amount, amount), randf_range(-amount, amount))
+			tween.tween_property(camera, "h_offset", rand_offset.x, 0.02)
+			tween.tween_property(camera, "v_offset", rand_offset.y, 0.02)
+		tween.tween_property(camera, "h_offset", 0.0, 0.05)
+		tween.tween_property(camera, "v_offset", 0.0, 0.05)
+		
+func _on_area_3d_body_entered(body: Node3D) -> void:
 	if destroyed: return
 	
 	var speed_mps = linear_velocity.length()
@@ -193,23 +211,3 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 				body.take_damage(speed_mps * 2.0) 
 			
 			print("УДАР ОБ ОБЪЕКТ! Урон машине: ", round(damage_to_car))
-
-func _destroy_car():
-	if destroyed: return
-	destroyed = true
-	print("МАШИНА УНИЧТОЖЕНА!")
-	engine_force = 0
-	brake = brake_force
-	await get_tree().create_timer(3.0).timeout
-	get_tree().reload_current_scene()
-
-func shake_camera(amount: float):
-	var camera = get_node_or_null("look/Camera3D")
-	if camera:
-		var tween = create_tween()
-		for i in range(5):
-			var rand_offset = Vector2(randf_range(-amount, amount), randf_range(-amount, amount))
-			tween.tween_property(camera, "h_offset", rand_offset.x, 0.02)
-			tween.tween_property(camera, "v_offset", rand_offset.y, 0.02)
-		tween.tween_property(camera, "h_offset", 0.0, 0.05)
-		tween.tween_property(camera, "v_offset", 0.0, 0.05)

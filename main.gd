@@ -6,7 +6,7 @@ extends Node3D
 @export_group("World Generation")
 @export var chunks_ahead: int = 10
 @export var chunks_behind: int = 2
-@export var update_distance: float = 30.0
+@export var update_distance: float = 10.0
 @export var chunk_width: float = 44.0
 @export var chunk_length: float = 120.0
 @export var chunk_thickness: float = 8.0
@@ -24,6 +24,13 @@ var _last_checked_distance: float = -INF
 
 
 func _ready() -> void:
+	# СПАВНИМ МАШИНУ ИЗ ВЫБОРА В МАГАЗИНЕ
+	var car_path = Game.car_data[Game.selected_car_index].path
+	var car_scene = load(car_path)
+	car = car_scene.instantiate()
+	add_child(car)
+	car.global_position = Vector3(0, 2, 0) # Поставь точку старта
+	car.add_to_group("player") # ВАЖНО для работы генератора!
 	_resolve_car()
 	if chunk_scene == null:
 		push_error("Main: chunk_scene не назначен.")
@@ -46,7 +53,6 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if car == null or chunk_scene == null:
 		return
-
 	var distance := _distance_along_forward(car.global_position)
 	if absf(distance - _last_checked_distance) < update_distance:
 		return

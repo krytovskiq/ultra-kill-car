@@ -156,7 +156,7 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_cck15")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5rs8t"]
-size = Vector3(1.9233038, 2.084044, 5.02913)
+size = Vector3(1.9233038, 1.0467827, 1.4032369)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_b84sy"]
 size = Vector3(1.0407372, 1.9694806, 2.043563)
@@ -177,6 +177,7 @@ script = ExtResource("2_2krpi")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9000748, 0.378, 1.9702673)
 use_as_traction = true
 wheel_radius = 0.38
+wheel_friction_slip = 5.0
 suspension_stiffness = 40.0
 suspension_max_force = 10000.0
 damping_compression = 2.0
@@ -193,6 +194,7 @@ mesh = SubResource("ArrayMesh_4y5h0")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.378, 1.97)
 use_as_traction = true
 wheel_radius = 0.38
+wheel_friction_slip = 5.0
 suspension_stiffness = 40.0
 suspension_max_force = 10000.0
 damping_compression = 2.0
@@ -209,6 +211,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.378, -1.0747669)
 use_as_traction = true
 use_as_steering = true
 wheel_radius = 0.38
+wheel_friction_slip = 5.0
 suspension_stiffness = 40.0
 suspension_max_force = 10000.0
 damping_compression = 2.0
@@ -225,6 +228,7 @@ transform = Transform3D(0.9999997, 0, 0, 0, 0.9999994, 0, 0, 0, 0.9999996, -0.9,
 use_as_traction = true
 use_as_steering = true
 wheel_radius = 0.38
+wheel_friction_slip = 5.0
 suspension_stiffness = 40.0
 suspension_max_force = 10000.0
 damping_compression = 2.0
@@ -243,7 +247,7 @@ collision_layer = 0
 collision_mask = 12
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=912835130]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.54912955, 0.40201718, 3.4073594)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.021654725, -0.11661345, 1.5944128)
 shape = SubResource("BoxShape3D_5rs8t")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=411032973]
@@ -266,6 +270,8 @@ shape = SubResource("CapsuleShape3D_5rs8t")
 
 [node name="CarBody" parent="." unique_id=572198494 instance=ExtResource("6_v1nkx")]
 transform = Transform3D(-4.371138e-08, 0, -0.9999997, 0, 0.9999999, 0, 0.9999998, 0, -4.3711374e-08, 0, 0, 0)
+
+[node name="car_body_body_0" parent="CarBody" index="1" unique_id=1891730208 groups=["player"]]
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=2029127597]
 layer = 2
@@ -303,7 +309,7 @@ offset_right = 153.0
 offset_bottom = 110.0
 
 [node name="Light_Right2" type="SpotLight3D" parent="." unique_id=75900612]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.82762337, 0.82330835, -1.8115149)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7974965, 0.87456906, -1.8115149)
 light_color = Color(0.96344227, 0.66862327, 0, 1)
 light_energy = 1.721
 light_specular = 0.8
@@ -316,7 +322,7 @@ distance_fade_begin = 0.0
 distance_fade_shadow = 184.5
 
 [node name="Light_Left2" type="SpotLight3D" parent="." unique_id=4477512]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8201407, 0.8547571, -1.8101869)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7886649, 0.87364256, -1.8101869)
 light_color = Color(0.96344227, 0.66862327, 0, 1)
 light_specular = 0.8
 shadow_enabled = true

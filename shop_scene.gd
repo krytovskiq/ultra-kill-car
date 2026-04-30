@@ -13,7 +13,8 @@ func update_shop_ui():
 	# Проверяем, есть ли данные в Game.gd
 	var car_data = [
 	{"path": "res://cars/ZAporochec/Zaziktazik.tscn", "price": 0},
-	{"path": "res://cars/Doge/Doge.tscn", "price": 0}
+	{"path": "res://cars/Doge/Doge.tscn", "price": 0},
+	{"path": "res://cars/Toyota_Apocalipsys/apocalipsys_car.tscn", "price": 0}
 ]
 	
 	var car_info = Game.car_data[current_idx]
