@@ -16,6 +16,7 @@ night_sky = ExtResource("1_0xm2m")
 
 [sub_resource type="Sky" id="Sky_1bvp3"]
 sky_material = SubResource("PhysicalSkyMaterial_h2yge")
+radiance_size = 2
 
 [sub_resource type="Environment" id="Environment_8dxyn"]
 background_mode = 2
@@ -24,15 +25,14 @@ sky = SubResource("Sky_1bvp3")
 sky_rotation = Vector3(0, 0.20245819, 0)
 ambient_light_color = Color(0.43137255, 0.44705883, 0.4745098, 1)
 ambient_light_sky_contribution = 0.42
-ambient_light_energy = 0.0
+ambient_light_energy = 0.7
 reflected_light_source = 2
-tonemap_mode = 3
-tonemap_exposure = 0.4
+tonemap_exposure = 0.3
+tonemap_agx_white = 16.5
 ssao_radius = 1.5
 ssao_intensity = 0.6
 ssao_power = 32.7849
 sdfgi_y_scale = 2
-glow_enabled = true
 glow_intensity = 2.12
 glow_bloom = 0.09
 fog_enabled = true
@@ -42,10 +42,9 @@ fog_sun_scatter = 0.31
 fog_density = 1.0
 fog_depth_curve = 0.20000064
 fog_depth_begin = 0.0
-fog_depth_end = 350.0
-adjustment_enabled = true
+fog_depth_end = 220.0
 adjustment_contrast = 1.125
-adjustment_saturation = 0.3
+adjustment_saturation = 0.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wjub3"]
 albedo_texture = ExtResource("8_kek77")
@@ -69,6 +68,8 @@ size = Vector3(150, 0, 120)
 [node name="Main" type="Node3D" unique_id=1305401198]
 script = ExtResource("1_272bh")
 chunk_scene = ExtResource("2_5vw27")
+chunks_ahead = 3
+update_distance = 100.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
 environment = SubResource("Environment_8dxyn")
@@ -77,7 +78,6 @@ environment = SubResource("Environment_8dxyn")
 transform = Transform3D(1, 0, 0, 0, 0.21567275, 0.97646564, 0, -0.97646564, 0.21567275, 0, 70.56531, 0)
 light_color = Color(0.5609549, 0.5609549, 0.5609549, 1)
 light_energy = 0.2
-shadow_enabled = true
 
 [node name="Pause" parent="." unique_id=1664862517 instance=ExtResource("5_lquwl")]
 visible = false

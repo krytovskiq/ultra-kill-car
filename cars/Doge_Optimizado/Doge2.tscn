@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://caos6kbupx860"]
+
+[ext_resource type="PackedScene" uid="uid://bcpr0nxjd1pbq" path="res://cars/Doge_Optimizado/carson_fastback.glb" id="1_uaem8"]
+[ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://camera/camera_3d.tscn" id="2_ti1hc"]
+
+[node name="Doge" unique_id=1038080756 instance=ExtResource("1_uaem8")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="look" type="Node3D" parent="." index="1" unique_id=2088708575]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
+
+[node name="Camera3D" parent="look" index="0" unique_id=1271028786 instance=ExtResource("2_ti1hc")]
+transform = Transform3D(1, 0, 0, 0, 0.98309237, 0.1831106, 0, -0.1831106, 0.98309237, 0, 2.2495344, 5.018093)
+
+[node name="VehicleWheel3D" type="VehicleWheel3D" parent="." index="2" unique_id=1208787404]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.2129769, 0.2877432, 0.79095596)
+wheel_radius = 0.3

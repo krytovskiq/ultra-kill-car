@@ -8,8 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="4_yegdb"]
 [ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_8g4c3"]
 [ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="6_6cu7m"]
-[ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="7_brxuf"]
-[ext_resource type="PackedScene" uid="uid://jnww6pucqdll" path="res://model/decor/Ambar/ambar.tscn" id="8_x7r45"]
+[ext_resource type="PackedScene" uid="uid://bggtemdkmx3qq" path="res://model/decor/Ambar/ambar.tscn" id="8_x7r45"]
 [ext_resource type="ArrayOccluder3D" uid="uid://dut67mfwfmugq" path="res://Generator.occ" id="12_6cu7m"]
 [ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
 [ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="13_ua3rv"]
@@ -35,28 +34,6 @@ size = Vector3(150, 0, 120)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j2hus"]
 size = Vector3(0, 15.921, 120)
-
-[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_nlgcw"]
-rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
-turbidity = 0.0
-ground_color = Color(0, 0, 0, 1)
-energy_multiplier = 1.7
-night_sky = ExtResource("7_brxuf")
-
-[sub_resource type="Sky" id="Sky_1bvp3"]
-sky_material = SubResource("PhysicalSkyMaterial_nlgcw")
-
-[sub_resource type="Environment" id="Environment_x7r45"]
-background_mode = 2
-sky = SubResource("Sky_1bvp3")
-ambient_light_sky_contribution = 0.15
-ambient_light_energy = 1.83
-tonemap_mode = 2
-tonemap_exposure = 1.1
-ssao_radius = 1.5
-ssao_intensity = 0.6
-ssao_power = 32.7849
-sdfgi_y_scale = 2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hju8v"]
 resource_name = "Tree_Pine"
@@ -107,6 +84,7 @@ mesh = SubResource("ArrayMesh_5nrek")
 script = ExtResource("1_1mryt")
 zombie_scene = ExtResource("2_ihm32")
 barn_scene = ExtResource("8_x7r45")
+barn_interval = 700.0
 object1 = ExtResource("4_8g4c3")
 object2 = ExtResource("4_yegdb")
 object3 = ExtResource("5_8g4c3")
@@ -131,9 +109,6 @@ shape = SubResource("BoxShape3D_j2hus")
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="GroundBody" unique_id=990953607]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 73.895836, 7.831604, -0.6683655)
 shape = SubResource("BoxShape3D_j2hus")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1424881713]
-environment = SubResource("Environment_x7r45")
 
 [node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="." unique_id=1519313398]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18412277, -0.22340393)

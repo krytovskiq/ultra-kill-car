@@ -2,11 +2,9 @@ extends Node
 
 # ВАЖНО: car_data должна быть здесь, в самом верху!
 var car_data = [
-	{"path": "res://cars/ZAporochec/Zaziktazik.tscn", "price": 0},
-	{"path": "res://cars/Doge/Doge.tscn", "price": 0},
-	{"path": "res://cars/Toyota_Apocalipsys/apocalipsys_car.tscn", "price": 0}
+	{"path": "res://cars/Doge_Optimizado/Doge2.tscn", "price": 0},
+	{"path": "res://cars/BTR/btr.tscn", "price": 0}
 ]
-
 var money: int = 10000
 var selected_car_index: int = 0
 var owned_cars: Array = [0] # Индекс 0 (первая машина) куплен сразу
