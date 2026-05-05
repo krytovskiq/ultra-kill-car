@@ -3121,6 +3121,7 @@ shadow_mesh = SubResource("ArrayMesh_kpppo")
 collision_mask = 517
 mass = 1600.0
 center_of_mass_mode = 1
+center_of_mass = Vector3(0, 0.1, 0)
 script = ExtResource("1_36car")
 
 [node name="Sketchfab_model" type="Node3D" parent="." unique_id=980538798]
@@ -3453,7 +3454,7 @@ transform = Transform3D(0, 1, 0, 0, 0, -1, -1, 0, 0, 0.022044092, 0.617525, 0.41
 mesh = SubResource("ArrayMesh_biath")
 
 [node name="80_1A_C8_F9_49" type="Node3D" parent="Sketchfab_model/root/GLTF_SceneRootNode" unique_id=1109178110]
-transform = Transform3D(0, 1, 0, 0, 0, -1, -1, 0, 0, 2.161595, 0.556002, -0.60699743)
+transform = Transform3D(-4.371139e-08, 1, -4.371139e-08, 0, -4.371139e-08, -1, -1, -4.371139e-08, 1.9106855e-15, 2.161595, 0.556002, -0.60699743)
 
 [node name="B5_BD_BF_86_48" type="Node3D" parent="Sketchfab_model/root/GLTF_SceneRootNode/80_1A_C8_F9_49" unique_id=1583076300]
 
@@ -3619,83 +3620,92 @@ shape = SubResource("BoxShape3D_miysu")
 transform = Transform3D(-4.371138e-08, 0.9999965, 0, -0.9999998, -4.3711236e-08, 0, 0, 0, 0.9999965, 0.00266736, 0.9610245, 2.4416053)
 shape = SubResource("CapsuleShape3D_mye8l")
 
-[node name="VehicleWheel3D" type="VehicleWheel3D" parent="." unique_id=2141682887]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.486, 1.6086633)
-use_as_traction = true
-wheel_radius = 0.45
-wheel_friction_slip = 5.0
-suspension_stiffness = 40.0
-damping_compression = 0.5
-damping_relaxation = 0.8
-
-[node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D" unique_id=2006032318]
-transform = Transform3D(-1, 8.742278e-08, 3.821371e-15, 0, -4.371139e-08, 1, 8.742278e-08, 1, 4.371139e-08, -0.03980851, -0.027507007, 0.0009573698)
-
-[node name="Object_164" type="MeshInstance3D" parent="VehicleWheel3D/C2_33_8B_35_66" unique_id=509433301]
-transform = Transform3D(0.39, 0, 0, 0, 0.975, 0, 0, 0, 0.975, 0, 0, 0)
-mesh = SubResource("ArrayMesh_ajkdk")
-
-[node name="Object_165" type="MeshInstance3D" parent="VehicleWheel3D/C2_33_8B_35_66" unique_id=329664005]
-transform = Transform3D(0.39, 0, 0, 0, 0.975, 0, 0, 0, 0.975, 0, 0, 0)
-mesh = SubResource("ArrayMesh_12ppg")
-
-[node name="VehicleWheel3D2" type="VehicleWheel3D" parent="." unique_id=1416085768]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.495, 1.609)
-use_as_traction = true
-wheel_radius = 0.45
-wheel_friction_slip = 5.0
-suspension_stiffness = 40.0
-damping_compression = 0.5
-damping_relaxation = 0.8
-
-[node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D2" unique_id=1034154249]
-transform = Transform3D(1, -4.3711392e-08, -1.9106857e-15, 0, -4.371139e-08, 1, -4.3711392e-08, -1, -4.371139e-08, -0.03980851, -0.027507007, 0.0009573698)
-
-[node name="Object_164" type="MeshInstance3D" parent="VehicleWheel3D2/C2_33_8B_35_66" unique_id=1388577998]
-transform = Transform3D(0.39, 0, 0, 0, 0.975, 0, 0, 0, 0.975, 0, 0, 0)
-mesh = SubResource("ArrayMesh_ajkdk")
-
-[node name="Object_165" type="MeshInstance3D" parent="VehicleWheel3D2/C2_33_8B_35_66" unique_id=320512140]
-transform = Transform3D(0.39, 0, 0, 0, 0.975, 0, 0, 0, 0.975, 0, 0, 0)
-mesh = SubResource("ArrayMesh_12ppg")
-
 [node name="VehicleWheel3D3" type="VehicleWheel3D" parent="." unique_id=285508681]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.47, -2.08)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.40248165, -2.068747)
 use_as_traction = true
 use_as_steering = true
-wheel_radius = 0.45
-wheel_friction_slip = 5.0
-suspension_stiffness = 40.0
+wheel_radius = 0.42
+wheel_rest_length = 0.2
+wheel_friction_slip = 7.0
+suspension_travel = 1.0
+suspension_stiffness = 50.0
+suspension_max_force = 17000.0
 damping_compression = 0.5
-damping_relaxation = 0.8
+damping_relaxation = 0.9
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D3" unique_id=646174211]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -0.03980851, -0.027507007, 0.0009573698)
 
 [node name="Object_164" type="MeshInstance3D" parent="VehicleWheel3D3/C2_33_8B_35_66" unique_id=1100715336]
-transform = Transform3D(0.39, 0, 0, 0, 0.975, 0, 0, 0, 0.975, 0, 0, 0)
+transform = Transform3D(0.335, 0, 0, 0, 0.838, 0, 0, 0, 0.838, 0, 0, 0)
 mesh = SubResource("ArrayMesh_ajkdk")
 
 [node name="Object_165" type="MeshInstance3D" parent="VehicleWheel3D3/C2_33_8B_35_66" unique_id=1925184083]
-transform = Transform3D(0.39, 0, 0, 0, 0.975, 0, 0, 0, 0.975, 0, 0, 0)
+transform = Transform3D(0.335, 0, 0, 0, 0.838, 0, 0, 0, 0.838, 0, 0, 0)
 mesh = SubResource("ArrayMesh_12ppg")
 
-[node name="VehicleWheel3D4" type="VehicleWheel3D" parent="." unique_id=166251302]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.468, -2.08)
+[node name="VehicleWheel3D4" type="VehicleWheel3D" parent="." unique_id=1254425755]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.40248165, 1.564486)
 use_as_traction = true
-wheel_radius = 0.45
-wheel_friction_slip = 5.0
-suspension_stiffness = 40.0
+wheel_radius = 0.42
+wheel_rest_length = 0.2
+wheel_friction_slip = 7.0
+suspension_travel = 1.0
+suspension_stiffness = 60.0
+suspension_max_force = 17000.0
 damping_compression = 0.5
-damping_relaxation = 0.8
+damping_relaxation = 0.9
 
-[node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D4" unique_id=445729318]
-transform = Transform3D(-1, 1.509958e-07, 6.600236e-15, 0, -4.371139e-08, 1, 1.509958e-07, 1, 4.371139e-08, -0.03980851, -0.027507007, 0.0009573698)
+[node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D4" unique_id=355998477]
 
-[node name="Object_164" type="MeshInstance3D" parent="VehicleWheel3D4/C2_33_8B_35_66" unique_id=1589449692]
-transform = Transform3D(0.39, 0, 0, 0, 0.975, 0, 0, 0, 0.975, 0, 0, 0)
+[node name="Object_164" type="MeshInstance3D" parent="VehicleWheel3D4/C2_33_8B_35_66" unique_id=405199177]
+transform = Transform3D(0.335, 0, 0, 0, 0.838, 0, 0, 0, 0.838, 0, 0, 0)
 mesh = SubResource("ArrayMesh_ajkdk")
 
-[node name="Object_165" type="MeshInstance3D" parent="VehicleWheel3D4/C2_33_8B_35_66" unique_id=1306424629]
-transform = Transform3D(0.39, 0, 0, 0, 0.975, 0, 0, 0, 0.975, 0, 0, 0)
+[node name="Object_165" type="MeshInstance3D" parent="VehicleWheel3D4/C2_33_8B_35_66" unique_id=1171778092]
+transform = Transform3D(0.335, 0, 0, 0, 0.838, 0, 0, 0, 0.838, 0, 0, 0)
+mesh = SubResource("ArrayMesh_12ppg")
+
+[node name="VehicleWheel3D5" type="VehicleWheel3D" parent="." unique_id=1699212338]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0856478, 0.40248165, 1.564486)
+use_as_traction = true
+wheel_radius = 0.42
+wheel_rest_length = 0.2
+wheel_friction_slip = 7.0
+suspension_travel = 1.0
+suspension_stiffness = 60.0
+suspension_max_force = 17000.0
+damping_compression = 0.5
+damping_relaxation = 0.9
+
+[node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D5" unique_id=1286838409]
+
+[node name="Object_164" type="MeshInstance3D" parent="VehicleWheel3D5/C2_33_8B_35_66" unique_id=124834758]
+transform = Transform3D(-0.335, 0, -7.326029e-08, 0, 0.838, 0, 2.928663e-08, 0, -0.838, 0, 0, 0)
+mesh = SubResource("ArrayMesh_ajkdk")
+
+[node name="Object_165" type="MeshInstance3D" parent="VehicleWheel3D5/C2_33_8B_35_66" unique_id=1513781612]
+transform = Transform3D(-0.335, 0, -7.326029e-08, 0, 0.838, 0, 2.928663e-08, 0, -0.838, 0, 0, 0)
+mesh = SubResource("ArrayMesh_12ppg")
+
+[node name="VehicleWheel3D6" type="VehicleWheel3D" parent="." unique_id=682092696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.086, 0.402, -2.069)
+use_as_traction = true
+use_as_steering = true
+wheel_radius = 0.42
+wheel_rest_length = 0.2
+wheel_friction_slip = 7.0
+suspension_travel = 1.0
+suspension_stiffness = 50.0
+suspension_max_force = 17000.0
+damping_compression = 0.5
+damping_relaxation = 0.9
+
+[node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D6" unique_id=2089244218]
+
+[node name="Object_164" type="MeshInstance3D" parent="VehicleWheel3D6/C2_33_8B_35_66" unique_id=767645194]
+transform = Transform3D(-0.335, 0, -7.326029e-08, 0, 0.838, 0, 2.928663e-08, 0, -0.838, 0, 0, 0)
+mesh = SubResource("ArrayMesh_ajkdk")
+
+[node name="Object_165" type="MeshInstance3D" parent="VehicleWheel3D6/C2_33_8B_35_66" unique_id=1551624720]
+transform = Transform3D(-0.335, 0, -7.326029e-08, 0, 0.838, 0, 2.928663e-08, 0, -0.838, 0, 0, 0)
 mesh = SubResource("ArrayMesh_12ppg")

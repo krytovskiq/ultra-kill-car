@@ -5,11 +5,10 @@ var start_z_position: float = 0.0
 var lights_tween: Tween
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 4.0
-@export var STEER_LIMIT: float = 0.5
+@export var STEER_SPEED: float = 0.4
+@export var STEER_LIMIT: float = 0.1
 @export var engine_force_value: int = 4000
-@export var brake_force: float = 15.0
-@export var handbrake_force: float = 15.0
+@export var brake_force: float = 90.0
 @export var MAX_SPEED_KMH: int = 250
 
 @export_group("Health")
@@ -53,7 +52,6 @@ func _ready() -> void:
 	max_contacts_reported = 24
 	current_hp = health
 	current_fuel = max_fuel
-	center_of_mass = Vector3(0, 0, 0)
 	if has_node("Hud/HpBar"):
 		$Hud/HpBar.max_value = health
 		$Hud/HpBar.value = current_hp
@@ -95,18 +93,27 @@ func _physics_process(delta: float) -> void:
 	elif not Input.is_key_pressed(KEY_W) and speed_kmh < min_speed_kmh:
 		brake = 0.0
 		engine_force = -(engine_force_value * 0.3)
-	else:
-		if not Input.is_key_pressed(KEY_SPACE):
-			brake = 0.0
 
 	var steer_input = Input.get_axis("D", "A") 
 	var speed_factor = clamp(1.0 - (speed_kmh / 400.0), 0.6, 1.0) 
-	var steer_target = steer_input * STEER_LIMIT * speed_factor
+	# 1. Считаем коэффициент скорости (от 0.0 до 1.0)
+# Чем ближе к MAX_SPEED_KMH, тем ближе значение к 1.0
+	var speed_ratio = clamp(speed_kmh / float(MAX_SPEED_KMH), 0.0, 1.0)
+
+# 2. Рассчитываем динамический лимит поворота
+# На низкой скорости будет STEER_LIMIT (0.5), 
+# а на максимальной — в 3-4 раза меньше (например, 0.15)
+	var dynamic_steer_limit = STEER_LIMIT * lerp(1.0, 0.25, speed_ratio)
+
+# 3. Считаем итоговую цель поворота
+	var steer_target = steer_input * dynamic_steer_limit
+
+# 4. Плавный поворот руля
+# На высокой скорости руль должен крутиться ТЯЖЕЛЕЕ (медленнее)
+	var dynamic_steer_speed = STEER_SPEED * lerp(1.0, 0.3, speed_ratio)
 	steering = move_toward(steering, steer_target, STEER_SPEED * delta)
-
+	
 	traction(speed_mps)
-
-
 	
 	if not destroyed and speed_mps > 0.1:
 		current_fuel -= fuel_consumption * delta
