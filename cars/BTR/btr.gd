@@ -7,10 +7,10 @@ var lights_tween: Tween
 @export_group("Driving")
 @export var STEER_SPEED: float = 1.2
 @export var STEER_LIMIT: float = 0.5
-@export var engine_force_value: int = 4000
-@export var brake_force: float = 7.0
-@export var handbrake_force: float = 7.0
-@export var MAX_SPEED_KMH: int = 90
+@export var engine_force_value: int = 5000
+@export var brake_force: float = 9.0
+@export var handbrake_force: float = 9.0
+@export var MAX_SPEED_KMH: int = 110
 
 @export_group("Health")
 @export var health: int = 100
@@ -106,9 +106,6 @@ func _physics_process(delta: float) -> void:
 
 	traction(speed_mps)
 	
-
-
-	
 	if not destroyed and speed_mps > 0.1:
 		current_fuel -= fuel_consumption * delta
 	
@@ -167,7 +164,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 
 	# 1. СТОЛКНОВЕНИЕ С ЗОМБИ
 	if body.is_in_group("zombie"):
-		take_damage(10) # Машина получает урон
+		take_damage(2)
 		if speed_kmh >= 40:
 			if body.has_method("die"):
 				body.die(linear_velocity, speed_mps)
@@ -207,7 +204,7 @@ func shake_camera(amount: float):
 		var tween = create_tween()
 		for i in range(5):
 			var rand_offset = Vector2(randf_range(-amount, amount), randf_range(-amount, amount))
-			tween.tween_property(camera, "h_offset", rand_offset.x, 0.02)
-			tween.tween_property(camera, "v_offset", rand_offset.y, 0.02)
-		tween.tween_property(camera, "h_offset", 0.0, 0.05)
-		tween.tween_property(camera, "v_offset", 0.0, 0.05)
+			tween.tween_property(camera, "h_offset", rand_offset.x, 0.003)
+			tween.tween_property(camera, "v_offset", rand_offset.y, 0.003)
+		tween.tween_property(camera, "h_offset", 0.0, 0.003)
+		tween.tween_property(camera, "v_offset", 0.0, 0.003)

@@ -14,14 +14,14 @@ ground_color = Color(0, 0, 0, 1)
 energy_multiplier = 1.7
 night_sky = ExtResource("1_0xm2m")
 
-[sub_resource type="Sky" id="Sky_1bvp3"]
+[sub_resource type="Sky" id="Sky_5vw27"]
 sky_material = SubResource("PhysicalSkyMaterial_h2yge")
 radiance_size = 2
 
 [sub_resource type="Environment" id="Environment_8dxyn"]
 background_mode = 2
 background_color = Color(0, 0, 0.43137255, 1)
-sky = SubResource("Sky_1bvp3")
+sky = SubResource("Sky_5vw27")
 sky_rotation = Vector3(0, 0.20245819, 0)
 ambient_light_color = Color(0.43137255, 0.44705883, 0.4745098, 1)
 ambient_light_sky_contribution = 0.42

@@ -116,7 +116,6 @@ aabb = AABB(-78.026, -0.96, -60.045, 155.31, 17.13, 120.091)
 
 [node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=337661843]
 occluder = ExtResource("12_6cu7m")
-bake_simplification_distance = 0.0
 
 [node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=1645147157]
 multimesh = SubResource("MultiMesh_dc0kt")

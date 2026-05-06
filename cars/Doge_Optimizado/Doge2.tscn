@@ -3130,7 +3130,7 @@ transform = Transform3D(1, 0, 0, 0, 2.220446e-16, 1, 0, -1, 2.220446e-16, 0, 0, 
 [node name="root" type="Node3D" parent="Sketchfab_model" unique_id=1705233765]
 
 [node name="GLTF_SceneRootNode" type="Node3D" parent="Sketchfab_model/root" unique_id=1676214475]
-transform = Transform3D(2.4838909e-15, 6.556708e-08, 1.2999998, 1.2999998, -6.556708e-08, 0, 5.68248e-08, 1.4999999, -5.68248e-08, 0, 0, 0)
+transform = Transform3D(2.4838909e-15, 6.556708e-08, 1.2999998, 1.2999998, -6.556708e-08, 0, 5.68248e-08, 1.4999999, -5.68248e-08, 0, -1.6526777e-17, -0.07442999)
 
 [node name="70_C7_92_AB_001_1" type="Node3D" parent="Sketchfab_model/root/GLTF_SceneRootNode" unique_id=1410881093]
 transform = Transform3D(0, 1, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0)

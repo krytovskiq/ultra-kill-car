@@ -26,7 +26,7 @@ var lights_tween: Tween
 @export var wall_damage_min_speed_mps: float = 5.0
 
 @export_group("Fuel")
-@export var max_fuel: int = 1000
+@export var max_fuel: int = 100
 @export var fuel_consumption: float = 1.0
 var current_fuel: float = 0.0
 var current_hp: int = 0

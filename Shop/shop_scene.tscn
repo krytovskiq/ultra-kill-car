@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://bm52c2ry0p4yw"]
 
-[ext_resource type="Script" uid="uid://bt3i55n8bf2ix" path="res://shop_scene.gd" id="1_42hh6"]
+[ext_resource type="Script" uid="uid://bt3i55n8bf2ix" path="res://Shop/shop_scene.gd" id="1_m4aye"]
 
 [sub_resource type="Environment" id="Environment_e2eif"]
 
 [node name="ShopScene" type="Node3D" unique_id=430265009]
-script = ExtResource("1_42hh6")
+script = ExtResource("1_m4aye")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1863281194]
 current = true

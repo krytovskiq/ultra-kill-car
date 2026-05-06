@@ -1,6 +1,7 @@
 extends Node3D
 
 @export var chunk_scene: PackedScene
+@export var chunk_scene2: PackedScene
 @export var car: VehicleBody3D
 
 @export_group("World Generation")
