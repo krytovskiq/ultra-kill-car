@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://x8crbidqj8ja"
 path.s3tc="res://.godot/imported/burnin_rubber_3_hangar_2.png-abe18841a893a23d651419244b73838b.s3tc.ctex"
+path.etc2="res://.godot/imported/burnin_rubber_3_hangar_2.png-abe18841a893a23d651419244b73838b.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://Shop/Angar/burnin_rubber_3_hangar_2.png"
-dest_files=["res://.godot/imported/burnin_rubber_3_hangar_2.png-abe18841a893a23d651419244b73838b.s3tc.ctex"]
+dest_files=["res://.godot/imported/burnin_rubber_3_hangar_2.png-abe18841a893a23d651419244b73838b.s3tc.ctex", "res://.godot/imported/burnin_rubber_3_hangar_2.png-abe18841a893a23d651419244b73838b.etc2.ctex"]
 
 [params]
 
