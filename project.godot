@@ -21,10 +21,9 @@ Game="*uid://ilfv05hv7cnm"
 
 [display]
 
-window/size/viewport_width=1024
-window/size/viewport_height=576
-window/stretch/mode="viewport"
-window/stretch/scale=0.75
+window/size/mode=4
+window/stretch/mode="canvas_items"
+window/stretch/scale=0.72
 
 [global_group]
 
@@ -93,13 +92,11 @@ camera/depth_of_field/depth_of_field_bokeh_quality=0
 environment/ssao/quality=0
 environment/ssil/quality=0
 environment/ssil/adaptive_target=0.0
-anti_aliasing/quality/msaa_3d=1
 anti_aliasing/screen_space_roughness_limiter/enabled=false
 anti_aliasing/quality/smaa_edge_detection_threshold=0.01
 textures/default_filters/texture_mipmap_bias=-0.25
 environment/glow/upscale_mode=0
 environment/volumetric_fog/use_filter=0
-anti_aliasing/quality/screen_space_aa=2
 occlusion_culling/use_occlusion_culling=true
 2d/sdf/scale=0
 viewport/canvas_textures/default_texture_filter=1

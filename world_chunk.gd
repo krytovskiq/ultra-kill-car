@@ -21,6 +21,7 @@ static var global_distance_counter: float = 0.0
 @export var object2: PackedScene
 @export var object3: PackedScene
 @export var object4: PackedScene
+@export var object5: PackedScene
 
 func _ready() -> void:
 	var notifier = VisibleOnScreenNotifier3D.new()
@@ -90,6 +91,7 @@ func _spawn_random_objects():
 	if object2: objects.append(object2)
 	if object3: objects.append(object3)
 	if object4: objects.append(object4)
+	if object4: objects.append(object5)
 	
 	if objects.is_empty(): return
 

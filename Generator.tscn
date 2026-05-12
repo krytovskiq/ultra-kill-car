@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="4_yegdb"]
 [ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_8g4c3"]
 [ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="6_6cu7m"]
+[ext_resource type="PackedScene" uid="uid://cw1n1hwb3j3is" path="res://model/decor/bochka/bochka.tscn" id="8_j2hus"]
 [ext_resource type="PackedScene" uid="uid://bggtemdkmx3qq" path="res://model/decor/Ambar/ambar.tscn" id="8_x7r45"]
 [ext_resource type="ArrayOccluder3D" uid="uid://dut67mfwfmugq" path="res://Generator.occ" id="12_6cu7m"]
 [ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
@@ -89,6 +90,7 @@ object1 = ExtResource("4_8g4c3")
 object2 = ExtResource("4_yegdb")
 object3 = ExtResource("5_8g4c3")
 object4 = ExtResource("6_6cu7m")
+object5 = ExtResource("8_j2hus")
 
 [node name="GroundBody" type="StaticBody3D" parent="." unique_id=1961299343]
 collision_layer = 512

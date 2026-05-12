@@ -192,10 +192,9 @@ offset_right = 366.0
 offset_bottom = 515.0
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1416847367]
-transform = Transform3D(0.6965316, -0.12545446, 0.7064736, 0.02058585, 0.987685, 0.15509538, -0.71723074, -0.093485475, 0.69053644, 11.90227, 3.30142, 32.606934)
+transform = Transform3D(0.5964777, -0.13804273, 0.7906697, -0.01841999, 0.9824853, 0.18542774, -0.8024183, -0.12516765, 0.5834878, 11.90227, 3.30142, 32.606934)
 keep_aspect = 0
 current = true
-fov = 74.06638
 
 [node name="Spawn" type="Marker3D" parent="." unique_id=1990064799]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9367547, 0.1289168, 26.492281)

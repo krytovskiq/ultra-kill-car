@@ -1,9 +1,9 @@
 extends MultiMeshInstance3D
 
-@export var total_trees: int = 1400       # Общее количество деревьев
-@export var area_width: float = 250.0    # Ширина всего поля
-@export var area_depth: float = 120.0    # Длина поля (вглубь)
-@export var road_width: float = 150.0     # Ширина дороги (где деревьев НЕ будет)
+@export var total_trees: int = 700
+@export var area_width: float = 250.0
+@export var area_depth: float = 120.0
+@export var road_width: float = 150.0
 
 func _ready():
 	multimesh.instance_count = total_trees
