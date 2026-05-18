@@ -1883,7 +1883,9 @@ shadow_mesh = SubResource("ArrayMesh_0ynjp")
 resource_name = "38_50_87_0A"
 cull_mode = 2
 albedo_texture = ExtResource("13_ccbah")
-roughness = 0.5
+metallic = 1.0
+roughness = 0.0
+emission = Color(0.4745098, 0, 0, 1)
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_hr7qb"]
 _surfaces = [{

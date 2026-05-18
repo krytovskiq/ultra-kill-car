@@ -4,8 +4,6 @@
 [ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_272bh"]
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="2_5vw27"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://pause.tscn" id="5_lquwl"]
-[ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="8_kek77"]
-[ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="9_4c57u"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_h2yge"]
 rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
@@ -40,30 +38,11 @@ fog_mode = 1
 fog_light_energy = 0.7
 fog_sun_scatter = 0.31
 fog_density = 1.0
-fog_depth_curve = 0.20000064
+fog_depth_curve = 0.21763763
 fog_depth_begin = 0.0
 fog_depth_end = 220.0
 adjustment_contrast = 1.125
 adjustment_saturation = 0.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wjub3"]
-albedo_texture = ExtResource("8_kek77")
-normal_enabled = true
-normal_scale = 0.79
-normal_texture = ExtResource("9_4c57u")
-uv1_scale = Vector3(0.085, 0.085, 0.085)
-uv1_triplanar = true
-texture_filter = 5
-
-[sub_resource type="BoxMesh" id="BoxMesh_272bh"]
-resource_local_to_scene = true
-lightmap_size_hint = Vector2i(979, 616)
-material = SubResource("StandardMaterial3D_wjub3")
-size = Vector3(150, 1, 128.095)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_dg77c"]
-resource_local_to_scene = true
-size = Vector3(150, 0, 120)
 
 [node name="Main" type="Node3D" unique_id=1305401198]
 script = ExtResource("1_272bh")
@@ -75,21 +54,9 @@ update_distance = 100.0
 environment = SubResource("Environment_8dxyn")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=774830370]
-transform = Transform3D(1, 0, 0, 0, 0.21567275, 0.97646564, 0, -0.97646564, 0.21567275, 0, 70.56531, 0)
+transform = Transform3D(1, 0, 0, 0, 0.21567276, 0.9764657, 0, -0.9764657, 0.21567276, 0, 6.286339, 0)
 light_color = Color(0.5609549, 0.5609549, 0.5609549, 1)
 light_energy = 0.2
 
 [node name="Pause" parent="." unique_id=1664862517 instance=ExtResource("5_lquwl")]
 visible = false
-
-[node name="GroundBody" type="StaticBody3D" parent="." unique_id=1111331730]
-collision_layer = 512
-collision_mask = 0
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="GroundBody" unique_id=1619474154]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0141716, -0.6117554, -0.21616364)
-mesh = SubResource("BoxMesh_272bh")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody" unique_id=1687321113]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.076254, -0.32381684, 0)
-shape = SubResource("BoxShape3D_dg77c")
