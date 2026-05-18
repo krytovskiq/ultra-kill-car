@@ -10,23 +10,25 @@
 [ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="6_6cu7m"]
 [ext_resource type="PackedScene" uid="uid://cw1n1hwb3j3is" path="res://model/decor/bochka/bochka.tscn" id="8_j2hus"]
 [ext_resource type="PackedScene" uid="uid://bggtemdkmx3qq" path="res://model/decor/Ambar/ambar.tscn" id="8_x7r45"]
+[ext_resource type="Texture2D" uid="uid://d2bcbor7yky4" path="res://model/terrain/gravelly_sand_disp_1k.png" id="10_j2hus"]
 [ext_resource type="ArrayOccluder3D" uid="uid://dut67mfwfmugq" path="res://Generator.occ" id="12_6cu7m"]
 [ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
 [ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="13_ua3rv"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wjub3"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ua3rv"]
 albedo_texture = ExtResource("3_1cr0a")
 normal_enabled = true
-normal_scale = 0.79
+normal_scale = 1.92
 normal_texture = ExtResource("4_5sdx4")
-uv1_scale = Vector3(0.085, 0.085, 0.085)
+heightmap_scale = 2.0
+heightmap_texture = ExtResource("10_j2hus")
+uv1_scale = Vector3(0.1, 0.1, 0.1)
 uv1_triplanar = true
-texture_filter = 5
 
 [sub_resource type="BoxMesh" id="BoxMesh_80s8q"]
 resource_local_to_scene = true
 lightmap_size_hint = Vector2i(979, 616)
-material = SubResource("StandardMaterial3D_wjub3")
+material = SubResource("StandardMaterial3D_ua3rv")
 size = Vector3(150, 1, 124.555)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vh1cf"]
@@ -118,6 +120,7 @@ aabb = AABB(-78.026, -0.96, -60.045, 155.31, 17.13, 120.091)
 
 [node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=337661843]
 occluder = ExtResource("12_6cu7m")
+bake_simplification_distance = 0.01
 
 [node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=1645147157]
 multimesh = SubResource("MultiMesh_dc0kt")
