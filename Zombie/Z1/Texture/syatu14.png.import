@@ -2,21 +2,18 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blr3ssgnjr02j"
-path.s3tc="res://.godot/imported/fence_and_gate_wood_0.jpg-95e688dcd41b0df94815c9ca75409683.s3tc.ctex"
-path.etc2="res://.godot/imported/fence_and_gate_wood_0.jpg-95e688dcd41b0df94815c9ca75409683.etc2.ctex"
+uid="uid://bmd7bybc7u5lq"
+path.s3tc="res://.godot/imported/syatu14.png-d4413c8b031c97159f8a25be252a22a7.s3tc.ctex"
+path.etc2="res://.godot/imported/syatu14.png-d4413c8b031c97159f8a25be252a22a7.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "d76bc108603741d63ee31953524c833b"
-}
 
 [deps]
 
-source_file="res://Zombie/fence_and_gate_wood_0.jpg"
-dest_files=["res://.godot/imported/fence_and_gate_wood_0.jpg-95e688dcd41b0df94815c9ca75409683.s3tc.ctex", "res://.godot/imported/fence_and_gate_wood_0.jpg-95e688dcd41b0df94815c9ca75409683.etc2.ctex"]
+source_file="res://Zombie/Z1/Texture/syatu14.png"
+dest_files=["res://.godot/imported/syatu14.png-d4413c8b031c97159f8a25be252a22a7.s3tc.ctex", "res://.godot/imported/syatu14.png-d4413c8b031c97159f8a25be252a22a7.etc2.ctex"]
 
 [params]
 

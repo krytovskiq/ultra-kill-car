@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ggc1saroqc55"
-path.s3tc="res://.godot/imported/grendel_fps_creator_3.png-dd90d8da4d9417e76bb18230c1ab126c.s3tc.ctex"
-path.etc2="res://.godot/imported/grendel_fps_creator_3.png-dd90d8da4d9417e76bb18230c1ab126c.etc2.ctex"
+uid="uid://plr0q5c401yl"
+path.s3tc="res://.godot/imported/jyake14.png-c346816ae8f5278cbcae8153347f0bb7.s3tc.ctex"
+path.etc2="res://.godot/imported/jyake14.png-c346816ae8f5278cbcae8153347f0bb7.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://Zombie/grendel_fps_creator_3.png"
-dest_files=["res://.godot/imported/grendel_fps_creator_3.png-dd90d8da4d9417e76bb18230c1ab126c.s3tc.ctex", "res://.godot/imported/grendel_fps_creator_3.png-dd90d8da4d9417e76bb18230c1ab126c.etc2.ctex"]
+source_file="res://Zombie/Z1/Texture/jyake14.png"
+dest_files=["res://.godot/imported/jyake14.png-c346816ae8f5278cbcae8153347f0bb7.s3tc.ctex", "res://.godot/imported/jyake14.png-c346816ae8f5278cbcae8153347f0bb7.etc2.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1

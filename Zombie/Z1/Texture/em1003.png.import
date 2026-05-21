@@ -2,23 +2,22 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bbniriokc1ljr"
-path="res://.godot/imported/Zombiess_Image_4.png-79e18d77edbd17cbcd9da9269b5848d5.ctex"
+uid="uid://b3g0dgckrstwv"
+path.s3tc="res://.godot/imported/em1003.png-04677f0aa55b2480748eb38aa3e7cb8a.s3tc.ctex"
+path.etc2="res://.godot/imported/em1003.png-04677f0aa55b2480748eb38aa3e7cb8a.etc2.ctex"
 metadata={
-"vram_texture": false
-}
-generator_parameters={
-"md5": "625e316017e7294885a4f12a2ad1a7e3"
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
-source_file="res://Zombie/Zombiess_Image_4.png"
-dest_files=["res://.godot/imported/Zombiess_Image_4.png-79e18d77edbd17cbcd9da9269b5848d5.ctex"]
+source_file="res://Zombie/Z1/Texture/em1003.png"
+dest_files=["res://.godot/imported/em1003.png-04677f0aa55b2480748eb38aa3e7cb8a.s3tc.ctex", "res://.godot/imported/em1003.png-04677f0aa55b2480748eb38aa3e7cb8a.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +39,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

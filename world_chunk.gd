@@ -41,7 +41,7 @@ func spawn_zombies():
 	if not zombie_scene: return
 	for i in range(zombie_count):
 		var zombie = zombie_scene.instantiate()
-		zombie.scale = Vector3(0.03, 0.03, 0.03) 
+		zombie.scale = Vector3(1.0, 1.0, 1.0) 
 		add_child(zombie)
 		
 		# Генерируем случайную позицию на полотне дороги
@@ -50,7 +50,6 @@ func spawn_zombies():
 		
 		# Ставим зомби на поверхность (surface_y)
 		# Прибавляем 0.5 к высоте, чтобы они не спавнились "по пояс" в земле
-		zombie.position = Vector3(random_x, surface_y + 1.5, random_z)
 
 func _apply_chunk_geometry() -> void:
 	# 1. Настройка коллизии (физический пол)

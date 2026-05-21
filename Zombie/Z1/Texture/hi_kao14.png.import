@@ -2,21 +2,18 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bi74enqfa7uos"
-path.s3tc="res://.godot/imported/Zombiess_Image_0.png-5432160038abbdee060bc63b6a30289c.s3tc.ctex"
-path.etc2="res://.godot/imported/Zombiess_Image_0.png-5432160038abbdee060bc63b6a30289c.etc2.ctex"
+uid="uid://c4otam1isblvp"
+path.s3tc="res://.godot/imported/hi_kao14.png-a47deb905d63dea441e229840942f38a.s3tc.ctex"
+path.etc2="res://.godot/imported/hi_kao14.png-a47deb905d63dea441e229840942f38a.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "2f4653fbe2b5d0a56e079c966acd4fa8"
-}
 
 [deps]
 
-source_file="res://Zombie/Zombiess_Image_0.png"
-dest_files=["res://.godot/imported/Zombiess_Image_0.png-5432160038abbdee060bc63b6a30289c.s3tc.ctex", "res://.godot/imported/Zombiess_Image_0.png-5432160038abbdee060bc63b6a30289c.etc2.ctex"]
+source_file="res://Zombie/Z1/Texture/hi_kao14.png"
+dest_files=["res://.godot/imported/hi_kao14.png-a47deb905d63dea441e229840942f38a.s3tc.ctex", "res://.godot/imported/hi_kao14.png-a47deb905d63dea441e229840942f38a.etc2.ctex"]
 
 [params]
 

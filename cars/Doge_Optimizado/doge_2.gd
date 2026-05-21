@@ -12,7 +12,7 @@ var lights_tween: Tween
 @export var MAX_SPEED_KMH: int = 250
 
 @export_group("Health")
-@export var health: int = 100
+@export var health: int = 1000
 @export var collision_damage_multiplier: float = 0.35
 
 @export_group("Zombie Collision")

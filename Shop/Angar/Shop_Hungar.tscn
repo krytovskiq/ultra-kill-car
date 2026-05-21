@@ -105,7 +105,7 @@ transform = Transform3D(0.01, 0, 0, 0, 0, -0.01, 0, 0.01, 0, 0, 0, 0)
 transform = Transform3D(100, 0, 0, 0, -1.6292068e-05, 100, 0, -100, -1.6292068e-05, 0, 0, 0)
 
 [node name="Hangar_HangarMaterial_0" type="MeshInstance3D" parent="Sketchfab_model/br3menu_fbx/RootNode/Hangar" unique_id=1052454272]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0033483505, 0.0051755905, 8.4321067e-10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.008877754, 0.0043115644, -0.018425465)
 mesh = SubResource("ArrayMesh_ogdwx")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Sketchfab_model/br3menu_fbx/RootNode/Hangar" unique_id=483323444]

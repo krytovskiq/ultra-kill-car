@@ -3,7 +3,7 @@ extends RigidBody3D
 enum ZombieState { IDLE, CHASE, ATTACK, DEAD, FALLEN }
 @export var get_up_time: float = 0.5
 @export var speed: int = 8
-@export var damage: int = 100
+@export var damage: int = 10
 @export var player_path: NodePath
 @export var max_hp: float = 50.0
 @export var detection_radius: float = 500.0
@@ -94,7 +94,7 @@ func _process_idle(delta: float) -> void:
 
 func _process_chase(delta: float) -> void:
 	if !player: return
-	play_anim("root|Zombie Walk_003")
+	play_anim("Run")
 	var target_pos = player.global_position
 	var dir = (target_pos - global_position).normalized()
 	dir.y = 0
@@ -106,7 +106,7 @@ func _start_attack() -> void:
 	_internal_velocity = Vector3.ZERO
 	
 	# Создаем список имен твоих анимаций атак
-	var attack_anims = ["Attack", "Attack_2"] # Замени на свои точные названия
+	var attack_anims = ["Attack"] # Замени на свои точные названия
 	var random_anim = attack_anims.pick_random() # Выбираем случайную
 	
 	play_anim(random_anim)
@@ -135,8 +135,8 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 	# Даем импульс
 	apply_central_impulse(impact_force * 0.5) 
 	
-	if anim_player.has_animation("Dead"):
-		play_anim("Dead")
+	if anim_player.has_animation("Death"):
+		play_anim("Death")
 
 
 func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
@@ -164,8 +164,8 @@ func knockdown(impact_force: Vector3):
 	# Добавляем хаотичное вращение в полете
 	angular_velocity = Vector3(randf_range(-5, 5), 0, randf_range(-5, 5))
 
-	if anim_player.has_animation("Dead"):
-		anim_player.play("Dead")
+	if anim_player.has_animation("Death"):
+		anim_player.play("Death")
 	
 	# 4. Таймер вставания (без строчки freeze = true в конце)
 	await get_tree().create_timer(3.0).timeout
@@ -174,8 +174,8 @@ func knockdown(impact_force: Vector3):
 func _get_up_simple():
 	if state == ZombieState.DEAD: return
 	
-	if anim_player.has_animation("Dead"):
-		anim_player.play("Dead", -1, -1.0, true)
+	if anim_player.has_animation("Death"):
+		anim_player.play("Death", -1, -1.0, true)
 		await anim_player.animation_finished
 	
 	state = ZombieState.CHASE
@@ -186,8 +186,8 @@ func _get_up():
 	# Чтобы он не вставал "в воздухе", сначала ставим его на землю
 	# (Здесь можно добавить проверку лучем RayCast вниз, если нужно)
 	
-	if anim_player.has_animation("Dead"):
-		anim_player.play("Dead", -1, -1.0, true)
+	if anim_player.has_animation("Death"):
+		anim_player.play("Death", -1, -1.0, true)
 		await anim_player.animation_finished
 	
 	freeze = true
