@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3jip17n6x1ln"
-path.s3tc="res://.godot/imported/carson_fastback_2.png-82f4d1f9365f583a1ab78151c190428d.s3tc.ctex"
-path.etc2="res://.godot/imported/carson_fastback_2.png-82f4d1f9365f583a1ab78151c190428d.etc2.ctex"
+uid="uid://d2eje5xnfqjlw"
+path.s3tc="res://.godot/imported/Dodge_carson_fastback_7.jpg-284d55212a2982e459ecb20766b24c86.s3tc.ctex"
+path.etc2="res://.godot/imported/Dodge_carson_fastback_7.jpg-284d55212a2982e459ecb20766b24c86.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "0fd2755d13e1a5883a730488c71e0fd7"
+"md5": "0ce53190d2ff3a90007e69777b0dbfc0"
 }
 
 [deps]
 
-source_file="res://cars/Doge_Optimizado/carson_fastback_2.png"
-dest_files=["res://.godot/imported/carson_fastback_2.png-82f4d1f9365f583a1ab78151c190428d.s3tc.ctex", "res://.godot/imported/carson_fastback_2.png-82f4d1f9365f583a1ab78151c190428d.etc2.ctex"]
+source_file="res://cars/Doge_Optimizado/texture/Dodge_carson_fastback_7.jpg"
+dest_files=["res://.godot/imported/Dodge_carson_fastback_7.jpg-284d55212a2982e459ecb20766b24c86.s3tc.ctex", "res://.godot/imported/Dodge_carson_fastback_7.jpg-284d55212a2982e459ecb20766b24c86.etc2.ctex"]
 
 [params]
 
