@@ -1,5 +1,5 @@
 extends Node3D
-
+@export var world_environment: WorldEnvironment
 @export var chunk_scene: PackedScene
 @export var chunk_scene2: PackedScene
 @export var car: VehicleBody3D
@@ -17,7 +17,10 @@ extends Node3D
 
 @export_group("Debug")
 @export var verbose_logs: bool = false
-
+var normal_fog_color: Color = Color("a3b2c4")
+var scary_red_fog_color: Color = Color("9c3333ff")
+var current_fog_tween: Tween
+var is_fog_red: bool = false
 var _forward: Vector3 = Vector3.BACK
 var _chunk_step: float = 120.0
 var _chunk_nodes: Dictionary = {}
@@ -30,7 +33,7 @@ func _ready() -> void:
 	var car_scene = load(car_path)
 	car = car_scene.instantiate()
 	add_child(car)
-	car.global_position = Vector3(0, 0, 0) # Поставь точку старта
+	car.global_position = Vector3(0, 0.1, 0) # Поставь точку старта
 	car.add_to_group("player") # ВАЖНО для работы генератора!
 	_resolve_car()
 	if chunk_scene == null:
@@ -48,18 +51,39 @@ func _ready() -> void:
 	_cleanup_preplaced_chunks()
 	var car_index := _get_chunk_index(_distance_along_forward(car.global_position))
 	_ensure_chunks_for_index(car_index)
-	_last_checked_distance = _distance_along_forward(car.global_position)
-
-
+	_last_checked_distance = float(car_index)
+# Замените вашу функцию _process в main.gd на эту:
 func _process(_delta: float) -> void:
 	if car == null or chunk_scene == null:
 		return
+		
 	var distance := _distance_along_forward(car.global_position)
-	if absf(distance - _last_checked_distance) < update_distance:
-		return
+	var current_chunk_index := _get_chunk_index(distance)
+	
+	var abs_dist = absf(distance)
+	var zone_index = floori(abs_dist / 1500.0)
+	
+	var is_in_red_zone = (zone_index % 2 == 1)
+	
+	if is_in_red_zone and not is_fog_red:
+		is_fog_red = true
+		_transition_fog(scary_red_fog_color, 0.1) # Красный туман, делаем его чуть гуще
+		if verbose_logs: print("Вход в КРАСНУЮ зону сложности! Номер зоны: ", zone_index)
+	elif not is_in_red_zone and is_fog_red:
+		is_fog_red = false
+		_transition_fog(normal_fog_color, 0.01) # Возвращаем обычный туман
+		if verbose_logs: print("Вход в ОБЫЧНУЮ зону! Номер зоны: ", zone_index)
+	# -----------------------------------------------------
+	
+	# ХИТРОСТЬ: Вместо проверки метров, мы проверяем переменную _last_checked_distance.
+	# Но теперь мы будем хранить в ней именно ИНДЕКС чанка (0, 1, 2...), а не метры!
+	if current_chunk_index == int(_last_checked_distance):
+		return # Если машина все еще на том же чанке — ничего не делаем!
 
-	_last_checked_distance = distance
-	_ensure_chunks_for_index(_get_chunk_index(distance))
+	# Если индекс изменился (машина пересекла границу чанка) — генерируем дорогу вперед
+	_last_checked_distance = float(current_chunk_index)
+	_ensure_chunks_for_index(current_chunk_index)
+
 func _resolve_car() -> void:
 	if car != null:
 		return
@@ -76,8 +100,6 @@ func _ensure_chunks_for_index(current_index: int) -> void:
 	for index in range(min_index, max_index + 1):
 		if not _chunk_nodes.has(index):
 			_spawn_chunk(index)
-
-	# 2. ОЧИСТКА битых ссылок и старых индексов
 	var remove_list: Array[int] = []
 	for key in _chunk_nodes.keys():
 		var index := int(key)
@@ -88,9 +110,9 @@ func _ensure_chunks_for_index(current_index: int) -> void:
 	for index in remove_list:
 		var chunk = _chunk_nodes[index]
 		if is_instance_valid(chunk):
-			chunk.queue_free()
+			chunk.queue_free() # Это вызовет _exit_tree() в чанке и вернет зомби в пул!
 		_chunk_nodes.erase(index)
-		
+
 func _spawn_chunk(index: int) -> void:
 	var chunk := chunk_scene.instantiate() as Node3D
 	if chunk == null:
@@ -99,17 +121,25 @@ func _spawn_chunk(index: int) -> void:
 
 	var chunk_origin := world_origin + _forward * (_chunk_step * float(index))
 	var chunk_basis := Basis.looking_at(_forward, Vector3.UP)
+	
+	# 1. Сначала добавляем чанк в дерево сцены (срабатывает его _ready, но без спавна зомби)
 	add_child(chunk)
+	
+	# 2. Перемещаем чанк на его законное место впереди машины
 	chunk.global_transform = Transform3D(chunk_basis, Vector3(chunk_origin.x, road_y, chunk_origin.z))
 
 	if chunk.has_method("configure_chunk"):
 		chunk.call("configure_chunk", chunk_width, chunk_length, chunk_thickness, road_y)
 
+	# !!! ДОБАВЛЯЕМ СЮДА !!!
+	# Теперь, когда чанк железно стоит на нужной позиции, даем команду заселить зомби
+	if chunk.has_method("init_chunk_zombies"):
+		chunk.init_chunk_zombies()
+
 	_chunk_nodes[index] = chunk
 	if verbose_logs:
 		print("Chunk ", index, " @ ", chunk.global_position)
-
-
+		
 func _cleanup_preplaced_chunks() -> void:
 	if chunk_scene == null:
 		return
@@ -133,3 +163,17 @@ func _distance_along_forward(world_position: Vector3) -> float:
 
 func _get_chunk_index(distance_along_forward: float) -> int:
 	return int(floor(distance_along_forward / _chunk_step))
+	
+func _transition_fog(target_color: Color, target_density: float) -> void:
+	if world_environment == null or world_environment.environment == null:
+		return
+		
+	var env = world_environment.environment
+	env.fog_enabled = true
+		
+	if current_fog_tween:
+		current_fog_tween.kill()
+		
+	current_fog_tween = create_tween()
+	
+	current_fog_tween.tween_property(env, "fog_light_color", target_color, 5.0)

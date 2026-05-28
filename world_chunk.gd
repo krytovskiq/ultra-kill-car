@@ -1,6 +1,5 @@
 extends Node3D
 static var global_distance_counter: float = 0.0
-
 @export_group("Размеры чанка")
 @export var chunk_width: float = 250.0
 @export var chunk_length: float = 120.0
@@ -9,6 +8,8 @@ static var global_distance_counter: float = 0.0
 
 @export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
 @export var zombie_count: int = 10     # Сколько зомби на один кусок дороги
+
+var my_zombies: Array[Node3D] = []
 
 @export var barn_scene: PackedScene # Сцена амбара
 @export var barn_interval: float = 800.0 # Интервал в метрах
@@ -24,32 +25,40 @@ static var global_distance_counter: float = 0.0
 @export var object5: PackedScene
 
 func _ready() -> void:
-	var notifier = VisibleOnScreenNotifier3D.new()
-	# Настраиваем размер зоны видимости (чуть больше самого чанка)
-	notifier.aabb = AABB(Vector3(-chunk_width/2, -5, -chunk_length/2), Vector3(chunk_width, 10, chunk_length))
-	add_child(notifier)
-	notifier.screen_exited.connect(_on_visible_on_screen_notifier_3d_screen_exited)
+	#var notifier = VisibleOnScreenNotifier3D.new()
+	#notifier.aabb = AABB(Vector3(-chunk_width/2, -5, -chunk_length/2), Vector3(chunk_width, 10, chunk_length))
+	#add_child(notifier)
+	$VisibleOnScreenNotifier3D.screen_exited.connect(_on_visible_on_screen_notifier_3d_screen_exited)
+	
 	_apply_chunk_geometry()
-	spawn_zombies()
 	_spawn_random_objects()
-	global_distance_counter += chunk_length # Прибавляем длину чанка к счетчику
+	
+	global_distance_counter += chunk_length 
 	if global_distance_counter >= barn_interval:
 		spawn_barn(self)
 		global_distance_counter = 0.0 
+	# Строку spawn_zombies() отсюда мы убрали!
+
+# Эту функцию теперь вызывает main.gd строго вовремя
+func init_chunk_zombies() -> void:
+	await get_tree().physics_frame
+	# Теперь позиция чанка 100% правильная, и пул поставит зомби точно на дорогу!
+	spawn_zombies()
 
 func spawn_zombies():
-	if not zombie_scene: return
 	for i in range(zombie_count):
-		var zombie = zombie_scene.instantiate()
-		zombie.scale = Vector3(1.0, 1.0, 1.0) 
-		add_child(zombie)
-		
-		# Генерируем случайную позицию на полотне дороги
 		var random_x = randf_range(-chunk_width / 2.5, chunk_width / 2.5)
 		var random_z = randf_range(-chunk_length / 2.0, chunk_length / 2.0)
+		var spawn_pos = global_position + Vector3(random_x, surface_y, random_z)
 		
-		# Ставим зомби на поверхность (surface_y)
-		# Прибавляем 0.5 к высоте, чтобы они не спавнились "по пояс" в земле
+		# Просто запрашиваем зомби из пула без лишних проверок!
+		var zombie = ZombiePool.spawn_zombie_at(spawn_pos)
+		if zombie:
+			zombie.scale = Vector3(1.0, 1.0, 1.0)
+			if not my_zombies.has(zombie):
+				my_zombies.append(zombie)
+
+
 
 func _apply_chunk_geometry() -> void:
 	# 1. Настройка коллизии (физический пол)
@@ -104,7 +113,7 @@ func _spawn_random_objects():
 		
 		instance.position = Vector3(random_x, surface_y, random_z)
 		instance.rotation.y = randf_range(0, TAU)
-	print("Объект заспавнен аналогично амбару!")
+	print("Обьект создан")
 
 func spawn_barn(parent_chunk: Node3D):
 	if not barn_scene: return # Защита от вылета
@@ -116,12 +125,21 @@ func spawn_barn(parent_chunk: Node3D):
 	print("Амбар заспавнен!")
 
 func _on_visible_on_screen_notifier_3d_screen_exited() -> void:
-	var player = get_tree().get_first_node_in_group("player")
-	if player:
-		# Считаем расстояние между машиной и этим чанком
-		var dist = global_position.distance_to(player.global_position)
-		
-		# Если машина уехала дальше чем на 200 метров — удаляем чанк
-		# (200 метров достаточно, чтобы игрок не видел исчезновения)
-		if dist > 200.0:
-			queue_free()
+	for zombie in my_zombies:
+		if is_instance_valid(zombie):
+			ZombiePool.return_zombie(zombie) # Возвращаем в пул (вызовет remove_child)
+	my_zombies.clear()
+	queue_free() # Удаляем чанк
+
+
+func _exit_tree() -> void:
+	# Железная страховка Godot: если чанк удален кодом, возвращаем зомби
+	_clear_and_return_zombies()
+
+# Вспомогательная функция очистки
+func _clear_and_return_zombies() -> void:
+	for zombie in my_zombies:
+		if is_instance_valid(zombie):
+			# Возвращаем зомби обратно в скрытый пул
+			ZombiePool.return_zombie(zombie)
+	my_zombies.clear()

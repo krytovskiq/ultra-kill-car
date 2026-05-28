@@ -116,7 +116,7 @@ shape = SubResource("BoxShape3D_j2hus")
 
 [node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="." unique_id=1519313398]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18412277, -0.22340393)
-aabb = AABB(-78.026, -0.96, -60.045, 155.31, 17.13, 120.091)
+aabb = AABB(-125, -4, -60, 250, 15, 120)
 
 [node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=337661843]
 occluder = ExtResource("12_6cu7m")

@@ -14,14 +14,14 @@ night_sky = ExtResource("1_0xm2m")
 
 [sub_resource type="Sky" id="Sky_5vw27"]
 sky_material = SubResource("PhysicalSkyMaterial_h2yge")
-radiance_size = 2
+radiance_size = 1
 
 [sub_resource type="Environment" id="Environment_8dxyn"]
 background_mode = 2
 background_color = Color(0, 0, 0.43137255, 1)
 sky = SubResource("Sky_5vw27")
 sky_rotation = Vector3(0, 0.20245819, 0)
-ambient_light_color = Color(0.43137255, 0.44705883, 0.4745098, 1)
+ambient_light_color = Color(0.29185385, 0.30419937, 0.32580867, 1)
 ambient_light_sky_contribution = 0.42
 ambient_light_energy = 0.7
 reflected_light_source = 2
@@ -44,8 +44,9 @@ fog_depth_end = 220.0
 adjustment_contrast = 1.125
 adjustment_saturation = 0.0
 
-[node name="Main" type="Node3D" unique_id=1305401198]
+[node name="Main" type="Node3D" unique_id=1305401198 node_paths=PackedStringArray("world_environment")]
 script = ExtResource("1_272bh")
+world_environment = NodePath("WorldEnvironment")
 chunk_scene = ExtResource("2_5vw27")
 chunks_ahead = 3
 update_distance = 100.0
