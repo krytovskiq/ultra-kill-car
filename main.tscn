@@ -38,7 +38,7 @@ fog_mode = 1
 fog_light_energy = 0.7
 fog_sun_scatter = 0.31
 fog_density = 1.0
-fog_depth_curve = 0.21763763
+fog_depth_curve = 0.31864038
 fog_depth_begin = 0.0
 fog_depth_end = 220.0
 adjustment_contrast = 1.125
@@ -48,8 +48,6 @@ adjustment_saturation = 0.0
 script = ExtResource("1_272bh")
 world_environment = NodePath("WorldEnvironment")
 chunk_scene = ExtResource("2_5vw27")
-chunks_ahead = 3
-update_distance = 100.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
 environment = SubResource("Environment_8dxyn")

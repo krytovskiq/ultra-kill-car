@@ -5,11 +5,11 @@ extends Node3D
 @export var car: VehicleBody3D
 
 @export_group("World Generation")
-@export var chunks_ahead: int = 10
-@export var chunks_behind: int = 2
-@export var update_distance: float = 10.0
-@export var chunk_width: float = 44.0
-@export var chunk_length: float = 120.0
+@export var chunks_ahead: int = 2
+@export var chunks_behind: int = 1
+@export var update_distance: float = 220.0
+@export var chunk_width: float = 200.0
+@export var chunk_length: float = 240.0
 @export var chunk_thickness: float = 8.0
 @export var road_y: float = 0.0
 @export var world_origin: Vector3 = Vector3.ZERO
@@ -33,7 +33,7 @@ func _ready() -> void:
 	var car_scene = load(car_path)
 	car = car_scene.instantiate()
 	add_child(car)
-	car.global_position = Vector3(0, 0.1, 0) # Поставь точку старта
+	car.global_position = Vector3(0, 0, 0) # Поставь точку старта
 	car.add_to_group("player") # ВАЖНО для работы генератора!
 	_resolve_car()
 	if chunk_scene == null:

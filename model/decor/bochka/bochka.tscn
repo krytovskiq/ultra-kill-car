@@ -65,6 +65,7 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -7.141944, 3.6762733, -0.314
 
 [node name="Barrel_1_004_Barrel_3_0" type="MeshInstance3D" parent="Sketchfab_model/3_Materials_fbx/RootNode/Barrel_1_004" unique_id=8525626]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+visibility_range_end = 120.0
 mesh = SubResource("ArrayMesh_88oqq")
 
 [node name="StaticBody3D" type="RigidBody3D" parent="Sketchfab_model/3_Materials_fbx/RootNode/Barrel_1_004/Barrel_1_004_Barrel_3_0" unique_id=1859533653]

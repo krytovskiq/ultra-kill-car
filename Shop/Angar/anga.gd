@@ -47,6 +47,12 @@ func spawn_car_preview(path):
 		car_instance = car_scene.instantiate()
 		add_child(car_instance)
 		
+		# --- ОТКЛЮЧАЕМ КАМЕРУ МАШИНЫ ДЛЯ АНГАРА ---
+		var car_camera = car_instance.find_child("*Camera*", true, false) as Camera3D
+		if car_camera:
+			car_camera.current = false
+		# ------------------------------------------
+		
 		# Ставим машину в твой узел Spawn
 		car_instance.global_position = $Spawn.global_position
 		
@@ -54,6 +60,7 @@ func spawn_car_preview(path):
 		if car_instance is RigidBody3D:
 			car_instance.freeze = true
 		car_instance.set_physics_process(false)
+
 
 func _process(delta):
 	# Вращаем машину для красоты

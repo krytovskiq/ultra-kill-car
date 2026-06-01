@@ -19,6 +19,11 @@ config/icon="res://icon.svg"
 
 Game="*uid://ilfv05hv7cnm"
 ZombiePool="*uid://dd7y2rdsddyhk"
+YandexSDK="*uid://df67a6ypkak38"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot-yandex-games-sdk/plugin.cfg")
 
 [global_group]
 
@@ -98,6 +103,7 @@ occlusion_culling/occlusion_rays_per_thread=256
 environment/glow/upscale_mode=0
 environment/subsurface_scattering/subsurface_scattering_quality=0
 environment/volumetric_fog/use_filter=0
+anti_aliasing/quality/screen_space_aa=1
 occlusion_culling/use_occlusion_culling=true
 lights_and_shadows/positional_shadow/atlas_size=2048
 2d/sdf/scale=0

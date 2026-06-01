@@ -2,8 +2,8 @@ extends Node3D
 static var global_distance_counter: float = 0.0
 @export_group("Размеры чанка")
 @export var chunk_width: float = 250.0
-@export var chunk_length: float = 120.0
-@export var chunk_thickness: float = 8.0
+@export var chunk_length: float = 240.0
+@export var chunk_thickness: float = 80.0
 @export var surface_y: float = 0.0
 
 @export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
@@ -12,7 +12,7 @@ static var global_distance_counter: float = 0.0
 var my_zombies: Array[Node3D] = []
 
 @export var barn_scene: PackedScene # Сцена амбара
-@export var barn_interval: float = 800.0 # Интервал в метрах
+@export var barn_interval: float = 1300.0 # Интервал в метрах
 
 @onready var _collision_shape: CollisionShape3D = $GroundBody/CollisionShape3D
 @onready var _mesh_instance: MeshInstance3D = $GroundBody/MeshInstance3D
@@ -25,10 +25,6 @@ var my_zombies: Array[Node3D] = []
 @export var object5: PackedScene
 
 func _ready() -> void:
-	#var notifier = VisibleOnScreenNotifier3D.new()
-	#notifier.aabb = AABB(Vector3(-chunk_width/2, -5, -chunk_length/2), Vector3(chunk_width, 10, chunk_length))
-	#add_child(notifier)
-	$VisibleOnScreenNotifier3D.screen_exited.connect(_on_visible_on_screen_notifier_3d_screen_exited)
 	
 	_apply_chunk_geometry()
 	_spawn_random_objects()

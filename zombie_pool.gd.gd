@@ -37,7 +37,7 @@ func _create_new_pool_zombie() -> Node3D:
 	zombie.visible = false
 	zombie.process_mode = PROCESS_MODE_DISABLED 
 	
-	zombie.global_position = Vector3(0, -500.0, 0)
+	#zombie.global_position = Vector3(0, -500.0, 0)
 	get_tree().current_scene.add_child(zombie)
 	pool.append(zombie)
 	return zombie

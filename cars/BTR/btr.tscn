@@ -71,9 +71,11 @@ size = Vector3(1.9233038, 1.298866, 1.7814431)
 
 [node name="BTR" type="VehicleBody3D" unique_id=1984143113]
 collision_mask = 517
-mass = 4000.0
+mass = 8000.0
+gravity_scale = 1.1
 center_of_mass_mode = 1
 script = ExtResource("1_fwtlp")
+engine_force_value = 10000
 
 [node name="Sketchfab_model" type="Node3D" parent="." unique_id=17000276]
 transform = Transform3D(0.0051424326, 0, 0, 0, 0, 0.0051424326, 0, -0.0051424326, 0, 0, 0, 0)
@@ -93,18 +95,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0020747, -57.795586)
 transform = Transform3D(-2, 1.7484555e-07, 0, -1.7484555e-07, -2, 0, 0, 0, 2, 0, 0, 0)
 mesh = SubResource("ArrayMesh_qtrhr")
 
-[node name="look" type="Node3D" parent="." unique_id=1004061657]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
-
-[node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("4_vlebh")]
-transform = Transform3D(1, 0, 0, 0, 0.98309237, 0.1831106, 0, -0.1831106, 0.98309237, 0, 2.2495344, 5.018093)
-
 [node name="VehicleWheel3D" type="VehicleWheel3D" parent="." unique_id=1142800316]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 0.3, 1.5)
 use_as_traction = true
 wheel_friction_slip = 2.0
 suspension_stiffness = 120.0
-suspension_max_force = 18000.0
+suspension_max_force = 45000.0
 damping_compression = 2.0
 damping_relaxation = 4.0
 
@@ -117,7 +113,7 @@ use_as_traction = true
 use_as_steering = true
 wheel_friction_slip = 2.0
 suspension_stiffness = 120.0
-suspension_max_force = 18000.0
+suspension_max_force = 45000.0
 damping_compression = 2.0
 damping_relaxation = 4.0
 
@@ -130,7 +126,7 @@ use_as_traction = true
 use_as_steering = true
 wheel_friction_slip = 2.0
 suspension_stiffness = 120.0
-suspension_max_force = 18000.0
+suspension_max_force = 45000.0
 damping_compression = 2.0
 damping_relaxation = 4.0
 
@@ -142,7 +138,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.3, 1.5)
 use_as_traction = true
 wheel_friction_slip = 2.0
 suspension_stiffness = 120.0
-suspension_max_force = 18000.0
+suspension_max_force = 45000.0
 damping_compression = 2.0
 damping_relaxation = 4.0
 
@@ -204,3 +200,9 @@ collision_mask = 12
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=324925357]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.021654725, 0.009428263, 0.8165152)
 shape = SubResource("BoxShape3D_ouyga")
+
+[node name="look" type="Node3D" parent="." unique_id=1309019991]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
+
+[node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("4_vlebh")]
+transform = Transform3D(1, 0, 0, 0, 0.98309237, 0.1831106, 0, -0.1831106, 0.98309237, 0, 2.2495344, 5.018093)

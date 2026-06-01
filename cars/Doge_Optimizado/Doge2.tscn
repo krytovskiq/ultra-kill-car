@@ -577,13 +577,13 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_uwyn7")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_36car"]
-size = Vector3(2.180805, 0.96518064, 0.77432853)
+size = Vector3(2.180805, 0.6887671, 0.77432853)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_axoys"]
-size = Vector3(2.184557, 1.0005386, 1.8936515)
+size = Vector3(2.184557, 0.70351636, 1.8936515)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_miysu"]
-size = Vector3(1.2121729, 2.1274843, 2.773437)
+size = Vector3(1.1137769, 2.1274843, 2.773437)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mye8l"]
 radius = 0.4008789
@@ -704,8 +704,8 @@ shadow_mesh = SubResource("ArrayMesh_vgqad")
 [node name="Doge" type="VehicleBody3D" unique_id=2028712422]
 collision_mask = 517
 mass = 1600.0
+gravity_scale = 0.75
 center_of_mass_mode = 1
-center_of_mass = Vector3(0, 0.07, 0)
 script = ExtResource("1_36car")
 
 [node name="Sketchfab_model" type="Node3D" parent="." unique_id=980538798]
@@ -716,14 +716,6 @@ transform = Transform3D(1, 0, 0, 0, 2.220446e-16, 1, 0, -1, 2.220446e-16, 0, 0, 
 [node name="Object_83" type="MeshInstance3D" parent="Sketchfab_model/root" unique_id=1907011278]
 transform = Transform3D(-1.1, -8.8953905e-10, 1.0193107e-07, 0, 1.1659555, 0.010175141, -9.616505e-08, 0.010175141, -1.1659555, -1.015, 1.957, 0.6)
 mesh = SubResource("ArrayMesh_p51e5")
-
-[node name="look" type="Node3D" parent="." unique_id=2088708575]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
-
-[node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("2_ti1hc")]
-transform = Transform3D(1, 0, 0, 0, 0.98309237, 0.1831106, 0, -0.1831106, 0.98309237, 0, 2.404744, 5.018093)
-target_distance = 7.0
-target_height = 1.7
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=689880926]
 layer = 2
@@ -766,22 +758,22 @@ metadata/_edit_use_anchors_ = true
 [node name="Area3D" type="Area3D" parent="." unique_id=900741093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94620615, -2.8447406)
 collision_layer = 0
-collision_mask = 12
+collision_mask = 13
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=1503142467]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07924715, -0.20287377, 0.11866832)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07924715, -0.34108055, 0.18280149)
 shape = SubResource("BoxShape3D_36car")
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=966587558]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06768572, 0.8067837, -2.0179427)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06768572, 0.65827256, -2.0179427)
 shape = SubResource("BoxShape3D_axoys")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=1769451812]
-transform = Transform3D(-4.371139e-08, -1, -1.811884e-13, 1, -4.371139e-08, -7.919965e-21, 0, -1.811884e-13, 1, -0.10005677, 0.8552963, 0.26369053)
+transform = Transform3D(-4.371139e-08, -1, -1.811884e-13, 1, -4.371139e-08, -7.919965e-21, 0, -1.811884e-13, 1, -0.10005677, 0.80609834, 0.26369053)
 shape = SubResource("BoxShape3D_miysu")
 
 [node name="CollisionShape3D4" type="CollisionShape3D" parent="." unique_id=829254586]
-transform = Transform3D(-4.371138e-08, 0.9999965, 0, -0.9999998, -4.3711236e-08, 0, 0, 0, 0.9999965, -0.11720669, 0.8581233, 2.1152287)
+transform = Transform3D(-4.371138e-08, 0.9999965, 0, -0.9999998, -4.3711236e-08, 0, 0, 0, 0.9999965, -0.11720669, 0.77712226, 2.0261278)
 shape = SubResource("CapsuleShape3D_mye8l")
 
 [node name="VehicleWheel3D6" type="VehicleWheel3D" parent="." unique_id=682092696]
@@ -877,3 +869,9 @@ mesh = SubResource("ArrayMesh_ajkdk")
 transform = Transform3D(0.285, 0, 0, 0, 0.713, 0, 0, 0, 0.713, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_olbw5")
 mesh = SubResource("ArrayMesh_12ppg")
+
+[node name="look" type="Node3D" parent="." unique_id=2143890187]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
+
+[node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("2_ti1hc")]
+transform = Transform3D(1, 0, 0, 0, 0.98309237, 0.1831106, 0, -0.1831106, 0.98309237, 0, 2.2495344, 5.018093)

@@ -48,8 +48,8 @@ radius = 1.2055664
 
 [node name="Object_6" type="RigidBody3D" unique_id=290781301 groups=["object_hit"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5018909, 0)
-collision_layer = 7
-collision_mask = 519
+collision_layer = 9
+collision_mask = 525
 mass = 3000.0
 gravity_scale = 1.3
 
