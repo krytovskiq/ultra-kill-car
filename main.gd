@@ -5,11 +5,11 @@ extends Node3D
 @export var car: VehicleBody3D
 
 @export_group("World Generation")
-@export var chunks_ahead: int = 2
+@export var chunks_ahead: int = 1
 @export var chunks_behind: int = 1
-@export var update_distance: float = 220.0
-@export var chunk_width: float = 200.0
-@export var chunk_length: float = 240.0
+@export var update_distance: float = 330.0
+@export var chunk_width: float = 350.0
+@export var chunk_length: float = 330.0
 @export var chunk_thickness: float = 8.0
 @export var road_y: float = 0.0
 @export var world_origin: Vector3 = Vector3.ZERO
@@ -18,7 +18,7 @@ extends Node3D
 @export_group("Debug")
 @export var verbose_logs: bool = false
 var normal_fog_color: Color = Color("a3b2c4")
-var scary_red_fog_color: Color = Color("9c3333ff")
+var scary_red_fog_color: Color = Color("b13d3cff")
 var current_fog_tween: Tween
 var is_fog_red: bool = false
 var _forward: Vector3 = Vector3.BACK

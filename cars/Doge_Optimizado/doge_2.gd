@@ -2,8 +2,9 @@ extends VehicleBody3D
 
 var total_distance: float = 0.0
 var start_z_position: float = 0.0
-var lights_tween: Tween
-
+#@export var jump_height: float = 2.5 # Высота прыжка в метрах
+#@export var jump_duration: float = 0.4 # Время взлета/падения в секундах
+#var is_jumping: bool = false
 @export_group("Driving")
 @export var STEER_SPEED: float = 0.4
 @export var STEER_LIMIT: float = 0.08
@@ -72,16 +73,13 @@ func _physics_process(delta: float) -> void:
 	if has_node("Hud/speed"):
 		$Hud/speed.text = str(round(speed_kmh)) + "  KM/H"
 	
-	
 	var target_max_speed = MAX_SPEED_KMH
 	var auto_roll_speed = 0
-	
 	if Input.is_key_pressed(KEY_W):
 		engine_force = -engine_force_value if speed_kmh < target_max_speed else 0.0
 		brake = 0.0
 	else:
 		engine_force = -(engine_force_value * 0.5) if speed_kmh < auto_roll_speed else 0.0
-		
 	var min_speed_kmh = 25
 	if Input.is_key_pressed(KEY_S):
 		if speed_kmh > min_speed_kmh:
@@ -142,7 +140,6 @@ func _physics_process(delta: float) -> void:
 				damage_timer = 0.0
 		else:
 			damage_timer = 0.0
-
 
 func refuel(amount: float):
 	current_fuel = clamp(current_fuel + amount, 0, max_fuel)
@@ -217,3 +214,32 @@ func shake_camera(amount: float):
 			tween.tween_property(camera, "v_offset", rand_offset.y, 0.02)
 		tween.tween_property(camera, "h_offset", 0.0, 0.05)
 		tween.tween_property(camera, "v_offset", 0.0, 0.05)
+		
+#func _unhandled_input(event: InputEvent) -> void:
+	## Проверяем нажатие пробела и убеждаемся, что машина уже не прыгает
+	#if event is InputEventKey and event.keycode == KEY_SPACE and event.pressed and not event.is_echo():
+		#if not is_jumping:
+			#arcade_jump()
+#
+#func arcade_jump() -> void:
+	#is_jumping = true
+	#
+	## 1. Выключаем физику, чтобы она не мешала твину двигать машину
+	#
+	## Запоминаем точку старта
+	#var start_y: float = global_position.y
+	#var tween: Tween = create_tween()
+	#
+	## 2. Движение ВСЕЙ машины вверх
+	#tween.tween_property(self, "global_position:y", start_y + jump_height, jump_duration)\
+		#.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		#
+	## 3. Движение ВСЕЙ машины вниз
+	#tween.tween_property(self, "global_position:y", start_y, jump_duration * 0.9)\
+		#.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		#
+	## 4. Коллбэк: когда твин закончил движение, возвращаем честную физику
+	#tween.tween_callback(func():
+		#freeze = false
+		#is_jumping = false
+	#)

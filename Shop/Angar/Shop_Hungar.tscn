@@ -203,11 +203,12 @@ offset_right = 366.0
 offset_bottom = 515.0
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1416847367]
-transform = Transform3D(0.46383053, -0.07120111, 0.88305813, 0.011018478, 0.9971517, 0.07461298, -0.88585544, -0.02487782, 0.46329394, 12.776032, 2.3214757, 30.8734)
+transform = Transform3D(0.49929258, -0.07016581, 0.8635877, 0.010442306, 0.99713045, 0.074978724, -0.8663705, -0.02841847, 0.49859253, 12.776032, 2.3214757, 30.8734)
 keep_aspect = 0
 environment = SubResource("Environment_pmfdq")
 attributes = SubResource("CameraAttributesPractical_emvy3")
 current = true
+far = 63.0
 
 [node name="Spawn" type="Marker3D" parent="." unique_id=1990064799]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.015, 0.1, 25.943)

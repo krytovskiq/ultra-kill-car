@@ -1,4 +1,4 @@
-extends RigidBody3D
+extends CharacterBody3D
 
 enum ZombieState { IDLE, CHASE, ATTACK, DEAD, FALLEN }
 
@@ -35,9 +35,6 @@ func _ready() -> void:
 	add_to_group("zombie")
 	current_hp = max_hp
 	current_speed = walk_speed
-	
-	freeze = true
-	freeze_mode = RigidBody3D.FREEZE_MODE_KINEMATIC
 	
 	# Подключаем сигнал окончания анимации ОДИН раз, вместо опасных await
 	anim_player.animation_finished.connect(_on_animation_finished)

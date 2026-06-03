@@ -2,7 +2,7 @@ extends Node
 
 var zombie_scene: PackedScene = preload("res://Zombie/Z1/Z1.tscn") # Укажите ваш путь к zombie.tscn
 var pool: Array[Node3D] = []
-var pool_size: int = 300 
+var pool_size: int = 330 
 var is_initialized: bool = false # Флаг, чтобы не создавать зомби дважды
 
 func _ready() -> void:
@@ -59,7 +59,7 @@ func spawn_zombie_at(global_pos: Vector3) -> Node3D:
 			zombie.process_mode = PROCESS_MODE_INHERIT 
 			
 			var distance_from_start = absf(global_pos.z)
-			var zombie_zone_index = floori(distance_from_start / 1500.0)
+			var zombie_zone_index = floori(distance_from_start / 150.0)
 			var should_run: bool = (zombie_zone_index % 2 == 1)
 			
 			if zombie.has_method("reset_zombie"):

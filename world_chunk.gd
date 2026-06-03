@@ -1,8 +1,8 @@
 extends Node3D
 static var global_distance_counter: float = 0.0
 @export_group("Размеры чанка")
-@export var chunk_width: float = 250.0
-@export var chunk_length: float = 240.0
+@export var chunk_width: float = 380.0
+@export var chunk_length: float = 330.0
 @export var chunk_thickness: float = 80.0
 @export var surface_y: float = 0.0
 
@@ -88,7 +88,7 @@ func _apply_chunk_geometry() -> void:
 		_mesh_instance.position = Vector3(0.0, surface_y - chunk_thickness * 0.5, 0.0)
 
 func _spawn_random_objects():
-	var objects_to_spawn = randi_range(3, 6) # Случайное число объектов от 3 до 6
+	var objects_to_spawn = randi_range(20, 30) # Случайное число объектов от 3 до 6
 	
 	var objects = []
 	if object1: objects.append(object1)
