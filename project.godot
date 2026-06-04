@@ -21,6 +21,10 @@ Game="*uid://ilfv05hv7cnm"
 ZombiePool="*uid://dd7y2rdsddyhk"
 YandexSDK="*uid://df67a6ypkak38"
 
+[display]
+
+window/vsync/vsync_mode=0
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/godot-yandex-games-sdk/plugin.cfg")
@@ -78,13 +82,12 @@ space={
 [rendering]
 
 occlusion_culling/bvh_build_quality=0
-textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_s3tc_bptc=true
 textures/vram_compression/import_etc2_astc=true
+textures/vram_compression/compress_with_gpu=false
 lights_and_shadows/directional_shadow/size=2048
-lights_and_shadows/directional_shadow/soft_shadow_filter_quality=0
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality.mobile=1
 lights_and_shadows/positional_shadow/soft_shadow_filter_quality=1
 lights_and_shadows/positional_shadow/soft_shadow_filter_quality.mobile=1

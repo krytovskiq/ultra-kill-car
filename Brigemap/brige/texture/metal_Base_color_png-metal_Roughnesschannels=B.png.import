@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://e734xby8dn5f"
-path.s3tc="res://.godot/imported/only_water_base.jpg-a60760e744370327d37a1ebb0c1296bc.s3tc.ctex"
-path.etc2="res://.godot/imported/only_water_base.jpg-a60760e744370327d37a1ebb0c1296bc.etc2.ctex"
+uid="uid://blo0k8258oxla"
+path.s3tc="res://.godot/imported/metal_Base_color_png-metal_Roughnesschannels=B.png-fb1ea6d08e69b109fbc2cf7f92e53eda.s3tc.ctex"
+path.etc2="res://.godot/imported/metal_Base_color_png-metal_Roughnesschannels=B.png-fb1ea6d08e69b109fbc2cf7f92e53eda.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://Brigemap/Water/Texture/only_water_base.jpg"
-dest_files=["res://.godot/imported/only_water_base.jpg-a60760e744370327d37a1ebb0c1296bc.s3tc.ctex", "res://.godot/imported/only_water_base.jpg-a60760e744370327d37a1ebb0c1296bc.etc2.ctex"]
+source_file="res://Brigemap/brige/texture/metal_Base_color_png-metal_Roughnesschannels=B.png"
+dest_files=["res://.godot/imported/metal_Base_color_png-metal_Roughnesschannels=B.png-fb1ea6d08e69b109fbc2cf7f92e53eda.s3tc.ctex", "res://.godot/imported/metal_Base_color_png-metal_Roughnesschannels=B.png-fb1ea6d08e69b109fbc2cf7f92e53eda.etc2.ctex"]
 
 [params]
 

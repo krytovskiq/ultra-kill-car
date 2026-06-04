@@ -7,7 +7,7 @@ static var global_distance_counter: float = 0.0
 @export var surface_y: float = 0.0
 
 @export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
-@export var zombie_count: int = 10     # Сколько зомби на один кусок дороги
+@export var zombie_count: int = 20     # Сколько зомби на один кусок дороги
 
 var my_zombies: Array[Node3D] = []
 

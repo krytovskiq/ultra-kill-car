@@ -2,6 +2,10 @@
 
 [ext_resource type="Texture2D" uid="uid://y4sma77rq2ly" path="res://model/decor/bochka/texture/bochka_Image_10.jpg" id="1_7srh7"]
 
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_7srh7"]
+height = 1.8025799
+radius = 0.5019531
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_584mv"]
 resource_name = "Barrel_3"
 cull_mode = 2
@@ -45,32 +49,17 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_da4iy")
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_7srh7"]
-height = 9.44455
-radius = 2.6743164
+[node name="StaticBody3D" type="RigidBody3D" unique_id=1859533653 groups=["object_hit"]]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -0.7141944, 0.36762735, -0.03147298)
+collision_layer = 9
+collision_mask = 525
+mass = 20.0
 
-[node name="bochka" type="Node3D" unique_id=795777749]
-transform = Transform3D(1, 0, 0, 0, 0.97437006, 0.22495104, 0, -0.22495104, 0.97437006, 1.4686432, -0.044836134, 0)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=351986863]
+transform = Transform3D(0.8888414, -0.4582095, -0.0022392764, 0.44647095, 0.8671494, -0.22071607, 0.103075996, 0.19518182, 0.97533554, 0.3493475, -0.82678026, -0.21787237)
+shape = SubResource("CylinderShape3D_7srh7")
 
-[node name="Sketchfab_model" type="Node3D" parent="." unique_id=754432437]
-transform = Transform3D(0.1, 0, 0, 0, 0, 0.1, 0, -0.1, 0, 0, 0, 0)
-
-[node name="3_Materials_fbx" type="Node3D" parent="Sketchfab_model" unique_id=383455738]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
-
-[node name="RootNode" type="Node3D" parent="Sketchfab_model/3_Materials_fbx" unique_id=2023423916]
-
-[node name="Barrel_1_004" type="Node3D" parent="Sketchfab_model/3_Materials_fbx/RootNode" unique_id=1837070818]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -7.141944, 3.6762733, -0.3147299)
-
-[node name="Barrel_1_004_Barrel_3_0" type="MeshInstance3D" parent="Sketchfab_model/3_Materials_fbx/RootNode/Barrel_1_004" unique_id=8525626]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+[node name="Barrel_1_004_Barrel_3_0" type="MeshInstance3D" parent="." unique_id=8525626]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 2.9802327e-09, 0, -2.9802327e-09, 0.2, 0, 0, 0)
 visibility_range_end = 120.0
 mesh = SubResource("ArrayMesh_88oqq")
-
-[node name="StaticBody3D" type="RigidBody3D" parent="Sketchfab_model/3_Materials_fbx/RootNode/Barrel_1_004/Barrel_1_004_Barrel_3_0" unique_id=1859533653]
-collision_mask = 517
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Sketchfab_model/3_Materials_fbx/RootNode/Barrel_1_004/Barrel_1_004_Barrel_3_0/StaticBody3D" unique_id=351986863]
-transform = Transform3D(0.8888414, -0.4582095, -0.0022392764, 0.44647095, 0.8671494, -0.22071607, 0.103075996, 0.19518182, 0.97533554, 2.0396254, -3.6431494, -0.76412034)
-shape = SubResource("CylinderShape3D_7srh7")

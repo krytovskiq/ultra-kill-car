@@ -2,21 +2,18 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://6a2pg8ul7lom"
-path.s3tc="res://.godot/imported/bridge_Image_0.jpg-0401c34283295f6b6baca69e2a3aef34.s3tc.ctex"
-path.etc2="res://.godot/imported/bridge_Image_0.jpg-0401c34283295f6b6baca69e2a3aef34.etc2.ctex"
+uid="uid://jyqjiepifrfj"
+path.s3tc="res://.godot/imported/metal_Base_color_png-metal_Roughnesschannels=G.png-04f7747d9490593553cce5b1a6a753f1.s3tc.ctex"
+path.etc2="res://.godot/imported/metal_Base_color_png-metal_Roughnesschannels=G.png-04f7747d9490593553cce5b1a6a753f1.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "b8f12da35669ac60fb0b9ca6349cc9f6"
-}
 
 [deps]
 
-source_file="res://Brigemap/brige/texture/bridge_Image_0.jpg"
-dest_files=["res://.godot/imported/bridge_Image_0.jpg-0401c34283295f6b6baca69e2a3aef34.s3tc.ctex", "res://.godot/imported/bridge_Image_0.jpg-0401c34283295f6b6baca69e2a3aef34.etc2.ctex"]
+source_file="res://Brigemap/brige/texture/metal_Base_color_png-metal_Roughnesschannels=G.png"
+dest_files=["res://.godot/imported/metal_Base_color_png-metal_Roughnesschannels=G.png-04f7747d9490593553cce5b1a6a753f1.s3tc.ctex", "res://.godot/imported/metal_Base_color_png-metal_Roughnesschannels=G.png-04f7747d9490593553cce5b1a6a753f1.etc2.ctex"]
 
 [params]
 

@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c4hpprbasyrnf"
-path.s3tc="res://.godot/imported/only_water_normal.jpg-4339cd34e3543f129ae87fb07a815834.s3tc.ctex"
-path.etc2="res://.godot/imported/only_water_normal.jpg-4339cd34e3543f129ae87fb07a815834.etc2.ctex"
+uid="uid://bdofdneanwlim"
+path.s3tc="res://.godot/imported/asphalt_Base_color.png-117458eb5510c5507f2cd59741429afb.s3tc.ctex"
+path.etc2="res://.godot/imported/asphalt_Base_color.png-117458eb5510c5507f2cd59741429afb.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://Brigemap/Water/Texture/only_water_normal.jpg"
-dest_files=["res://.godot/imported/only_water_normal.jpg-4339cd34e3543f129ae87fb07a815834.s3tc.ctex", "res://.godot/imported/only_water_normal.jpg-4339cd34e3543f129ae87fb07a815834.etc2.ctex"]
+source_file="res://Brigemap/brige/texture/asphalt_Base_color.png"
+dest_files=["res://.godot/imported/asphalt_Base_color.png-117458eb5510c5507f2cd59741429afb.s3tc.ctex", "res://.godot/imported/asphalt_Base_color.png-117458eb5510c5507f2cd59741429afb.etc2.ctex"]
 
 [params]
 
@@ -23,12 +23,12 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=1
-roughness/src_normal="res://Brigemap/Water/Texture/only_water_normal.jpg"
+roughness/mode=0
+roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

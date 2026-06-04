@@ -6,8 +6,8 @@ var start_z_position: float = 0.0
 #@export var jump_duration: float = 0.4 # Время взлета/падения в секундах
 #var is_jumping: bool = false
 @export_group("Driving")
-@export var STEER_SPEED: float = 0.4
-@export var STEER_LIMIT: float = 0.08
+@export var STEER_SPEED: float = 0.9
+@export var STEER_LIMIT: float = 0.1
 @export var engine_force_value: int = 4000
 @export var brake_force: float = 90.0
 @export var MAX_SPEED_KMH: int = 250

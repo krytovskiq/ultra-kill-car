@@ -5,7 +5,7 @@ enum ZombieState { IDLE, CHASE, ATTACK, DEAD, FALLEN }
 @export_group("Zombie Settings")
 @export var max_hp: float = 50.0
 @export var walk_speed: float = 5.0    
-@export var run_speed: float = 20.0     
+@export var run_speed: float = 14.0     
 @export var damage: int = 12
 @export var attack_range: float = 3.0
 @export var detection_radius: float = 500.0

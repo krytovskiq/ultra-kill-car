@@ -2,21 +2,18 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://tx7rkkki1064"
-path.s3tc="res://.godot/imported/bridge_Image_2.jpg-3de5e633c6c582f69cb0caa9b08c951e.s3tc.ctex"
-path.etc2="res://.godot/imported/bridge_Image_2.jpg-3de5e633c6c582f69cb0caa9b08c951e.etc2.ctex"
+uid="uid://cgsxfyn23il7d"
+path.s3tc="res://.godot/imported/asphalt_Metallic-asphalt_Roughnesschannels=B.png-630a90f93eb8af177e4fa5a8c833b0e8.s3tc.ctex"
+path.etc2="res://.godot/imported/asphalt_Metallic-asphalt_Roughnesschannels=B.png-630a90f93eb8af177e4fa5a8c833b0e8.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "ee03290e3620c7b3c8ece05f7f10abb6"
-}
 
 [deps]
 
-source_file="res://Brigemap/brige/texture/bridge_Image_2.jpg"
-dest_files=["res://.godot/imported/bridge_Image_2.jpg-3de5e633c6c582f69cb0caa9b08c951e.s3tc.ctex", "res://.godot/imported/bridge_Image_2.jpg-3de5e633c6c582f69cb0caa9b08c951e.etc2.ctex"]
+source_file="res://Brigemap/brige/texture/asphalt_Metallic-asphalt_Roughnesschannels=B.png"
+dest_files=["res://.godot/imported/asphalt_Metallic-asphalt_Roughnesschannels=B.png-630a90f93eb8af177e4fa5a8c833b0e8.s3tc.ctex", "res://.godot/imported/asphalt_Metallic-asphalt_Roughnesschannels=B.png-630a90f93eb8af177e4fa5a8c833b0e8.etc2.ctex"]
 
 [params]
 
@@ -26,12 +23,12 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=1
-roughness/src_normal="res://model/bridge_Image_2.jpg"
+roughness/mode=0
+roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2
