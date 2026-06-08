@@ -3,11 +3,11 @@ static var global_distance_counter: float = 0.0
 @export_group("Размеры чанка")
 @export var chunk_width: float = 380.0
 @export var chunk_length: float = 330.0
-@export var chunk_thickness: float = 80.0
+@export var chunk_thickness: float = 1.0
 @export var surface_y: float = 0.0
 
 @export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
-@export var zombie_count: int = 20     # Сколько зомби на один кусок дороги
+@export var zombie_count: int = 10     # Сколько зомби на один кусок дороги
 
 var my_zombies: Array[Node3D] = []
 
@@ -96,6 +96,7 @@ func _spawn_random_objects():
 	if object3: objects.append(object3)
 	if object4: objects.append(object4)
 	if object4: objects.append(object5)
+	if object5: objects.append(object5)
 	
 	if objects.is_empty(): return
 

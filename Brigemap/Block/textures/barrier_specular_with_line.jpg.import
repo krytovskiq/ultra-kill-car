@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://g27wpl5btp0q"
-path.s3tc="res://.godot/imported/mixed_grunge_texture_0.jpeg-8cb5d8736c9675b314ca85b04cffd059.s3tc.ctex"
-path.etc2="res://.godot/imported/mixed_grunge_texture_0.jpeg-8cb5d8736c9675b314ca85b04cffd059.etc2.ctex"
+uid="uid://by6lygwge7j7p"
+path.s3tc="res://.godot/imported/barrier_specular_with_line.jpg-f96071eafdc307db396802cc2abe8541.s3tc.ctex"
+path.etc2="res://.godot/imported/barrier_specular_with_line.jpg-f96071eafdc307db396802cc2abe8541.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://Biome_City/textures/mixed_grunge_texture_0.jpeg"
-dest_files=["res://.godot/imported/mixed_grunge_texture_0.jpeg-8cb5d8736c9675b314ca85b04cffd059.s3tc.ctex", "res://.godot/imported/mixed_grunge_texture_0.jpeg-8cb5d8736c9675b314ca85b04cffd059.etc2.ctex"]
+source_file="res://Brigemap/Block/textures/barrier_specular_with_line.jpg"
+dest_files=["res://.godot/imported/barrier_specular_with_line.jpg-f96071eafdc307db396802cc2abe8541.s3tc.ctex", "res://.godot/imported/barrier_specular_with_line.jpg-f96071eafdc307db396802cc2abe8541.etc2.ctex"]
 
 [params]
 

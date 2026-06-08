@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_272bh"]
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="2_5vw27"]
+[ext_resource type="PackedScene" uid="uid://bbs788x153n6p" path="res://Brigemap/brige/Brige.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://pause.tscn" id="5_lquwl"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_h2yge"]
@@ -47,7 +48,8 @@ adjustment_saturation = 0.0
 [node name="Main" type="Node3D" unique_id=1305401198 node_paths=PackedStringArray("world_environment")]
 script = ExtResource("1_272bh")
 world_environment = NodePath("WorldEnvironment")
-chunk_scene = ExtResource("2_5vw27")
+chunk_scenes_list = Array[PackedScene]([ExtResource("2_5vw27")])
+bridge_scene = ExtResource("3_lquwl")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
 environment = SubResource("Environment_8dxyn")

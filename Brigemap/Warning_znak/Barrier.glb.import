@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://g6xg838ibdsc"
-path="res://.godot/imported/Apocalypsis_Bild.glb-72ac51d7136108aa31c1ef1bc7f493be.scn"
+uid="uid://dq3runnael0ht"
+path="res://.godot/imported/Barrier.glb-a65897a1cf995aafab65683e047cb3e4.scn"
 
 [deps]
 
-source_file="res://Biome_City/Apocalypsis_Bild.glb"
-dest_files=["res://.godot/imported/Apocalypsis_Bild.glb-72ac51d7136108aa31c1ef1bc7f493be.scn"]
+source_file="res://Brigemap/Warning_znak/Barrier.glb"
+dest_files=["res://.godot/imported/Barrier.glb-a65897a1cf995aafab65683e047cb3e4.scn"]
 
 [params]
 
@@ -37,6 +37,18 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={}
+_subresources={
+"nodes": {
+"PATH:NoSigns/Not_Enter/Not_Enter2": {
+"generate/physics": true
+},
+"PATH:NoSigns/Stop/Stop2": {
+"generate/physics": true
+},
+"PATH:NoSigns/Wrong_Way2/Wrong_Way": {
+"generate/physics": true
+}
+}
+}
 gltf/naming_version=2
 gltf/embedded_image_handling=1

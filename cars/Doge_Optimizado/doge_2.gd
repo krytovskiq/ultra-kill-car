@@ -75,6 +75,9 @@ func _physics_process(delta: float) -> void:
 	
 	var target_max_speed = MAX_SPEED_KMH
 	var auto_roll_speed = 0
+	if Input.is_key_pressed(KEY_SPACE):
+		position.y = 2
+		rotation.x = 90
 	if Input.is_key_pressed(KEY_W):
 		engine_force = -engine_force_value if speed_kmh < target_max_speed else 0.0
 		brake = 0.0

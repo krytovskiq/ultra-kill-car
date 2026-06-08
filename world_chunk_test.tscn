@@ -1,27 +1,27 @@
-[gd_scene format=4 uid="uid://hut6rtb4m5uh"]
+[gd_scene format=4 uid="uid://fftgg44ngfs7"]
 
-[ext_resource type="Script" uid="uid://qlfobs7v7t5o" path="res://world_chunk.gd" id="1_1mryt"]
-[ext_resource type="PackedScene" uid="uid://btk65abugxc3d" path="res://Zombie/Z1/Z1.tscn" id="2_ua3rv"]
-[ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="3_1cr0a"]
-[ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="4_5sdx4"]
-[ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="4_8g4c3"]
-[ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="4_yegdb"]
-[ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_8g4c3"]
-[ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="6_6cu7m"]
-[ext_resource type="PackedScene" uid="uid://ww4cxhxsyvpo" path="res://model/decor/wrekers_car/wagon_001a_reference_smd_4.tscn" id="8_ua3rv"]
-[ext_resource type="PackedScene" uid="uid://bggtemdkmx3qq" path="res://model/decor/Ambar/ambar.tscn" id="8_x7r45"]
-[ext_resource type="Texture2D" uid="uid://d2bcbor7yky4" path="res://model/terrain/gravelly_sand_disp_1k.png" id="10_j2hus"]
-[ext_resource type="ArrayOccluder3D" uid="uid://dut67mfwfmugq" path="res://Generator.occ" id="12_6cu7m"]
-[ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
-[ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="13_ua3rv"]
+[ext_resource type="Script" uid="uid://qlfobs7v7t5o" path="res://world_chunk.gd" id="1_jxjpd"]
+[ext_resource type="PackedScene" uid="uid://btk65abugxc3d" path="res://Zombie/Z1/Z1.tscn" id="2_sa7cs"]
+[ext_resource type="PackedScene" uid="uid://bggtemdkmx3qq" path="res://model/decor/Ambar/ambar.tscn" id="3_bnois"]
+[ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="4_iuauh"]
+[ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="5_ti1a1"]
+[ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="6_5rmd6"]
+[ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="7_ss4fs"]
+[ext_resource type="PackedScene" uid="uid://ww4cxhxsyvpo" path="res://model/decor/wrekers_car/wagon_001a_reference_smd_4.tscn" id="8_0j6mu"]
+[ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="9_gvyof"]
+[ext_resource type="Texture2D" uid="uid://d2bcbor7yky4" path="res://model/terrain/gravelly_sand_disp_1k.png" id="10_p21ph"]
+[ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="11_plqib"]
+[ext_resource type="ArrayOccluder3D" uid="uid://dut67mfwfmugq" path="res://Generator.occ" id="12_0grau"]
+[ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="13_pib0s"]
+[ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="14_btsts"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ua3rv"]
-albedo_texture = ExtResource("3_1cr0a")
+albedo_texture = ExtResource("9_gvyof")
 normal_enabled = true
 normal_scale = 16.0
-normal_texture = ExtResource("4_5sdx4")
+normal_texture = ExtResource("11_plqib")
 heightmap_scale = 2.0
-heightmap_texture = ExtResource("10_j2hus")
+heightmap_texture = ExtResource("10_p21ph")
 uv1_scale = Vector3(0.1, 0.1, 0.1)
 uv1_triplanar = true
 
@@ -42,7 +42,7 @@ size = Vector3(0, 15.921, 330)
 resource_name = "Tree_Pine"
 transparency = 4
 cull_mode = 2
-albedo_texture = ExtResource("12_j2hus")
+albedo_texture = ExtResource("13_pib0s")
 roughness = 0.8040408
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_y2q7l"]
@@ -84,14 +84,14 @@ transform_format = 1
 mesh = SubResource("ArrayMesh_5nrek")
 
 [node name="WorldChunk" type="Node3D" unique_id=560257719]
-script = ExtResource("1_1mryt")
-zombie_scene = ExtResource("2_ua3rv")
-barn_scene = ExtResource("8_x7r45")
-object1 = ExtResource("4_8g4c3")
-object2 = ExtResource("4_yegdb")
-object3 = ExtResource("5_8g4c3")
-object4 = ExtResource("6_6cu7m")
-object5 = ExtResource("8_ua3rv")
+script = ExtResource("1_jxjpd")
+zombie_scene = ExtResource("2_sa7cs")
+barn_scene = ExtResource("3_bnois")
+object1 = ExtResource("4_iuauh")
+object2 = ExtResource("5_ti1a1")
+object3 = ExtResource("6_5rmd6")
+object4 = ExtResource("7_ss4fs")
+object5 = ExtResource("8_0j6mu")
 
 [node name="GroundBody" type="StaticBody3D" parent="." unique_id=1961299343]
 collision_layer = 512
@@ -118,10 +118,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18412277, -2.470375)
 aabb = AABB(-131.80214, -13.568, -159.81291, 263.60428, 31.175, 319.9258)
 
 [node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=337661843]
-occluder = ExtResource("12_6cu7m")
+occluder = ExtResource("12_0grau")
 
 [node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=1645147157]
 multimesh = SubResource("MultiMesh_dc0kt")
-script = ExtResource("13_ua3rv")
+script = ExtResource("14_btsts")
+
+[node name="Ambar" parent="." unique_id=393427140 instance=ExtResource("3_bnois")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -51.672928, 1.8393726, 34.004593)
+
+[node name="Ambar2" parent="." unique_id=839752402 instance=ExtResource("3_bnois")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -38.3095, 1.8393745, -2.5855942)
+
+[node name="Ambar3" parent="." unique_id=1036560133 instance=ExtResource("3_bnois")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 41.18254, 1.8393726, -25.109379)
+
+[node name="Ambar4" parent="." unique_id=1098300894 instance=ExtResource("3_bnois")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 17.810213, 1.8393726, 13.832907)
 
 [connection signal="screen_exited" from="VisibleOnScreenNotifier3D" to="." method="_on_visible_on_screen_notifier_3d_screen_exited"]

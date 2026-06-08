@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://d33l7kct56alo" path="res://Brigemap/brige/texture/asphalt_Normal_OpenGL.png" id="3_1abyw"]
 [ext_resource type="Texture2D" uid="uid://bgysud0gv7tk4" path="res://Brigemap/brige/texture/asphalt_Metallic-asphalt_Roughnesschannels=G.png" id="4_bos00"]
 [ext_resource type="Texture2D" uid="uid://oyx7gfw6pe8w" path="res://Brigemap/brige/texture/metal_Base_color.png" id="5_vio08"]
+[ext_resource type="Script" uid="uid://cw7do0b72m1l7" path="res://Brigemap/brige/area_3d.gd" id="6_1abyw"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ghmqd"]
 albedo_texture = ExtResource("2_f4erd")
@@ -183,7 +184,7 @@ size = Vector3(19, 15, 0.636)
 [node name="Bridge2" type="Node3D" unique_id=285877190]
 
 [node name="Bridge" type="MeshInstance3D" parent="." unique_id=1430854610]
-transform = Transform3D(-2.6226832e-09, -0.059999995, 2.6226832e-09, 0, -2.6226832e-09, -0.06, 0.059999995, -2.6226832e-09, 1.1464113e-16, 0, -0.2, -51)
+transform = Transform3D(-2.6226832e-09, -0.059999987, 2.2023135e-23, 0.010552927, -4.6128315e-10, -0.059064664, 0.059064664, -2.5817988e-09, 0.010552927, 0, -0.425, 94.345)
 cast_shadow = 0
 mesh = SubResource("ArrayMesh_extcl")
 
@@ -203,8 +204,22 @@ mesh = SubResource("ArrayMesh_vio08")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge_007/StaticBody3D" unique_id=815900993]
 shape = SubResource("ConcavePolygonShape3D_lkhbt")
 
+[node name="Bridge_008" type="MeshInstance3D" parent="." unique_id=828647578]
+transform = Transform3D(-2.6226832e-09, -0.059999995, 2.6226832e-09, 0, -2.6226832e-09, -0.06, 0.059999995, -2.6226832e-09, 1.1464113e-16, 0, -0.425, 80.591)
+material_override = SubResource("StandardMaterial3D_bos00")
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_vio08")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Bridge_008" unique_id=148694838]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge_008/StaticBody3D" unique_id=648544303]
+shape = SubResource("ConcavePolygonShape3D_lkhbt")
+
 [node name="Area3D" type="Area3D" parent="." unique_id=2095982494]
+script = ExtResource("6_1abyw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=576530736]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.017326355, 6.7961135, -124.66912)
 shape = SubResource("BoxShape3D_igm4e")
+
+[connection signal="body_entered" from="Area3D" to="Area3D" method="_on_body_entered"]

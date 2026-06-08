@@ -58,13 +58,6 @@ adjustment_contrast = 1.125
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_emvy3"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pmfdq"]
-albedo_color = Color(0, 0, 0, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_emvy3"]
-material = SubResource("StandardMaterial3D_pmfdq")
-size = Vector3(28.8, 17.44, 0)
-
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_emvy3"]
 rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
 ground_color = Color(0, 0, 0, 1)
@@ -207,15 +200,13 @@ transform = Transform3D(0.49929258, -0.07016581, 0.8635877, 0.010442306, 0.99713
 keep_aspect = 0
 environment = SubResource("Environment_pmfdq")
 attributes = SubResource("CameraAttributesPractical_emvy3")
+v_offset = -0.245
 current = true
-far = 63.0
+fov = 82.2
+far = 70.0
 
 [node name="Spawn" type="Marker3D" parent="." unique_id=1990064799]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.015, 0.1, 25.943)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1939539451]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6994371, 0, 77.94249)
-mesh = SubResource("BoxMesh_emvy3")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2015963402]
 environment = SubResource("Environment_1twjb")
