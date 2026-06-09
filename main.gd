@@ -11,9 +11,9 @@ extends Node3D
 
 @export var chunks_ahead: int = 1
 @export var chunks_behind: int = 1
-@export var update_distance: float = 330.0
-@export var chunk_width: float = 350.0
-@export var chunk_length: float = 330.0
+@export var update_distance: float = 510.0
+@export var chunk_width: float = 380.0
+@export var chunk_length: float = 500.0
 @export var chunk_thickness: float = 8.0
 @export var road_y: float = 0.0
 @export var world_origin: Vector3 = Vector3.ZERO

@@ -57,9 +57,9 @@ collision_layer = 9
 collision_mask = 525
 
 [node name="barrier" type="MeshInstance3D" parent="." unique_id=595887237]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
+transform = Transform3D(0.04, 0, 0, 0, -1.7484555e-09, -0.04, 0, 0.04, -1.7484555e-09, 0, 0, 0)
 mesh = SubResource("ArrayMesh_rfiun")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="barrier" unique_id=1556317698]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.4741497, 0.1856041, -23.025085)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1556317698]
+transform = Transform3D(0.04, 0, 0, 0, 0.04, -1.7484555e-09, 0, 1.7484555e-09, 0.04, -0.018965987, 0.9210034, 0.0074242037)
 shape = SubResource("BoxShape3D_dqfa1")

@@ -3,13 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_272bh"]
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="2_5vw27"]
-[ext_resource type="PackedScene" uid="uid://bbs788x153n6p" path="res://Brigemap/brige/Brige.tscn" id="3_lquwl"]
+[ext_resource type="PackedScene" uid="uid://c35qvve85puyj" path="res://Brigemap/brige/danger_brige.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://pause.tscn" id="5_lquwl"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_h2yge"]
-rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
 turbidity = 0.0
-ground_color = Color(0, 0, 0, 1)
 energy_multiplier = 1.7
 night_sky = ExtResource("1_0xm2m")
 
@@ -18,16 +16,14 @@ sky_material = SubResource("PhysicalSkyMaterial_h2yge")
 radiance_size = 1
 
 [sub_resource type="Environment" id="Environment_8dxyn"]
-background_mode = 2
-background_color = Color(0, 0, 0.43137255, 1)
+background_energy_multiplier = 1.98
 sky = SubResource("Sky_5vw27")
 sky_rotation = Vector3(0, 0.20245819, 0)
-ambient_light_color = Color(0.29185385, 0.30419937, 0.32580867, 1)
-ambient_light_sky_contribution = 0.42
-ambient_light_energy = 0.7
+ambient_light_source = 1
+ambient_light_energy = 0.0
 reflected_light_source = 2
-tonemap_exposure = 0.3
 tonemap_agx_white = 16.5
+tonemap_agx_contrast = 2.0
 ssao_radius = 1.5
 ssao_intensity = 0.6
 ssao_power = 32.7849
@@ -36,12 +32,10 @@ glow_intensity = 2.12
 glow_bloom = 0.09
 fog_enabled = true
 fog_mode = 1
-fog_light_energy = 0.7
-fog_sun_scatter = 0.31
 fog_density = 1.0
-fog_depth_curve = 0.31864038
+fog_depth_curve = 0.5
 fog_depth_begin = 0.0
-fog_depth_end = 220.0
+fog_depth_end = 350.0
 adjustment_contrast = 1.125
 adjustment_saturation = 0.0
 
@@ -56,8 +50,8 @@ environment = SubResource("Environment_8dxyn")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=774830370]
 transform = Transform3D(1, 0, 0, 0, 0.21567276, 0.9764657, 0, -0.9764657, 0.21567276, 0, 6.286339, 0)
-light_color = Color(0.5609549, 0.5609549, 0.5609549, 1)
-light_energy = 0.2
+light_energy = 0.1
+light_bake_mode = 1
 
 [node name="Pause" parent="." unique_id=1664862517 instance=ExtResource("5_lquwl")]
 visible = false

@@ -124,16 +124,4 @@ occluder = ExtResource("12_0grau")
 multimesh = SubResource("MultiMesh_dc0kt")
 script = ExtResource("14_btsts")
 
-[node name="Ambar" parent="." unique_id=393427140 instance=ExtResource("3_bnois")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -51.672928, 1.8393726, 34.004593)
-
-[node name="Ambar2" parent="." unique_id=839752402 instance=ExtResource("3_bnois")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -38.3095, 1.8393745, -2.5855942)
-
-[node name="Ambar3" parent="." unique_id=1036560133 instance=ExtResource("3_bnois")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 41.18254, 1.8393726, -25.109379)
-
-[node name="Ambar4" parent="." unique_id=1098300894 instance=ExtResource("3_bnois")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 17.810213, 1.8393726, 13.832907)
-
 [connection signal="screen_exited" from="VisibleOnScreenNotifier3D" to="." method="_on_visible_on_screen_notifier_3d_screen_exited"]

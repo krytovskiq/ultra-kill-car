@@ -29,14 +29,14 @@ uv1_triplanar = true
 resource_local_to_scene = true
 lightmap_size_hint = Vector2i(979, 616)
 material = SubResource("StandardMaterial3D_ua3rv")
-size = Vector3(250, 0, 330)
+size = Vector3(380, 0, 500)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vh1cf"]
 resource_local_to_scene = true
-size = Vector3(250, 0, 330)
+size = Vector3(380, 0, 500)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j2hus"]
-size = Vector3(0, 15.921, 330)
+size = Vector3(0, 15.921, 500)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hju8v"]
 resource_name = "Tree_Pine"
@@ -102,20 +102,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0141716, -0.6117554, -0.21
 mesh = SubResource("BoxMesh_80s8q")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody" unique_id=921476853]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.076254, -0.32381684, 0)
 shape = SubResource("BoxShape3D_vh1cf")
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="GroundBody" unique_id=273603427]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -124.301636, 7.831604, -0.6683655)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -170, 7.832, -0.668)
 shape = SubResource("BoxShape3D_j2hus")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="GroundBody" unique_id=990953607]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 123.96781, 7.831604, -0.6683655)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 169.88025, 7.831604, -0.6683655)
 shape = SubResource("BoxShape3D_j2hus")
 
 [node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="." unique_id=1519313398]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18412277, -2.470375)
-aabb = AABB(-131.80214, -13.568, -159.81291, 263.60428, 31.175, 319.9258)
+aabb = AABB(-189.24176, -13.568, -239.9009, 378.48352, 31.175, 480.10178)
 
 [node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=337661843]
 occluder = ExtResource("12_6cu7m")

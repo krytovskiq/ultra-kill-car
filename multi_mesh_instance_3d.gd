@@ -2,7 +2,7 @@ extends MultiMeshInstance3D
 
 @export var total_trees: int = 800
 @export var area_width: float = 350.0
-@export var area_depth: float = 330.0
+@export var area_depth: float = 630.0
 @export var road_width: float = 250.0
 
 func _ready():

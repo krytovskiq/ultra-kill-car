@@ -2101,7 +2101,7 @@ height = 2.3040009
 
 [node name="Z1" type="CharacterBody3D" unique_id=260525653 groups=["zombie"]]
 collision_layer = 8
-collision_mask = 520
+collision_mask = 525
 axis_lock_angular_x = true
 axis_lock_angular_z = true
 script = ExtResource("1_igjkd")

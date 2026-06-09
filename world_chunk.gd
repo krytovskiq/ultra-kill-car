@@ -2,7 +2,7 @@ extends Node3D
 static var global_distance_counter: float = 0.0
 @export_group("Размеры чанка")
 @export var chunk_width: float = 380.0
-@export var chunk_length: float = 330.0
+@export var chunk_length: float = 500.0
 @export var chunk_thickness: float = 1.0
 @export var surface_y: float = 0.0
 
