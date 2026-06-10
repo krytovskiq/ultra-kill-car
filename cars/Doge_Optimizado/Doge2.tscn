@@ -875,5 +875,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 
 [node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("2_ti1hc")]
 transform = Transform3D(1, 0, 0, 0, 0.98309237, 0.1831106, 0, -0.1831106, 0.98309237, 0, 2.2495344, 5.018093)
-
-[node name="CPUParticles3D" type="CPUParticles3D" parent="." unique_id=783540256]
