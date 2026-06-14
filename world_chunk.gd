@@ -1,21 +1,16 @@
 extends Node3D
+
 static var global_distance_counter: float = 0.0
+
 @export_group("Размеры чанка")
 @export var chunk_width: float = 380.0
 @export var chunk_length: float = 500.0
 @export var chunk_thickness: float = 1.0
 @export var surface_y: float = 0.0
 
-@export var zombie_scene: PackedScene # Сюда перетащи Zombie.tscn в инспекторе
-@export var zombie_count: int = 10     # Сколько зомби на один кусок дороги
-
-var my_zombies: Array[Node3D] = []
-
-@export var barn_scene: PackedScene # Сцена амбара
-@export var barn_interval: float = 1300.0 # Интервал в метрах
-
-@onready var _collision_shape: CollisionShape3D = $GroundBody/CollisionShape3D
-@onready var _mesh_instance: MeshInstance3D = $GroundBody/MeshInstance3D
+@export_group("Окружение")
+@export var barn_scene: PackedScene 
+@export var barn_interval: float = 1300.0 
 
 @export_group("Декорации")
 @export var object1: PackedScene 
@@ -24,8 +19,10 @@ var my_zombies: Array[Node3D] = []
 @export var object4: PackedScene
 @export var object5: PackedScene
 
+@onready var _collision_shape: CollisionShape3D = $GroundBody/CollisionShape3D
+@onready var _mesh_instance: MeshInstance3D = $GroundBody/MeshInstance3D
+
 func _ready() -> void:
-	
 	_apply_chunk_geometry()
 	_spawn_random_objects()
 	
@@ -33,110 +30,50 @@ func _ready() -> void:
 	if global_distance_counter >= barn_interval:
 		spawn_barn(self)
 		global_distance_counter = 0.0 
-	# Строку spawn_zombies() отсюда мы убрали!
 
-# Эту функцию теперь вызывает main.gd строго вовремя
+# Метод пустой, чтобы main.gd не ругался при спавне чанков
 func init_chunk_zombies() -> void:
-	await get_tree().physics_frame
-	# Теперь позиция чанка 100% правильная, и пул поставит зомби точно на дорогу!
-	spawn_zombies()
-
-func spawn_zombies():
-	for i in range(zombie_count):
-		var random_x = randf_range(-chunk_width / 2.5, chunk_width / 2.5)
-		var random_z = randf_range(-chunk_length / 2.0, chunk_length / 2.0)
-		var spawn_pos = global_position + Vector3(random_x, surface_y, random_z)
-		
-		# Просто запрашиваем зомби из пула без лишних проверок!
-		var zombie = ZombiePool.spawn_zombie_at(spawn_pos)
-		if zombie:
-			zombie.scale = Vector3(1.0, 1.0, 1.0)
-			if not my_zombies.has(zombie):
-				my_zombies.append(zombie)
-
-
+	pass
 
 func _apply_chunk_geometry() -> void:
-	# 1. Настройка коллизии (физический пол)
 	if _collision_shape:
-		# Делаем ресурс уникальным, чтобы чанки не слипались
-		if _collision_shape.shape:
-			_collision_shape.shape = _collision_shape.shape.duplicate()
-		
-		var shape_res = _collision_shape.shape as BoxShape3D
-		if shape_res == null:
-			shape_res = BoxShape3D.new()
-			_collision_shape.shape = shape_res
-		
+		if not _collision_shape.shape: _collision_shape.shape = BoxShape3D.new()
+		else: _collision_shape.shape = _collision_shape.shape.duplicate()
+		var shape_res := _collision_shape.shape as BoxShape3D
 		shape_res.size = Vector3(chunk_width, chunk_thickness, chunk_length)
-		# Центрируем коллизию, чтобы верх был на surface_y
 		_collision_shape.position = Vector3(0.0, surface_y - chunk_thickness * 0.5, 0.0)
 
-	# 2. Настройка визуала (то, что мы видим)
 	if _mesh_instance:
-		# Тоже делаем меш уникальным
-		if _mesh_instance.mesh:
-			_mesh_instance.mesh = _mesh_instance.mesh.duplicate()
-			
-		var mesh_res = _mesh_instance.mesh as BoxMesh
-		if mesh_res == null:
-			mesh_res = BoxMesh.new()
-			_mesh_instance.mesh = mesh_res
-		
-		# Делаем меш ТАКИМ ЖЕ по размеру, как коллизия, чтобы не было обмана зрения
+		if not _mesh_instance.mesh: _mesh_instance.mesh = BoxMesh.new()
+		else: _mesh_instance.mesh = _mesh_instance.mesh.duplicate()
+		var mesh_res := _mesh_instance.mesh as BoxMesh
 		mesh_res.size = Vector3(chunk_width, chunk_thickness, chunk_length)
 		_mesh_instance.position = Vector3(0.0, surface_y - chunk_thickness * 0.5, 0.0)
 
-func _spawn_random_objects():
-	var objects_to_spawn = randi_range(20, 30) # Случайное число объектов от 3 до 6
-	
-	var objects = []
+func _spawn_random_objects() -> void:
+	var objects: Array[PackedScene] = []
 	if object1: objects.append(object1)
 	if object2: objects.append(object2)
 	if object3: objects.append(object3)
 	if object4: objects.append(object4)
-	if object4: objects.append(object5)
 	if object5: objects.append(object5)
-	
 	if objects.is_empty(): return
 
-	for i in range(objects_to_spawn): # Запускаем цикл
-		var selected_scene = objects.pick_random()
-		var instance = selected_scene.instantiate()
+	var objects_to_spawn: int = randi_range(20, 30) 
+	for i in range(objects_to_spawn): 
+		var instance: Node3D = objects.pick_random().instantiate() as Node3D
 		add_child(instance)
-		
-		var random_x = randf_range(-chunk_width / 3.0, chunk_width / 3.0)
-		var random_z = randf_range(-chunk_length / 2.5, chunk_length / 2.5)
-		
+		var random_x: float = randf_range(-chunk_width / 3.0, chunk_width / 3.0)
+		var random_z: float = randf_range(-chunk_length / 2.5, chunk_length / 2.5)
 		instance.position = Vector3(random_x, surface_y, random_z)
-		instance.rotation.y = randf_range(0, TAU)
-	print("Обьект создан")
+		instance.rotation.y = randf_range(0.0, TAU)
 
-func spawn_barn(parent_chunk: Node3D):
-	if not barn_scene: return # Защита от вылета
-	var barn = barn_scene.instantiate()
+func spawn_barn(parent_chunk: Node3D) -> void:
+	if not barn_scene: return 
+	var barn: Node3D = barn_scene.instantiate() as Node3D
 	parent_chunk.add_child(barn)
-	# Приподнимаем на 0.1, чтобы не было мерцания текстур пола
-	barn.position = Vector3(0, 0.1, 0) 
+	barn.position = Vector3(0.0, 0.1, 0.0) 
 	barn.rotation = Vector3.ZERO
-	print("Амбар заспавнен!")
 
 func _on_visible_on_screen_notifier_3d_screen_exited() -> void:
-	for zombie in my_zombies:
-		if is_instance_valid(zombie):
-			ZombiePool.return_zombie(zombie) # Возвращаем в пул (вызовет remove_child)
-	my_zombies.clear()
-	queue_free() # Удаляем чанк
-
-
-func _exit_tree() -> void:
-	# Железная страховка Godot: если чанк удален кодом, возвращаем зомби
-	_clear_and_return_zombies()
-
-# Вспомогательная функция очистки
-func _clear_and_return_zombies() -> void:
-	for zombie in my_zombies:
-		if is_instance_valid(zombie):
-			# Возвращаем зомби обратно в скрытый пул
-			ZombiePool.return_zombie(zombie)
-	my_zombies.clear()
+	queue_free() 

@@ -579,8 +579,9 @@ shadow_mesh = SubResource("ArrayMesh_uwyn7")
 [sub_resource type="BoxShape3D" id="BoxShape3D_36car"]
 size = Vector3(2.180805, 0.6887671, 0.77432853)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_axoys"]
-size = Vector3(2.184557, 0.70351636, 1.8936515)
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_36car"]
+radius = 0.37597656
+height = 2.1333008
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_miysu"]
 size = Vector3(1.1137769, 2.1274843, 2.773437)
@@ -702,6 +703,7 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_vgqad")
 
 [node name="Doge" type="VehicleBody3D" unique_id=2028712422]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 collision_mask = 517
 mass = 1600.0
 gravity_scale = 0.75
@@ -765,8 +767,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07924715, -0.34108055, 0.1
 shape = SubResource("BoxShape3D_36car")
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=966587558]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06768572, 0.65827256, -2.0179427)
-shape = SubResource("BoxShape3D_axoys")
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -0.12408221, 0.58155507, -2.5218902)
+shape = SubResource("CapsuleShape3D_36car")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=1769451812]
 transform = Transform3D(-4.371139e-08, -1, -1.811884e-13, 1, -4.371139e-08, -7.919965e-21, 0, -1.811884e-13, 1, -0.10005677, 0.80609834, 0.26369053)

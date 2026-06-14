@@ -4,14 +4,11 @@ extends Node3D
 @export var car: VehicleBody3D
 
 @export_group("World Generation")
-# СПИСОК ЧАНКОВ: Добавляйте сюда сцены в инспекторе. 
-# Когда они закончатся, список начнет читаться заново с 0!
 @export var chunk_scenes_list: Array[PackedScene] = []
-@export var bridge_scene: PackedScene # Сцена моста с Area3D
+@export var bridge_scene: PackedScene 
 
-@export var chunks_ahead: int = 1
+@export var chunks_ahead: int = 2
 @export var chunks_behind: int = 1
-@export var update_distance: float = 510.0
 @export var chunk_width: float = 380.0
 @export var chunk_length: float = 500.0
 @export var chunk_thickness: float = 8.0
@@ -20,42 +17,41 @@ extends Node3D
 @export var forward_axis: Vector3 = Vector3.BACK
 
 @export_group("Bridge Settings")
-@export var bridge_each_nth_chunk: int = 3 # Спавнить мост каждый N-й чанк (например, каждый 3-й)
+@export var bridge_interval_meters: float = 3000.0
+
+@export_group("Динамический Спавн Зомби")
+@export var base_spawn_cooldown: float = 1.2 # Интервал спавна (в секундах)
+@export var spawn_distance_ahead: float = 110.0 # Дистанция спавна перед машиной (в тумане)
+@export var road_spawn_width: float = 15.0 # Ширина дороги для спавна
 
 @export_group("Debug")
 @export var verbose_logs: bool = false
 
-var normal_fog_color: Color = Color("a3b2c4")
-var scary_red_fog_color: Color = Color("b13d3cff")
+var normal_fog_color: Color = Color("0d1117")      
+var scary_red_fog_color: Color = Color("3a0808")   
 var current_fog_tween: Tween
 var is_fog_red: bool = false
+
 var _forward: Vector3 = Vector3.BACK
-var _chunk_step: float = 120.0
+var _chunk_step: float = 500.0
 var _chunk_nodes: Dictionary = {}
 var _last_checked_distance: float = -INF
 
-# Внутренние переменные для бесконечного цикла мостов и биомов
-var current_biome_index: int = 0
-var chunks_spawned_counter: int = 0 # Счетчик созданных чанков подряд
+var spawn_timer: float = 0.0
+var current_spawn_cooldown: float = 1.2
 
 func _ready() -> void:
-	# СПАВНИМ МАШИНУ ИЗ ВЫБОРА В МАГАЗИНЕ
-	var car_path = Game.car_data[Game.selected_car_index].path
-	var car_scene = load(car_path)
-	car = car_scene.instantiate()
+	var car_path: String = Game.car_data[Game.selected_car_index].path
+	var car_scene: PackedScene = load(car_path)
+	car = car_scene.instantiate() as VehicleBody3D
 	add_child(car)
-	car.global_position = Vector3(0, 0, 0) 
+	car.global_position = Vector3.ZERO
 	car.add_to_group("player") 
-	_resolve_car()
 	
-	if chunk_scenes_list.is_empty():
-		push_error("Main: Список chunk_scenes_list пуст. Добавьте чанки в инспекторе.")
-		return
-	if bridge_scene == null:
-		push_error("Main: bridge_scene не назначен.")
-		return
-	if car == null:
-		push_error("Main: машина не найдена. Назначь узел car в инспекторе.")
+	current_spawn_cooldown = base_spawn_cooldown
+	
+	if chunk_scenes_list.is_empty() or bridge_scene == null or car == null:
+		push_error("Main: Критические ресурсы не назначены в Инспекторе!")
 		return
 
 	_forward = forward_axis.normalized()
@@ -64,30 +60,37 @@ func _ready() -> void:
 	_chunk_step = maxf(chunk_length, 1.0)
 
 	_cleanup_preplaced_chunks()
-	var car_index := _get_chunk_index(_distance_along_forward(car.global_position))
+	var car_index: int = _get_chunk_index(_distance_along_forward(car.global_position))
 	_ensure_chunks_for_index(car_index)
 	_last_checked_distance = float(car_index)
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if car == null or chunk_scenes_list.is_empty():
 		return
 		
-	var distance := _distance_along_forward(car.global_position)
-	var current_chunk_index := _get_chunk_index(distance)
+	var distance: float = _distance_along_forward(car.global_position)
+	var current_chunk_index: int = _get_chunk_index(distance)
 	
-	var abs_dist = absf(distance)
-	var zone_index = floori(abs_dist / 1500.0)
+	# 1. СИСТЕМА ДИНАМИЧЕСКОГО СПАВНА
+	var passed_500m_steps: int = floori(absf(distance) / 500.0)
+	# Каждые 500 метров уменьшаем задержку на 0.1 сек (зомби спавнятся плотнее)
+	current_spawn_cooldown = maxf(base_spawn_cooldown - (passed_500m_steps * 0.1), 0.25)
 	
-	var is_in_red_zone = (zone_index % 2 == 1)
+	spawn_timer += delta
+	if spawn_timer >= current_spawn_cooldown:
+		spawn_timer = 0.0
+		_spawn_single_zombie_ahead()
+	
+	# 2. ПЕРЕКЛЮЧЕНИЕ ТУМАНА (Каждые 1500м)
+	var zone_index: int = floori(absf(distance) / 1500.0)
+	var is_in_red_zone: bool = (zone_index % 2 == 1)
 	
 	if is_in_red_zone and not is_fog_red:
 		is_fog_red = true
-		_transition_fog(scary_red_fog_color, 0.1) 
-		if verbose_logs: print("Вход в КРАСНУЮ зону сложности! Номер зоны: ", zone_index)
+		_transition_fog(scary_red_fog_color) 
 	elif not is_in_red_zone and is_fog_red:
 		is_fog_red = false
-		_transition_fog(normal_fog_color, 0.01) 
-		if verbose_logs: print("Вход в ОБЫЧНУЮ зону! Номер зоны: ", zone_index)
+		_transition_fog(normal_fog_color) 
 	
 	if current_chunk_index == int(_last_checked_distance):
 		return 
@@ -95,18 +98,10 @@ func _process(_delta: float) -> void:
 	_last_checked_distance = float(current_chunk_index)
 	_ensure_chunks_for_index(current_chunk_index)
 
-func _resolve_car() -> void:
-	if car != null:
-		return
-	car = get_node_or_null("car") as VehicleBody3D
-	if car == null:
-		car = get_tree().get_first_node_in_group("player") as VehicleBody3D
-
 func _ensure_chunks_for_index(current_index: int) -> void:
-	var min_index: int = current_index - maxi(chunks_behind, 0)
-	var max_index: int = current_index + maxi(chunks_ahead, 1)
+	var min_index: int = current_index - maxi(chunks_behind, 1)
+	var max_index: int = current_index + maxi(chunks_ahead, 2)
 
-	# 1. Спавним новые чанки
 	for index in range(min_index, max_index + 1):
 		if not _chunk_nodes.has(index):
 			_spawn_chunk(index)
@@ -126,26 +121,32 @@ func _ensure_chunks_for_index(current_index: int) -> void:
 
 func _spawn_chunk(index: int) -> void:
 	var chunk: Node3D = null
+	var abs_index: int = abs(index)
 	
-	# Считаем текущий шаг. Если дошли до N-го чанка (например, 3), то спавним мост
-	chunks_spawned_counter += 1
-	
-	if chunks_spawned_counter >= bridge_each_nth_chunk:
+	var chunks_per_bridge: int = floori(bridge_interval_meters / _chunk_step)
+	if chunks_per_bridge <= 0: chunks_per_bridge = 6
+
+	var is_bridge: bool = (abs_index > 0 and abs_index % chunks_per_bridge == 0)
+	var prev_was_bridge: bool = (abs(index - 1) > 0 and abs(index - 1) % chunks_per_bridge == 0)
+
+	if is_bridge:
 		chunk = bridge_scene.instantiate() as Node3D
-		chunks_spawned_counter = 0 # Сбрасываем счетчик чанков
-		if verbose_logs: print("Генератор: Спавним МОСТ на индексе ", index)
 	else:
-		# Спавним обычный чанк из списка
-		var active_scene = chunk_scenes_list[current_biome_index]
-		chunk = active_scene.instantiate() as Node3D
-		if verbose_logs: print("Генератор: Спавним обычный чанк №", current_biome_index, " на индексе ", index)
+		var calculated_biome: int = fposmod(floori(float(abs_index) / float(chunks_per_bridge)), chunk_scenes_list.size())
+		chunk = chunk_scenes_list[calculated_biome].instantiate() as Node3D
 
-	if chunk == null:
-		push_error("Main: Не удалось создать чанк/мост.")
-		return
+	if chunk == null: return
 
-	var chunk_origin := world_origin + _forward * (_chunk_step * float(index))
-	var chunk_basis := Basis.looking_at(_forward, Vector3.UP)
+	var chunk_z_pos: float = _chunk_step * float(index)
+	
+	var how_many_bridges_passed: int = floori(float(abs_index) / float(chunks_per_bridge))
+	if abs_index % chunks_per_bridge == 0 and abs_index > 0:
+		how_many_bridges_passed -= 1
+		
+	chunk_z_pos -= float(how_many_bridges_passed) * 0.0 # Измени 0.0 на длину моста, если будет щель
+
+	var chunk_origin: Vector3 = world_origin + _forward * chunk_z_pos
+	var chunk_basis: Basis = Basis.looking_at(_forward, Vector3.UP)
 	
 	add_child(chunk)
 	chunk.global_transform = Transform3D(chunk_basis, Vector3(chunk_origin.x, road_y, chunk_origin.z))
@@ -154,26 +155,37 @@ func _spawn_chunk(index: int) -> void:
 		chunk.call("configure_chunk", chunk_width, chunk_length, chunk_thickness, road_y)
 
 	if chunk.has_method("init_chunk_zombies"):
-		chunk.init_chunk_zombies()
+		chunk.call("init_chunk_zombies")
 
 	_chunk_nodes[index] = chunk
 
-# ЭТУ ФУНКЦИЮ БЕСКОНЕЧНО ВЫЗЫВАЕТ МОСТ ПРИ КАСАНИИ СВОЕЙ Area3D
+func _spawn_single_zombie_ahead() -> void:
+	# 1. Твоя машина едет вперед по оси +Z (Vector3.BACK).
+	# Чтобы закинуть зомби ДАЛЕКО ВПЕРЕД за черту тумана, 
+	# мы берем Depth End (300 метров) и прибавляем еще 20 метров запаса.
+	var safe_fog_distance: float = 320.0
+	
+	# Считаем точку строго в 320 метрах ПЕРЕД машиной в полной темноте
+	var spawn_pos: Vector3 = car.global_position + _forward * safe_fog_distance
+	
+	# 2. Рандомим позицию влево-вправо по ширине асфальта,
+	# чтобы они не выстраивались в одну идеальную линию
+	spawn_pos.x += randf_range(-road_spawn_width, road_spawn_width)
+	
+	# 3. Прижимаем зомби к высоте дорожного полотна
+	spawn_pos.y = road_y
+	
+	# Отправляем команду в пул на честный спавн в правильной точке
+	ZombiePool.spawn_zombie_at(spawn_pos)
+
 func advance_to_next_biome() -> void:
-	# Формула (%) делает цикл бесконечным: 0 -> 1 -> 2 -> снова 0 -> 1...
-	current_biome_index = (current_biome_index + 1) % chunk_scenes_list.size()
-	print("Генератор: Мост пройден! Следующие чанки будут типа №: ", current_biome_index)
+	pass
 
 func _cleanup_preplaced_chunks() -> void:
 	for child in get_children():
-		var child_node := child as Node
-		if child_node == null or child_node == car:
-			continue
-		
-		# Удаляем любые старые чанки или мосты, оставшиеся в редакторе перед запуском
-		if child_node.name.to_lower().contains("chunk") or child_node.name.to_lower().contains("bridge"):
-			child_node.queue_free()
-
+		if child == car: continue
+		if child.name.to_lower().contains("chunk") or child.name.to_lower().contains("bridge"):
+			child.queue_free()
 
 func _distance_along_forward(world_position: Vector3) -> float:
 	return (world_position - world_origin).dot(_forward)
@@ -181,15 +193,20 @@ func _distance_along_forward(world_position: Vector3) -> float:
 func _get_chunk_index(distance_along_forward: float) -> int:
 	return int(floor(distance_along_forward / _chunk_step))
 	
-func _transition_fog(target_color: Color, target_density: float) -> void:
+func _transition_fog(target_color: Color) -> void:
 	if world_environment == null or world_environment.environment == null:
 		return
 		
-	var env = world_environment.environment
+	var env: Environment = world_environment.environment
 	env.fog_enabled = true
+	env.tonemap_mode = 3 
+	env.adjustment_enabled = true 
 		
 	if current_fog_tween:
 		current_fog_tween.kill()
 		
-	current_fog_tween = create_tween()
-	current_fog_tween.tween_property(env, "fog_light_color", target_color, 5.0)
+	current_fog_tween = create_tween().set_parallel(true)
+	current_fog_tween.tween_property(env, "fog_light_color", target_color, 4.0)
+	current_fog_tween.tween_property(env, "adjustment_saturation", 0.6, 3.0)  
+	current_fog_tween.tween_property(env, "adjustment_contrast", 1.3, 3.0)    
+	current_fog_tween.tween_property(env, "adjustment_brightness", 0.85, 3.0) 

@@ -1,7 +1,6 @@
 [gd_scene format=4 uid="uid://hut6rtb4m5uh"]
 
 [ext_resource type="Script" uid="uid://qlfobs7v7t5o" path="res://world_chunk.gd" id="1_1mryt"]
-[ext_resource type="PackedScene" uid="uid://btk65abugxc3d" path="res://Zombie/Z1/Z1.tscn" id="2_ua3rv"]
 [ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://model/terrain/gravelly_sand_diff_1k.jpg" id="3_1cr0a"]
 [ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://model/terrain/forest_ground_04_nor_gl_1k.jpg" id="4_5sdx4"]
 [ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="4_8g4c3"]
@@ -11,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://ww4cxhxsyvpo" path="res://model/decor/wrekers_car/wagon_001a_reference_smd_4.tscn" id="8_ua3rv"]
 [ext_resource type="PackedScene" uid="uid://bggtemdkmx3qq" path="res://model/decor/Ambar/ambar.tscn" id="8_x7r45"]
 [ext_resource type="Texture2D" uid="uid://d2bcbor7yky4" path="res://model/terrain/gravelly_sand_disp_1k.png" id="10_j2hus"]
-[ext_resource type="ArrayOccluder3D" uid="uid://dut67mfwfmugq" path="res://Generator.occ" id="12_6cu7m"]
 [ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
 [ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="13_ua3rv"]
 
@@ -34,9 +32,6 @@ size = Vector3(380, 0, 500)
 [sub_resource type="BoxShape3D" id="BoxShape3D_vh1cf"]
 resource_local_to_scene = true
 size = Vector3(380, 0, 500)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_j2hus"]
-size = Vector3(0, 15.921, 500)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hju8v"]
 resource_name = "Tree_Pine"
@@ -85,7 +80,6 @@ mesh = SubResource("ArrayMesh_5nrek")
 
 [node name="WorldChunk" type="Node3D" unique_id=560257719]
 script = ExtResource("1_1mryt")
-zombie_scene = ExtResource("2_ua3rv")
 barn_scene = ExtResource("8_x7r45")
 object1 = ExtResource("4_8g4c3")
 object2 = ExtResource("4_yegdb")
@@ -104,23 +98,6 @@ mesh = SubResource("BoxMesh_80s8q")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="GroundBody" unique_id=921476853]
 shape = SubResource("BoxShape3D_vh1cf")
 
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="GroundBody" unique_id=273603427]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -170, 7.832, -0.668)
-shape = SubResource("BoxShape3D_j2hus")
-
-[node name="CollisionShape3D3" type="CollisionShape3D" parent="GroundBody" unique_id=990953607]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 169.88025, 7.831604, -0.6683655)
-shape = SubResource("BoxShape3D_j2hus")
-
-[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="." unique_id=1519313398]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18412277, -2.470375)
-aabb = AABB(-189.24176, -13.568, -239.9009, 378.48352, 31.175, 480.10178)
-
-[node name="OccluderInstance3D" type="OccluderInstance3D" parent="." unique_id=337661843]
-occluder = ExtResource("12_6cu7m")
-
 [node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="." unique_id=1645147157]
 multimesh = SubResource("MultiMesh_dc0kt")
 script = ExtResource("13_ua3rv")
-
-[connection signal="screen_exited" from="VisibleOnScreenNotifier3D" to="." method="_on_visible_on_screen_notifier_3d_screen_exited"]

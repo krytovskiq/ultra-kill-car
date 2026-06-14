@@ -2,33 +2,25 @@ extends VehicleBody3D
 
 var total_distance: float = 0.0
 var start_z_position: float = 0.0
-#@export var jump_height: float = 2.5 # Высота прыжка в метрах
-#@export var jump_duration: float = 0.4 # Время взлета/падения в секундах
-#var is_jumping: bool = false
+
 @export_group("Driving")
 @export var STEER_SPEED: float = 0.9
 @export var STEER_LIMIT: float = 0.1
 @export var engine_force_value: int = 4000
 @export var brake_force: float = 90.0
-@export var MAX_SPEED_KMH: int = 250
+@export var MAX_SPEED_KMH: int = 280
 
 @export_group("Health")
 @export var health: int = 100
 @export var collision_damage_multiplier: float = 0.35
 
 @export_group("Zombie Collision")
-@export var zombie_hit_min_speed_mps: float = 0.8
-@export var zombie_hit_max_speed_mps: float = 24.0
-@export var zombie_damage_at_min_speed: float = 20.0
-@export var zombie_damage_at_max_speed: float = 150.0
-@export var zombie_impulse_at_min_speed: float = 30.0 
-@export var zombie_impulse_at_max_speed: float = 80.0 
-@export var zombie_upward_impulse: float = 15.0 
 @export var wall_damage_min_speed_mps: float = 5.0
 
 @export_group("Fuel")
 @export var max_fuel: int = 100
 @export var fuel_consumption: float = 1.0
+
 var current_fuel: float = 0.0
 var current_hp: int = 0
 var destroyed: bool = false
@@ -36,14 +28,14 @@ var destroyed: bool = false
 @export_group("Enemy Damage")
 @export var damage_per_second: int = 10
 var damage_timer: float = 0.0
+var cleanup_timer: float = 0.0 # Таймер для очистки отставших зомби
 
 func _ready() -> void:
-	# ИСПРАВЛЕННАЯ ПРОВЕРКА И ПОДКЛЮЧЕНИЕ
 	var kill_zone = get_node_or_null("Area3D")
 	if kill_zone:
-		kill_zone.connect("body_entered", _on_kill_zone_body_entered)
+		kill_zone.body_entered.connect(_on_kill_zone_body_entered)
 	else:
-		push_error("ОШИБКА: Узел Area3D не найден! Создай его внутри машины.")
+		push_error("Main: Узел Area3D не найден внутри машины!")
 
 	start_z_position = global_position.z
 	linear_velocity = -global_transform.basis.z * (20.0 / 3.6)
@@ -53,6 +45,7 @@ func _ready() -> void:
 	max_contacts_reported = 24
 	current_hp = health
 	current_fuel = max_fuel
+	
 	if has_node("Hud/HpBar"):
 		$Hud/HpBar.max_value = health
 		$Hud/HpBar.value = current_hp
@@ -63,27 +56,25 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if destroyed: return
 	
-	total_distance = abs(global_position.z - start_z_position)
+	total_distance = absf(global_position.z - start_z_position)
 	if has_node("Hud/Metr"):
 		$Hud/Metr.text = str(round(total_distance)) + " M"
 		
 	var speed_mps: float = linear_velocity.length()
-	var speed_kmh: int = speed_mps * 3.6
+	var speed_kmh: int = floori(speed_mps * 3.6)
 	
 	if has_node("Hud/speed"):
-		$Hud/speed.text = str(round(speed_kmh)) + "  KM/H"
+		$Hud/speed.text = str(speed_kmh) + "  KM/H"
 	
-	var target_max_speed = MAX_SPEED_KMH
-	var auto_roll_speed = 0
-	if Input.is_key_pressed(KEY_SPACE):
-		position.y = 2
-		rotation.x = 90
+	# Управление двигателем (W)
 	if Input.is_key_pressed(KEY_W):
-		engine_force = -engine_force_value if speed_kmh < target_max_speed else 0.0
+		engine_force = -engine_force_value if speed_kmh < MAX_SPEED_KMH else 0.0
 		brake = 0.0
 	else:
-		engine_force = -(engine_force_value * 0.5) if speed_kmh < auto_roll_speed else 0.0
-	var min_speed_kmh = 25
+		engine_force = 0.0
+		
+	# Тормоз и задний ход (S)
+	var min_speed_kmh: int = 25
 	if Input.is_key_pressed(KEY_S):
 		if speed_kmh > min_speed_kmh:
 			brake = brake_force
@@ -95,154 +86,140 @@ func _physics_process(delta: float) -> void:
 		brake = 0.0
 		engine_force = -(engine_force_value * 0.3)
 
-	var steer_input = Input.get_axis("D", "A") 
-	var speed_factor = clamp(1.0 - (speed_kmh / 400.0), 0.6, 1.0) 
-	# 1. Считаем коэффициент скорости (от 0.0 до 1.0)
-# Чем ближе к MAX_SPEED_KMH, тем ближе значение к 1.0
-	var speed_ratio = clamp(speed_kmh / float(MAX_SPEED_KMH), 0.0, 1.0)
-
-# 2. Рассчитываем динамический лимит поворота
-# На низкой скорости будет STEER_LIMIT (0.5), 
-# а на максимальной — в 3-4 раза меньше (например, 0.15)
-	var dynamic_steer_limit = STEER_LIMIT * lerp(1.0, 0.25, speed_ratio)
-
-# 3. Считаем итоговую цель поворота
-	var steer_target = steer_input * dynamic_steer_limit
-
-# 4. Плавный поворот руля
-# На высокой скорости руль должен крутиться ТЯЖЕЛЕЕ (медленнее)
-	var dynamic_steer_speed = STEER_SPEED * lerp(1.0, 0.3, speed_ratio)
-	steering = move_toward(steering, steer_target, STEER_SPEED * delta)
+	# Плавное динамическое рулевое управление
+	var steer_input := Input.get_axis("D", "A") 
+	var speed_ratio := clampf(float(speed_kmh) / float(MAX_SPEED_KMH), 0.0, 1.0)
+	var dynamic_steer_limit: float = STEER_LIMIT * lerp(1.0, 0.25, speed_ratio)
+	var steer_target: float = steer_input * dynamic_steer_limit
+	var dynamic_steer_speed: float = STEER_SPEED * lerp(1.0, 0.3, speed_ratio)
 	
-	traction(speed_mps)
+	# ИСПРАВЛЕНО: Теперь используется dynamic_steer_speed вместо константы
+	steering = move_toward(steering, steer_target, dynamic_steer_speed * delta)
 	
-	if not destroyed and speed_mps > 0.1:
-		current_fuel -= fuel_consumption * delta
+	_apply_traction(speed_mps)
 	
-	if current_fuel <= 0:
-		current_fuel = 0
-		engine_force = 0
+	if speed_mps > 0.1:
+		current_fuel = maxf(current_fuel - fuel_consumption * delta, 0.0)
+	
+	if current_fuel <= 0.0:
+		engine_force = 0.0
 	
 	if has_node("Hud/FuelBar"):
 		$Hud/FuelBar.value = current_fuel
-	var kill_zone = get_node_or_null("Area3D")
-	if kill_zone:
-		var bodies = kill_zone.get_overlapping_bodies()
-		var has_zombie = false
 		
-		for body in bodies:
-			# Проверяем, что это зомби и он ЖИВОЙ
-			if body.is_in_group("zombie") and body.get("state") != 3: # 3 — это ZombieState.DEAD
-				has_zombie = true
-				break 
+	_handle_zombie_overlapping_damage(delta)
+	_cleanup_distant_zombies(delta)
 
-		if has_zombie:
-			damage_timer += delta
-			if damage_timer >= 1.0: # Если прошла секунда
-				take_damage(damage_per_second)
-				damage_timer = 0.0
-		else:
-			damage_timer = 0.0
+func refuel(amount: float) -> void:
+	current_fuel = clampf(current_fuel + amount, 0.0, float(max_fuel))
 
-func refuel(amount: float):
-	current_fuel = clamp(current_fuel + amount, 0, max_fuel)
-
-func traction(speed: float) -> void:
-	var downforce = clamp(speed * 10.0, 0, 8000)
+func _apply_traction(speed: float) -> void:
+	var downforce := clampf(speed * 10.0, 0.0, 8000.0)
 	apply_central_force(Vector3.DOWN * downforce)
 
-func hit_stop(duration: float):
+func hit_stop(duration: float) -> void:
 	Engine.time_scale = 0.1
 	await get_tree().create_timer(duration * 0.1, true, false, true).timeout
 	Engine.time_scale = 1.0
 
 func take_damage(amount: int) -> void:
 	if destroyed: return
-	current_hp = maxf(current_hp - amount, 0)
+	current_hp = maxi(current_hp - amount, 0)
 	if has_node("Hud/HpBar"):
 		$Hud/HpBar.value = current_hp
-		print("ХП Машины: ", current_hp)
-		if current_hp <= 0: _destroy_car()
-		
+	if current_hp <= 0: 
+		_destroy_car()
+
+func _handle_zombie_overlapping_damage(delta: float) -> void:
+	var kill_zone = get_node_or_null("Area3D")
+	if not kill_zone: return
+	
+	var bodies: Array[Node3D] = kill_zone.get_overlapping_bodies()
+	var has_active_zombie := false
+	
+	for body in bodies:
+		if body.is_in_group("zombie") and body.get("state") != 3: 
+			has_active_zombie = true
+			break 
+
+	if has_active_zombie:
+		damage_timer += delta
+		if damage_timer >= 1.0:
+			take_damage(damage_per_second)
+			damage_timer = 0.0
+	else:
+		damage_timer = 0.0
+
+# АВТОМАТИЧЕСКАЯ ОЧИСТКА: Удаляет зомби, которых машина проехала мимо
+# Замени эту функцию в файле твоей машины:
+func _cleanup_distant_zombies(delta: float) -> void:
+	cleanup_timer += delta
+	if cleanup_timer < 1.5: return
+	cleanup_timer = 0.0
+	
+	var all_zombies: Array[Node3D] = []
+	for node in get_tree().get_nodes_in_group("zombie"):
+		if node is Node3D:
+			all_zombies.append(node)
+			
+	for zombie in all_zombies:
+		if is_instance_valid(zombie):
+			# Считаем расстояние вдоль твоего вектора движения _forward
+			var main_node = get_tree().current_scene
+			if main_node and "_forward" in main_node:
+				var forward_vector: Vector3 = main_node._forward
+				
+				# Проекция расстояния на вектор движения автомобиля
+				var rel_pos = zombie.global_position - global_position
+				var dist_along_forward = rel_pos.dot(forward_vector)
+				
+				# Если dist_along_forward меньше нуля, значит зомби ПОЗАДИ машины.
+				# Если он отстал больше чем на 40 метров назад — полностью удаляем.
+				if dist_along_forward < -40.0 and zombie.get("state") != 3:
+					zombie.queue_free()
 
 func _on_kill_zone_body_entered(body: Node3D) -> void:
 	if destroyed: return
 	
-	var speed_mps = linear_velocity.length()
-	var speed_kmh = speed_mps * 3.6 
+	var speed_mps := linear_velocity.length()
+	var speed_kmh := speed_mps * 3.6 
 
-	# 1. СТОЛКНОВЕНИЕ С ЗОМБИ
 	if body.is_in_group("zombie"):
-		take_damage(10) # Машина получает урон
-		if speed_kmh >= 40:
+		take_damage(10) 
+		if speed_kmh >= 40.0:
 			if body.has_method("die"):
 				body.die(linear_velocity, speed_mps)
 			shake_camera(0.5)
 			hit_stop(0.1)
-		elif speed_kmh >= 10:
+		elif speed_kmh >= 10.0:
 			if body.has_method("knockdown"):
 				body.knockdown(linear_velocity)
 		return 
 
-	# 2. СТОЛКНОВЕНИЕ С ОБЪЕКТАМИ (Стены, препятствия)
 	if body != self and not body.is_in_group("player") and body.is_in_group("object_hit"):
 		if speed_mps > wall_damage_min_speed_mps:
-			# Рассчитываем урон: чем выше скорость, тем больше повреждений
-			var damage_to_car = speed_mps * collision_damage_multiplier
+			var damage_to_car := int(speed_mps * collision_damage_multiplier)
 			take_damage(damage_to_car)
-			shake_camera(clamp(damage_to_car * 0.1, 0.2, 1.5))
-			
-			# Если у объекта есть метод получения урона (например, он должен разрушиться)
+			shake_camera(clampf(float(damage_to_car) * 0.1, 0.2, 1.5))
 			if body.has_method("take_damage"):
 				body.take_damage(speed_mps * 2.0) 
-			
-			print("УДАР ОБ ОБЪЕКТ! Урон машине: ", round(damage_to_car))
 
-func _destroy_car():
+func _destroy_car() -> void:
 	if destroyed: return
 	destroyed = true
-	print("МАШИНА УНИЧТОЖЕНА!")
-	engine_force = 0
+	engine_force = 0.0
 	brake = brake_force
 	await get_tree().create_timer(3.0).timeout
 	get_tree().reload_current_scene()
 
-func shake_camera(amount: float):
+func shake_camera(amount: float) -> void:
 	var camera = get_node_or_null("look/Camera3D")
-	if camera:
-		var tween = create_tween()
-		for i in range(5):
-			var rand_offset = Vector2(randf_range(-amount, amount), randf_range(-amount, amount))
-			tween.tween_property(camera, "h_offset", rand_offset.x, 0.02)
-			tween.tween_property(camera, "v_offset", rand_offset.y, 0.02)
-		tween.tween_property(camera, "h_offset", 0.0, 0.05)
-		tween.tween_property(camera, "v_offset", 0.0, 0.05)
-		
-#func _unhandled_input(event: InputEvent) -> void:
-	## Проверяем нажатие пробела и убеждаемся, что машина уже не прыгает
-	#if event is InputEventKey and event.keycode == KEY_SPACE and event.pressed and not event.is_echo():
-		#if not is_jumping:
-			#arcade_jump()
-#
-#func arcade_jump() -> void:
-	#is_jumping = true
-	#
-	## 1. Выключаем физику, чтобы она не мешала твину двигать машину
-	#
-	## Запоминаем точку старта
-	#var start_y: float = global_position.y
-	#var tween: Tween = create_tween()
-	#
-	## 2. Движение ВСЕЙ машины вверх
-	#tween.tween_property(self, "global_position:y", start_y + jump_height, jump_duration)\
-		#.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		#
-	## 3. Движение ВСЕЙ машины вниз
-	#tween.tween_property(self, "global_position:y", start_y, jump_duration * 0.9)\
-		#.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-		#
-	## 4. Коллбэк: когда твин закончил движение, возвращаем честную физику
-	#tween.tween_callback(func():
-		#freeze = false
-		#is_jumping = false
-	#)
+	if not camera: return
+	
+	var tween := create_tween()
+	for i in range(5):
+		var rand_offset := Vector2(randf_range(-amount, amount), randf_range(-amount, amount))
+		tween.tween_property(camera, "h_offset", rand_offset.x, 0.02)
+		tween.tween_property(camera, "v_offset", rand_offset.y, 0.02)
+	tween.tween_property(camera, "h_offset", 0.0, 0.05)
+	tween.tween_property(camera, "v_offset", 0.0, 0.05)

@@ -45,11 +45,12 @@ func _find_player() -> void:
 	player = get_tree().get_first_node_in_group("player") as Node3D
 
 func _physics_process(delta: float) -> void:
+	# Если зомби мертв или сбит, обрабатываем физику отлета
 	if state == ZombieState.DEAD or state == ZombieState.FALLEN:
 		position.z = move_toward(position.z, target_z, 8.0 * delta)
 		return
 
-	position.z = move_toward(position.z, 0.0, 4.0 * delta)
+	# УДАЛЕНО: Строка position.z = move_toward..., которая уносила зомби на нулевой метр карты!
 
 	if attack_timer > 0.0: 
 		attack_timer -= delta
@@ -62,7 +63,9 @@ func _physics_process(delta: float) -> void:
 
 	_update_state_and_movement(delta)
 
+	# Движение живого зомби (работает правильно)
 	global_position += _internal_velocity * delta
+
 
 func _update_state_and_movement(delta: float) -> void:
 	# ОПТИМИЗАЦИЯ: Используем distance_to_squared (работает в 5 раз быстрее)
