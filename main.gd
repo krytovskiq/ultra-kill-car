@@ -197,16 +197,24 @@ func _transition_fog(target_color: Color) -> void:
 	if world_environment == null or world_environment.environment == null:
 		return
 		
+	if not world_environment.environment.resource_local_to_scene:
+		world_environment.environment = world_environment.environment.duplicate()
+		
 	var env: Environment = world_environment.environment
 	env.fog_enabled = true
-	env.tonemap_mode = 3 
-	env.adjustment_enabled = true 
-		
+	
+	# НЕ трогаем tonemap_mode и adjustment, чтобы мир не чернел!
+	
 	if current_fog_tween:
 		current_fog_tween.kill()
 		
 	current_fog_tween = create_tween().set_parallel(true)
-	current_fog_tween.tween_property(env, "fog_light_color", target_color, 4.0)
-	current_fog_tween.tween_property(env, "adjustment_saturation", 0.6, 3.0)  
-	current_fog_tween.tween_property(env, "adjustment_contrast", 1.3, 3.0)    
-	current_fog_tween.tween_property(env, "adjustment_brightness", 0.85, 3.0) 
+	
+	# 1. Плавно меняем цвет тумана на ваш жуткий бордовый за 2 секунды
+	current_fog_tween.tween_property(env, "fog_light_color", target_color, 0.0)
+	
+	# 2. Усиливаем энергию (яркость самого тумана), чтобы он стал гуще и заметнее
+	current_fog_tween.tween_property(env, "fog_light_energy", 0.0, 0.0)
+	
+	# 3. Дополнительно: если туман обычный (Depth), можно плавно приблизить его к игроку
+	current_fog_tween.tween_property(env, "fog_density", 0.0, 0.0)

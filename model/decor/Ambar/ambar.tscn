@@ -441,4 +441,4 @@ mesh = SubResource("ArrayMesh_2q5p5")
 shape = SubResource("ConcavePolygonShape3D_xd3wf")
 
 [node name="kanistr" parent="." unique_id=183247914 instance=ExtResource("9_ewb7g")]
-transform = Transform3D(-0.006707701, 0.013416659, 5.864608e-10, -5.4943514e-20, -6.556708e-10, 0.014999999, 0.013416659, 0.006707701, 2.93203e-10, 0.011822774, 0, -0.1874991)
+transform = Transform3D(8.1407425e-06, 0.014999998, 8.742277e-10, 0, -6.556708e-10, 0.02, 0.014999998, -8.1407425e-06, -4.7445755e-13, 0, 0, 0)
