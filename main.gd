@@ -7,7 +7,7 @@ extends Node3D
 @export var chunk_scenes_list: Array[PackedScene] = []
 @export var bridge_scene: PackedScene 
 
-@export var chunks_ahead: int = 2
+@export var chunks_ahead: int = 1
 @export var chunks_behind: int = 1
 @export var chunk_width: float = 380.0
 @export var chunk_length: float = 500.0
@@ -74,7 +74,7 @@ func _process(delta: float) -> void:
 	# 1. СИСТЕМА ДИНАМИЧЕСКОГО СПАВНА
 	var passed_500m_steps: int = floori(absf(distance) / 500.0)
 	# Каждые 500 метров уменьшаем задержку на 0.1 сек (зомби спавнятся плотнее)
-	current_spawn_cooldown = maxf(base_spawn_cooldown - (passed_500m_steps * 0.1), 0.25)
+	current_spawn_cooldown = maxf(base_spawn_cooldown - (passed_500m_steps * 0.1), 0.01)
 	
 	spawn_timer += delta
 	if spawn_timer >= current_spawn_cooldown:

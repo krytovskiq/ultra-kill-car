@@ -4,8 +4,8 @@ var total_distance: float = 0.0
 var start_z_position: float = 0.0
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 0.9
-@export var STEER_LIMIT: float = 0.1
+@export var STEER_SPEED: float = 0.85
+@export var STEER_LIMIT: float = 0.15
 @export var engine_force_value: int = 4000
 @export var brake_force: float = 90.0
 @export var MAX_SPEED_KMH: int = 280
@@ -61,7 +61,7 @@ func _physics_process(delta: float) -> void:
 		$Hud/Metr.text = str(round(total_distance)) + " M"
 		
 	var speed_mps: float = linear_velocity.length()
-	var speed_kmh: int = floori(speed_mps * 3.6)
+	var speed_kmh: int = floori(speed_mps * 2.6)
 	
 	if has_node("Hud/speed"):
 		$Hud/speed.text = str(speed_kmh) + "  KM/H"

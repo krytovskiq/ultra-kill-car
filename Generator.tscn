@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_8g4c3"]
 [ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="6_6cu7m"]
 [ext_resource type="PackedScene" uid="uid://ww4cxhxsyvpo" path="res://model/decor/wrekers_car/wagon_001a_reference_smd_4.tscn" id="8_ua3rv"]
-[ext_resource type="PackedScene" uid="uid://bggtemdkmx3qq" path="res://model/decor/Ambar/ambar.tscn" id="8_x7r45"]
 [ext_resource type="Texture2D" uid="uid://d2bcbor7yky4" path="res://model/terrain/gravelly_sand_disp_1k.png" id="10_j2hus"]
 [ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
 [ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="13_ua3rv"]
@@ -80,7 +79,6 @@ mesh = SubResource("ArrayMesh_5nrek")
 
 [node name="WorldChunk" type="Node3D" unique_id=560257719]
 script = ExtResource("1_1mryt")
-barn_scene = ExtResource("8_x7r45")
 object1 = ExtResource("4_8g4c3")
 object2 = ExtResource("4_yegdb")
 object3 = ExtResource("5_8g4c3")

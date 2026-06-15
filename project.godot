@@ -77,7 +77,7 @@ space={
 
 [physics]
 
-3d/physics_engine="GodotPhysics3D"
+3d/physics_engine="Jolt Physics"
 
 [rendering]
 
