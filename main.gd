@@ -7,7 +7,7 @@ extends Node3D
 @export var chunk_scenes_list: Array[PackedScene] = []
 @export var bridge_scene: PackedScene 
 
-@export var chunks_ahead: int = 1
+@export var chunks_ahead: int = 2
 @export var chunks_behind: int = 1
 @export var chunk_width: float = 380.0
 @export var chunk_length: float = 500.0
@@ -17,12 +17,12 @@ extends Node3D
 @export var forward_axis: Vector3 = Vector3.BACK
 
 @export_group("Bridge Settings")
-@export var bridge_interval_meters: float = 3000.0
+@export var bridge_interval_meters: float = 1500.0
 
 @export_group("Динамический Спавн Зомби")
 @export var base_spawn_cooldown: float = 1.2 # Интервал спавна (в секундах)
-@export var spawn_distance_ahead: float = 110.0 # Дистанция спавна перед машиной (в тумане)
-@export var road_spawn_width: float = 15.0 # Ширина дороги для спавна
+@export var spawn_distance_ahead: float = 0.0 # Дистанция спавна перед машиной (в тумане)
+@export var road_spawn_width: float = 150.0 # Ширина дороги для спавна
 
 @export_group("Debug")
 @export var verbose_logs: bool = false
@@ -74,7 +74,7 @@ func _process(delta: float) -> void:
 	# 1. СИСТЕМА ДИНАМИЧЕСКОГО СПАВНА
 	var passed_500m_steps: int = floori(absf(distance) / 500.0)
 	# Каждые 500 метров уменьшаем задержку на 0.1 сек (зомби спавнятся плотнее)
-	current_spawn_cooldown = maxf(base_spawn_cooldown - (passed_500m_steps * 0.1), 0.01)
+	current_spawn_cooldown = maxf(base_spawn_cooldown - (passed_500m_steps * 0.1), 0.25)
 	
 	spawn_timer += delta
 	if spawn_timer >= current_spawn_cooldown:
@@ -82,7 +82,7 @@ func _process(delta: float) -> void:
 		_spawn_single_zombie_ahead()
 	
 	# 2. ПЕРЕКЛЮЧЕНИЕ ТУМАНА (Каждые 1500м)
-	var zone_index: int = floori(absf(distance) / 1500.0)
+	var zone_index: int = floori(absf(distance) / 10500.0)
 	var is_in_red_zone: bool = (zone_index % 2 == 1)
 	
 	if is_in_red_zone and not is_fog_red:
@@ -127,13 +127,35 @@ func _spawn_chunk(index: int) -> void:
 	if chunks_per_bridge <= 0: chunks_per_bridge = 6
 
 	var is_bridge: bool = (abs_index > 0 and abs_index % chunks_per_bridge == 0)
-	var prev_was_bridge: bool = (abs(index - 1) > 0 and abs(index - 1) % chunks_per_bridge == 0)
 
 	if is_bridge:
-		chunk = bridge_scene.instantiate() as Node3D
+		if bridge_scene != null:
+			chunk = bridge_scene.instantiate() as Node3D
+		else:
+			push_error("Main: bridge_scene is null!")
+			return
 	else:
-		var calculated_biome: int = fposmod(floori(float(abs_index) / float(chunks_per_bridge)), chunk_scenes_list.size())
-		chunk = chunk_scenes_list[calculated_biome].instantiate() as Node3D
+		var list_size: int = chunk_scenes_list.size()
+		if list_size == 0:
+			push_error("Main: chunk_scenes_list is empty!")
+			return
+			
+		var calculated_biome: int = fposmod(floori(float(abs_index) / float(chunks_per_bridge)), list_size)
+		var scene_to_spawn: PackedScene = chunk_scenes_list[calculated_biome]
+		
+		if scene_to_spawn == null:
+			push_error("Main: chunk_scenes_list[%d] is null! Проверьте, что в массиве в Инспекторе нет пустых слотов." % calculated_biome)
+			# Попытка найти первый непустой элемент как запасной вариант, чтобы игра не крашилась
+			for s in chunk_scenes_list:
+				if s != null:
+					scene_to_spawn = s
+					break
+					
+		if scene_to_spawn != null:
+			chunk = scene_to_spawn.instantiate() as Node3D
+		else:
+			push_error("Main: Не удалось найти валидную сцену чанка для спавна.")
+			return
 
 	if chunk == null: return
 

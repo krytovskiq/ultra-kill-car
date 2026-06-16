@@ -19,6 +19,7 @@
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mcq5y"]
 resource_name = "6A_F3_A5_32.001"
 cull_mode = 2
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 albedo_texture = ExtResource("2_36car")
 metallic = 0.3
 roughness = 0.25
@@ -703,11 +704,14 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_vgqad")
 
 [node name="Doge" type="VehicleBody3D" unique_id=2028712422]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0, 0, 0)
 collision_mask = 517
-mass = 1600.0
-gravity_scale = 0.75
+mass = 1500.0
+gravity_scale = 0.9
 center_of_mass_mode = 1
+can_sleep = false
+linear_damp = 0.03
+angular_damp = 5.0
 script = ExtResource("1_36car")
 
 [node name="Sketchfab_model" type="Node3D" parent="." unique_id=980538798]
@@ -783,12 +787,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.367, -2.027)
 use_as_traction = true
 use_as_steering = true
 wheel_radius = 0.36
-wheel_friction_slip = 7.0
-suspension_travel = 1.0
-suspension_stiffness = 65.0
-suspension_max_force = 17000.0
-damping_compression = 0.5
-damping_relaxation = 0.9
+wheel_friction_slip = 4.5
+suspension_travel = 0.1
+suspension_stiffness = 150.0
+suspension_max_force = 20000.0
+damping_compression = 15.0
+damping_relaxation = 17.0
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D6" unique_id=2089244218]
 
@@ -806,12 +810,12 @@ mesh = SubResource("ArrayMesh_12ppg")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0503914, 0.367, 1.2131228)
 use_as_traction = true
 wheel_radius = 0.36
-wheel_friction_slip = 7.0
-suspension_travel = 1.0
-suspension_stiffness = 65.0
-suspension_max_force = 17000.0
-damping_compression = 0.5
-damping_relaxation = 0.9
+wheel_friction_slip = 4.0
+suspension_travel = 0.1
+suspension_stiffness = 150.0
+suspension_max_force = 20000.0
+damping_compression = 15.0
+damping_relaxation = 17.0
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D7" unique_id=881748876]
 
@@ -830,12 +834,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.367, -2.027)
 use_as_traction = true
 use_as_steering = true
 wheel_radius = 0.36
-wheel_friction_slip = 7.0
-suspension_travel = 1.0
-suspension_stiffness = 65.0
-suspension_max_force = 17000.0
-damping_compression = 0.5
-damping_relaxation = 0.9
+wheel_friction_slip = 4.5
+suspension_travel = 0.1
+suspension_stiffness = 150.0
+suspension_max_force = 20000.0
+damping_compression = 15.0
+damping_relaxation = 17.0
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D8" unique_id=779290469]
 
@@ -853,12 +857,12 @@ mesh = SubResource("ArrayMesh_12ppg")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.367, 1.213)
 use_as_traction = true
 wheel_radius = 0.36
-wheel_friction_slip = 7.0
-suspension_travel = 1.0
-suspension_stiffness = 65.0
-suspension_max_force = 17000.0
-damping_compression = 0.5
-damping_relaxation = 0.9
+wheel_friction_slip = 4.0
+suspension_travel = 0.1
+suspension_stiffness = 150.0
+suspension_max_force = 20000.0
+damping_compression = 15.0
+damping_relaxation = 17.0
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D9" unique_id=128885941]
 

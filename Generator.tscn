@@ -12,7 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
 [ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="13_ua3rv"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ua3rv"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8g4c3"]
 albedo_texture = ExtResource("3_1cr0a")
 normal_enabled = true
 normal_scale = 16.0
@@ -25,7 +25,7 @@ uv1_triplanar = true
 [sub_resource type="BoxMesh" id="BoxMesh_80s8q"]
 resource_local_to_scene = true
 lightmap_size_hint = Vector2i(979, 616)
-material = SubResource("StandardMaterial3D_ua3rv")
+material = SubResource("StandardMaterial3D_8g4c3")
 size = Vector3(380, 0, 500)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vh1cf"]
