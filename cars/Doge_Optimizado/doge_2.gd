@@ -67,7 +67,7 @@ func _physics_process(delta: float) -> void:
 		$Hud/speed.text = str(speed_kmh) + "  KM/H"
 	
 	# Управление двигателем (W)
-	if Input.is_key_pressed(KEY_W):
+	if Input.is_action_pressed("W"):
 		engine_force = -engine_force_value if speed_kmh < MAX_SPEED_KMH else 0.0
 		brake = 0.0
 	else:
@@ -75,7 +75,7 @@ func _physics_process(delta: float) -> void:
 		
 	# Тормоз и задний ход (S)
 	var min_speed_kmh: int = 25
-	if Input.is_key_pressed(KEY_S):
+	if Input.is_action_pressed("S"):
 		if speed_kmh > min_speed_kmh:
 			brake = brake_force
 			engine_force = 0.0

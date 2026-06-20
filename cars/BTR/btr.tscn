@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bnrv8vfcom1l8" path="res://cars/BTR/texture/BTR_BTR_Image_1.jpg" id="3_1jed2"]
 [ext_resource type="Texture2D" uid="uid://3avkcy757eav" path="res://cars/BTR/texture/BTR_BTR_Image_2.jpg" id="4_ouyga"]
 [ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://camera/camera_3d.tscn" id="4_vlebh"]
+[ext_resource type="Shader" uid="uid://cbvk81cqd1ey6" path="res://cars/BTR/btr.gdshader" id="5_1jed2"]
 [ext_resource type="PackedScene" uid="uid://cq3n4b78h5nv" path="res://cars/Wheel/wheel.tscn" id="6_fwtlp"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ym3jb"]
@@ -56,6 +57,19 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_7wvbb")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rks3q"]
+render_priority = 0
+shader = ExtResource("5_1jed2")
+shader_parameter/core_color = Color(0.8444775, 0.7386442, 0, 1)
+shader_parameter/edge_color = Color(0.98294944, 0.8687677, 1.1551381e-06, 1)
+shader_parameter/glow_power = 4.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ouyga"]
+material = SubResource("ShaderMaterial_rks3q")
+top_radius = 0.0
+bottom_radius = 1.159
+height = 5.959293
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_x07o0"]
 _surfaces = [{
@@ -131,8 +145,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0020747, -57.795586)
 transform = Transform3D(-19.040003, 1.6645298e-06, 4.2632564e-14, -1.4210855e-14, -8.3226485e-07, 19.040003, 1.6645298e-06, 19.040003, 8.322649e-07, 0, 0, 0)
 mesh = SubResource("ArrayMesh_rks3q")
 
-[node name="Gun" type="MeshInstance3D" parent="Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4" unique_id=832721370]
-transform = Transform3D(-19.04, 1.6645297e-06, 7.2758904e-14, 0, -8.3226485e-07, 19.04, 1.6645297e-06, 19.04, 8.3226485e-07, 0, 0, 0)
+[node name="base_gun" type="Node3D" parent="Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base" unique_id=1200547889]
+transform = Transform3D(0.99999976, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999976, 1.0477379e-07, 11.749291, 2.9453013)
+
+[node name="Gun_Effect" type="MeshInstance3D" parent="Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun" unique_id=2054595829]
+transform = Transform3D(0.99994624, 4.3093262e-10, 2.3401723e-08, -2.340391e-08, 0.03670959, 0.99927217, -4.2942006e-10, -0.99927217, 0.03670959, 2.7311035e-07, 1.9492321, -26.11873)
+visible = false
+mesh = SubResource("CylinderMesh_ouyga")
+
+[node name="Gun" type="MeshInstance3D" parent="Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun" unique_id=832721370]
+transform = Transform3D(0.9999999, -3.9196395e-15, 8.881784e-16, -3.6692615e-16, 0.9999999, 3.5527137e-15, 0, -1.7763568e-14, 0.9999999, -1.0873191e-07, -11.804857, -2.6554387)
 mesh = SubResource("ArrayMesh_kcxae")
 
 [node name="VehicleWheel3D" type="VehicleWheel3D" parent="." unique_id=1142800316]

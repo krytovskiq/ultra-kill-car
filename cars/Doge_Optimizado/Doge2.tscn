@@ -13,7 +13,9 @@
 [ext_resource type="Texture2D" uid="uid://cq0q0m3apeelb" path="res://cars/Doge_Optimizado/texture/Dodge_carson_fastback_9.png" id="10_0d7se"]
 [ext_resource type="Texture2D" uid="uid://cv3bc85jngsat" path="res://cars/Doge_Optimizado/texture/Dodge_carson_fastback_11.jpg" id="11_cse3p"]
 [ext_resource type="Texture2D" uid="uid://cn1jfcwt15rb3" path="res://cars/Doge_Optimizado/texture/Dodge_carson_fastback_12.png" id="12_plfow"]
+[ext_resource type="Texture2D" uid="uid://duvq5xocns3d8" path="res://cars/texture/Gas.png" id="13_miysu"]
 [ext_resource type="Texture2D" uid="uid://r2sbb0snlfmg" path="res://cars/Doge_Optimizado/texture/Dodge_carson_fastback_0.png" id="14_36car"]
+[ext_resource type="Texture2D" uid="uid://dflunt5pvepti" path="res://cars/texture/Brake.png" id="14_mye8l"]
 [ext_resource type="Texture2D" uid="uid://dtuyls8n3kngx" path="res://cars/Doge_Optimizado/texture/Dodge_carson_fastback_1.jpg" id="15_axoys"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mcq5y"]
@@ -577,6 +579,12 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_uwyn7")
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_miysu"]
+size = Vector2(120, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mye8l"]
+size = Vector2(120, 310)
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_36car"]
 size = Vector3(2.180805, 0.6887671, 0.77432853)
 
@@ -725,6 +733,33 @@ mesh = SubResource("ArrayMesh_p51e5")
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=689880926]
 layer = 2
+
+[node name="VirtualJoystick" type="VirtualJoystick" parent="Hud" unique_id=2074420456]
+offset_left = 2.0
+offset_top = 344.0
+offset_right = 463.0
+offset_bottom = 712.0
+joystick_mode = 1
+joystick_size = 190.0
+initial_offset_ratio = Vector2(0.5, 0.67)
+action_left = &"A"
+action_right = &"D"
+
+[node name="Brake" type="TouchScreenButton" parent="Hud" unique_id=55923882]
+position = Vector2(973, 601)
+scale = Vector2(1.1900828, 0.9928641)
+texture_normal = ExtResource("14_mye8l")
+shape = SubResource("RectangleShape2D_miysu")
+action = "S"
+visibility_mode = 1
+
+[node name="Gas" type="TouchScreenButton" parent="Hud" unique_id=259678140]
+position = Vector2(1140, 452.00003)
+scale = Vector2(1.1150522, 0.8278051)
+texture_normal = ExtResource("13_miysu")
+shape = SubResource("RectangleShape2D_mye8l")
+action = "W"
+visibility_mode = 1
 
 [node name="speed" type="Label" parent="Hud" unique_id=1890477302]
 anchors_preset = 7

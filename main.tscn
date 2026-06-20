@@ -1,17 +1,20 @@
 [gd_scene format=3 uid="uid://dqfol88j7isaq"]
 
-[ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_272bh"]
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="2_5vw27"]
 [ext_resource type="PackedScene" uid="uid://cx07xx5pvib5j" path="res://City_MAP.tscn" id="3_7mycd"]
 [ext_resource type="PackedScene" uid="uid://bbs788x153n6p" path="res://Brigemap/brige/Brige.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://pause.tscn" id="5_lquwl"]
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_lquwl"]
+load_path = "res://.godot/imported/893483.PNG-230050ba5ad6169130c5d6919eabf779.s3tc.ctex"
+
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_emvy3"]
 rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
+mie_coefficient = 0.086
 ground_color = Color(0, 0, 0, 1)
-energy_multiplier = 10.66
-night_sky = ExtResource("1_0xm2m")
+energy_multiplier = 16.86
+night_sky = SubResource("CompressedTexture2D_lquwl")
 
 [sub_resource type="Sky" id="Sky_1bvp3"]
 sky_material = SubResource("PhysicalSkyMaterial_emvy3")
@@ -23,7 +26,7 @@ background_color = Color(0, 0, 0.43137255, 1)
 sky = SubResource("Sky_1bvp3")
 sky_rotation = Vector3(0, 0.20245819, 0)
 ambient_light_color = Color(0.43137255, 0.44705883, 0.4745098, 1)
-ambient_light_sky_contribution = 0.42
+ambient_light_sky_contribution = 0.17
 ambient_light_energy = 0.7
 reflected_light_source = 2
 tonemap_exposure = 0.3
@@ -36,12 +39,15 @@ glow_intensity = 2.12
 glow_bloom = 0.09
 fog_enabled = true
 fog_mode = 1
+fog_light_energy = 2.0
 fog_sun_scatter = 0.17
 fog_density = 1.0
-fog_height = 2.0
-fog_depth_curve = 0.20000064
+fog_sky_affect = 0.944
+fog_height = 2.15
+fog_height_density = 0.2
+fog_depth_curve = 0.31864014
 fog_depth_begin = 0.0
-fog_depth_end = 220.0
+fog_depth_end = 330.0
 adjustment_contrast = 1.125
 adjustment_saturation = 0.0
 
@@ -60,4 +66,3 @@ light_energy = 0.1
 light_bake_mode = 1
 
 [node name="Pause" parent="." unique_id=1664862517 instance=ExtResource("5_lquwl")]
-visible = false
