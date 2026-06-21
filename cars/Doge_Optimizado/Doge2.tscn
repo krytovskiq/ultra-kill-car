@@ -17,6 +17,8 @@
 [ext_resource type="Texture2D" uid="uid://r2sbb0snlfmg" path="res://cars/Doge_Optimizado/texture/Dodge_carson_fastback_0.png" id="14_36car"]
 [ext_resource type="Texture2D" uid="uid://dflunt5pvepti" path="res://cars/texture/Brake.png" id="14_mye8l"]
 [ext_resource type="Texture2D" uid="uid://dtuyls8n3kngx" path="res://cars/Doge_Optimizado/texture/Dodge_carson_fastback_1.jpg" id="15_axoys"]
+[ext_resource type="Texture2D" uid="uid://dymyu702nhlow" path="res://cars/texture/check.png" id="15_mye8l"]
+[ext_resource type="Texture2D" uid="uid://du5lan442km8" path="res://cars/texture/fuel.png" id="16_olbw5"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mcq5y"]
 resource_name = "6A_F3_A5_32.001"
@@ -585,6 +587,32 @@ size = Vector2(120, 120)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mye8l"]
 size = Vector2(120, 310)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_olbw5"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(0, 0, 0, 0.39215687)
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qbdnx"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(1, 0, 0, 1)
+corner_detail = 1
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nb2yy"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(0, 0.92156863, 0, 1)
+corner_detail = 1
+anti_aliasing = false
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_36car"]
 size = Vector3(2.180805, 0.6887671, 0.77432853)
 
@@ -771,8 +799,14 @@ theme_override_font_sizes/font_size = 50
 metadata/_edit_use_anchors_ = true
 
 [node name="FuelBar" type="ProgressBar" parent="Hud" unique_id=1855113193]
-offset_right = 150.0
-offset_bottom = 53.0
+anchors_preset = -1
+offset_left = 52.0
+offset_top = 10.0
+offset_right = 207.535
+offset_bottom = 42.0
+theme_override_styles/background = SubResource("StyleBoxFlat_olbw5")
+theme_override_styles/fill = SubResource("StyleBoxFlat_qbdnx")
+show_percentage = false
 metadata/_edit_use_anchors_ = true
 
 [node name="Metr" type="Label" parent="Hud" unique_id=2073142997]
@@ -786,10 +820,24 @@ theme_override_font_sizes/font_size = 40
 metadata/_edit_use_anchors_ = true
 
 [node name="HpBar" type="ProgressBar" parent="Hud" unique_id=405068710]
-offset_top = 55.0
-offset_right = 153.0
-offset_bottom = 110.0
-metadata/_edit_use_anchors_ = true
+anchors_preset = -1
+offset_left = 52.0
+offset_top = 54.0
+offset_right = 207.535
+offset_bottom = 86.0
+theme_override_styles/background = SubResource("StyleBoxFlat_olbw5")
+theme_override_styles/fill = SubResource("StyleBoxFlat_nb2yy")
+show_percentage = false
+
+[node name="Check" type="Sprite2D" parent="Hud" unique_id=1791986250]
+position = Vector2(25, 70.00001)
+scale = Vector2(0.31689188, 0.33186272)
+texture = ExtResource("15_mye8l")
+
+[node name="Fuel" type="Sprite2D" parent="Hud" unique_id=1698237911]
+position = Vector2(25.000002, 26)
+scale = Vector2(0.36924526, 0.3611712)
+texture = ExtResource("16_olbw5")
 
 [node name="Area3D" type="Area3D" parent="." unique_id=900741093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94620615, -2.8447406)

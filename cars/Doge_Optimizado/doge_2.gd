@@ -76,6 +76,8 @@ func _physics_process(delta: float) -> void:
 		
 	# Тормоз и задний ход (S)
 	var min_speed_kmh: int = 25
+	if Input.is_action_just_pressed("ui_accessibility_drag_and_drop"):
+		brake_force > max_fuel
 	if Input.is_action_pressed("S"):
 		if speed_kmh > min_speed_kmh:
 			brake = brake_force
