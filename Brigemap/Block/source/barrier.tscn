@@ -52,7 +52,7 @@ shadow_mesh = SubResource("ArrayMesh_unigq")
 [sub_resource type="BoxShape3D" id="BoxShape3D_dqfa1"]
 size = Vector3(24.889832, 46.091, 94.33207)
 
-[node name="Barrier" type="StaticBody3D" unique_id=548533106 groups=["object_hit"]]
+[node name="Barrier" type="StaticBody3D" unique_id=548533106 groups=["dead_wall", "object_hit"]]
 collision_layer = 9
 collision_mask = 525
 

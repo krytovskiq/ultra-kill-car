@@ -588,16 +588,8 @@ size = Vector2(120, 310)
 [sub_resource type="BoxShape3D" id="BoxShape3D_36car"]
 size = Vector3(2.180805, 0.6887671, 0.77432853)
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_36car"]
-radius = 0.37597656
-height = 2.1333008
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_miysu"]
-size = Vector3(1.1137769, 2.1274843, 2.773437)
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mye8l"]
-radius = 0.4008789
-height = 2.0668974
+size = Vector3(1.1137769, 2.1274843, 4.9941254)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_miysu"]
 albedo_texture = ExtResource("14_36car")
@@ -735,6 +727,7 @@ mesh = SubResource("ArrayMesh_p51e5")
 layer = 2
 
 [node name="VirtualJoystick" type="VirtualJoystick" parent="Hud" unique_id=2074420456]
+visible = false
 offset_left = 2.0
 offset_top = 344.0
 offset_right = 463.0
@@ -746,6 +739,7 @@ action_left = &"A"
 action_right = &"D"
 
 [node name="Brake" type="TouchScreenButton" parent="Hud" unique_id=55923882]
+visible = false
 position = Vector2(973, 601)
 scale = Vector2(1.1900828, 0.9928641)
 texture_normal = ExtResource("14_mye8l")
@@ -754,6 +748,7 @@ action = "S"
 visibility_mode = 1
 
 [node name="Gas" type="TouchScreenButton" parent="Hud" unique_id=259678140]
+visible = false
 position = Vector2(1140, 452.00003)
 scale = Vector2(1.1150522, 0.8278051)
 texture_normal = ExtResource("13_miysu")
@@ -805,17 +800,9 @@ collision_mask = 13
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07924715, -0.34108055, 0.18280149)
 shape = SubResource("BoxShape3D_36car")
 
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=966587558]
-transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -0.12408221, 0.58155507, -2.5218902)
-shape = SubResource("CapsuleShape3D_36car")
-
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=1769451812]
-transform = Transform3D(-4.371139e-08, -1, -1.811884e-13, 1, -4.371139e-08, -7.919965e-21, 0, -1.811884e-13, 1, -0.10005677, 0.80609834, 0.26369053)
+transform = Transform3D(-4.371139e-08, -1, -1.8474111e-13, 1, -4.371139e-08, -7.919965e-21, 0, -1.8474111e-13, 1, -0.100056775, 0.80609834, -0.17389329)
 shape = SubResource("BoxShape3D_miysu")
-
-[node name="CollisionShape3D4" type="CollisionShape3D" parent="." unique_id=829254586]
-transform = Transform3D(-4.371138e-08, 0.9999965, 0, -0.9999998, -4.3711236e-08, 0, 0, 0, 0.9999965, -0.11720669, 0.77712226, 2.0261278)
-shape = SubResource("CapsuleShape3D_mye8l")
 
 [node name="VehicleWheel3D6" type="VehicleWheel3D" parent="." unique_id=682092696]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.367, -2.027)
@@ -915,4 +902,4 @@ mesh = SubResource("ArrayMesh_12ppg")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 
 [node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("2_ti1hc")]
-transform = Transform3D(1, 0, 0, 0, 0.98309237, 0.1831106, 0, -0.1831106, 0.98309237, 0, 2.2495344, 5.018093)
+transform = Transform3D(0.21579377, 0.93885624, -0.26829472, 0.38785973, -0.3345797, -0.8588488, -0.8961015, 0.08127349, -0.4363447, 0, 2.2495344, 5.018093)

@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://camera/camera_3d.tscn" id="4_vlebh"]
 [ext_resource type="Shader" uid="uid://cbvk81cqd1ey6" path="res://cars/BTR/btr.gdshader" id="5_1jed2"]
 [ext_resource type="PackedScene" uid="uid://cq3n4b78h5nv" path="res://cars/Wheel/wheel.tscn" id="6_fwtlp"]
+[ext_resource type="Texture2D" uid="uid://dflunt5pvepti" path="res://cars/texture/Brake.png" id="8_rks3q"]
+[ext_resource type="Texture2D" uid="uid://duvq5xocns3d8" path="res://cars/texture/Gas.png" id="9_kcxae"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ym3jb"]
 resource_name = "04_-_Default"
@@ -18,7 +20,7 @@ metallic_texture_channel = 2
 roughness_texture = ExtResource("3_1jed2")
 roughness_texture_channel = 1
 normal_enabled = true
-normal_scale = 9.85
+normal_scale = 3.15
 normal_texture = ExtResource("4_ouyga")
 ao_enabled = true
 ao_light_affect = 1.0
@@ -117,6 +119,12 @@ height = 1.6673584
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ouyga"]
 size = Vector3(1.9233038, 1.298866, 1.7814431)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_if5th"]
+size = Vector2(120, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2cwyt"]
+size = Vector2(120, 310)
 
 [node name="BTR" type="VehicleBody3D" unique_id=1984143113]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -219,44 +227,6 @@ shape = SubResource("BoxShape3D_1jed2")
 transform = Transform3D(-4.3711385e-08, 0.9999966, 0, -0.99999994, -4.371124e-08, 0, 0, 0, 0.99999654, 0.026939787, 0.77660877, 2.5264633)
 shape = SubResource("CapsuleShape3D_ouyga")
 
-[node name="Hud" type="CanvasLayer" parent="." unique_id=1743182385]
-layer = 2
-
-[node name="speed" type="Label" parent="Hud" unique_id=1918464098]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = -23.0
-offset_right = 20.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_font_sizes/font_size = 50
-metadata/_edit_use_anchors_ = true
-
-[node name="FuelBar" type="ProgressBar" parent="Hud" unique_id=2017762371]
-offset_right = 150.0
-offset_bottom = 53.0
-metadata/_edit_use_anchors_ = true
-
-[node name="Metr" type="Label" parent="Hud" unique_id=2095538548]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -120.0
-offset_bottom = 63.0
-grow_horizontal = 0
-theme_override_font_sizes/font_size = 40
-metadata/_edit_use_anchors_ = true
-
-[node name="HpBar" type="ProgressBar" parent="Hud" unique_id=1608967056]
-offset_top = 55.0
-offset_right = 153.0
-offset_bottom = 110.0
-metadata/_edit_use_anchors_ = true
-
 [node name="Area3D" type="Area3D" parent="." unique_id=1623991069]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94620615, -2.8447406)
 collision_layer = 0
@@ -270,4 +240,73 @@ shape = SubResource("BoxShape3D_ouyga")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 
 [node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("4_vlebh")]
-transform = Transform3D(1, 0, 0, 0, 0.98309237, 0.1831106, 0, -0.1831106, 0.98309237, 0, 2.2495344, 5.018093)
+transform = Transform3D(-0.99980897, 0, -0.01954637, 0, 1, 0, 0.01954637, 0, -0.99980897, 0, 3.169646, 0)
+far = 330.0
+
+[node name="Hud" type="CanvasLayer" parent="." unique_id=1281049681]
+layer = 2
+
+[node name="VirtualJoystick" type="VirtualJoystick" parent="Hud" unique_id=1194772127]
+visible = false
+offset_left = 2.0
+offset_top = 344.0
+offset_right = 463.0
+offset_bottom = 712.0
+joystick_mode = 1
+joystick_size = 190.0
+initial_offset_ratio = Vector2(0.5, 0.67)
+action_left = &"A"
+action_right = &"D"
+
+[node name="Brake" type="TouchScreenButton" parent="Hud" unique_id=747381257]
+visible = false
+position = Vector2(973, 601)
+scale = Vector2(1.1900828, 0.9928641)
+texture_normal = ExtResource("8_rks3q")
+shape = SubResource("RectangleShape2D_if5th")
+action = "S"
+visibility_mode = 1
+
+[node name="Gas" type="TouchScreenButton" parent="Hud" unique_id=1833259455]
+visible = false
+position = Vector2(1140, 452.00003)
+scale = Vector2(1.1150522, 0.8278051)
+texture_normal = ExtResource("9_kcxae")
+shape = SubResource("RectangleShape2D_2cwyt")
+action = "W"
+visibility_mode = 1
+
+[node name="speed" type="Label" parent="Hud" unique_id=1483472353]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -23.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 50
+metadata/_edit_use_anchors_ = true
+
+[node name="FuelBar" type="ProgressBar" parent="Hud" unique_id=1186671473]
+offset_right = 150.0
+offset_bottom = 53.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Metr" type="Label" parent="Hud" unique_id=914178158]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -120.0
+offset_bottom = 63.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 40
+metadata/_edit_use_anchors_ = true
+
+[node name="HpBar" type="ProgressBar" parent="Hud" unique_id=40109461]
+offset_top = 55.0
+offset_right = 153.0
+offset_bottom = 110.0
+metadata/_edit_use_anchors_ = true

@@ -16,6 +16,7 @@ var start_z_position: float = 0.0
 
 @export_group("Zombie Collision")
 @export var wall_damage_min_speed_mps: float = 5.0
+@export var crash_death_speed_mps: float = 25.0
 
 @export_group("Fuel")
 @export var max_fuel: int = 100
@@ -184,6 +185,14 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 	var speed_mps := linear_velocity.length()
 	var speed_kmh := speed_mps * 3.6 
 
+	# --- НОВАЯ ЛОГИКА: Моментальная смерть от группы dead_wall ---
+	if body.is_in_group("dead_wall"):
+		if speed_mps >= crash_death_speed_mps:
+			# Наносим урон, равный всему текущему здоровью, чтобы машина гарантированно взорвалась
+			take_damage(current_hp) 
+			shake_camera(2.0) # Сильная тряска при финальном ударе
+			return # Выходим из функции, машина уничтожена
+			
 	if body.is_in_group("zombie"):
 		take_damage(10) 
 		if speed_kmh >= 40.0:
@@ -203,7 +212,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 			shake_camera(clampf(float(damage_to_car) * 0.1, 0.2, 1.5))
 			if body.has_method("take_damage"):
 				body.take_damage(speed_mps * 2.0) 
-
+				
 func _destroy_car() -> void:
 	if destroyed: return
 	destroyed = true

@@ -3,22 +3,26 @@ extends Node3D
 var current_idx = 0 
 var car_instance = null 
 
+# СЛОВАРЬ ДЛЯ КЭША: Сюда мы сохраним уже загруженные файлы сцен при старте
+var loaded_car_scenes: Dictionary = {}
+
 func _ready():
 	$CanvasLayer/Money.text = str(Game.money) + " $"
-	# Берем индекс выбранной машины из твоего Game.gd
 	current_idx = Game.selected_car_index
+	preload_all_cars()
 	update_shop_ui()
 
+func preload_all_cars():
+	for info in Game.car_data:
+		var path = info["path"]
+		var scene = load(path) 
+		if scene:
+			loaded_car_scenes[path] = scene
+
 func update_shop_ui():
-	# Проверяем, есть ли данные в Game.gd
-	var car_data = [
-	{"path": "res://cars/Doge_Optimizado/Doge2.tscn", "price": 0},
-	{"path": "res://cars/BTR/btr.tscn", "price": 0}
-]
+	$CanvasLayer/Money.text = str(Game.money) + " $"
 	
 	var car_info = Game.car_data[current_idx]
-	
-	# Обновляем текст (пути к узлам согласно твоему скриншоту)
 	$CanvasLayer/CarName.text = "Машина #" + str(current_idx + 1)
 	
 	if current_idx in Game.owned_cars:
@@ -35,15 +39,16 @@ func update_shop_ui():
 		$CanvasLayer/Buy.text = "КУПИТЬ"
 		$CanvasLayer/Buy.disabled = false
 
-	# Спавним 3D модель для предпросмотра
+	# Мгновенный спавн превью без чтения диска
 	spawn_car_preview(car_info.path)
 
 func spawn_car_preview(path):
 	if car_instance:
 		car_instance.queue_free()
 	
-	var car_scene = load(path)
-	if car_scene:
+	# ОПТИМИЗАЦИЯ: Вместо тяжелого load(path) берем готовую сцену из словаря
+	if loaded_car_scenes.has(path):
+		var car_scene = loaded_car_scenes[path]
 		car_instance = car_scene.instantiate()
 		add_child(car_instance)
 		
@@ -51,23 +56,20 @@ func spawn_car_preview(path):
 		var car_camera = car_instance.find_child("*Camera*", true, false) as Camera3D
 		if car_camera:
 			car_camera.current = false
-		# ------------------------------------------
 		
-		# Ставим машину в твой узел Spawn
+		# Ставим машину в узел Spawn
 		car_instance.global_position = $Spawn.global_position
 		
-		# Замораживаем физику, чтобы машина не улетела
+		# Замораживаем физику
 		if car_instance is RigidBody3D:
 			car_instance.freeze = true
 		car_instance.set_physics_process(false)
 
-
 func _process(delta):
-	# Вращаем машину для красоты
 	if car_instance:
 		car_instance.rotate_y(delta * 0.5)
 
-# --- СИГНАЛЫ КНОПОК (Подключи их во вкладке "Узел"!) ---
+# --- СИГНАЛЫ КНОПОК ---
 
 func _on_next_pressed():
 	current_idx = (current_idx + 1) % Game.car_data.size()
@@ -82,6 +84,7 @@ func _on_buy_pressed():
 	
 	if current_idx in Game.owned_cars:
 		Game.selected_car_index = current_idx
+		Game.save_data() 
 	else:
 		if Game.money >= car_info.price:
 			Game.money -= car_info.price
@@ -94,4 +97,4 @@ func _on_buy_pressed():
 	update_shop_ui()
 
 func _on_back_menu_pressed():
-	get_tree().change_scene_to_file("res://menu.tscn") 
+	get_tree().change_scene_to_file("res://menu.tscn")

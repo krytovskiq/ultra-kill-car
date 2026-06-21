@@ -4,16 +4,16 @@ enum ZombieState { IDLE, CHASE, ATTACK, DEAD, FALLEN }
 
 @export_group("Zombie Settings")
 @export var max_hp: float = 50.0
-@export var walk_speed: float = 5.0    
-@export var run_speed: float = 14.0     
-@export var damage: int = 12
-@export var attack_range: float = 3.0
-@export var detection_radius: float = 500.0
-@export var lose_target_radius: float = 200.0
+@export var walk_speed: float = 2.0    
+@export var run_speed: float = 7.0     
+@export var damage: int = 9
+@export var attack_range: float = 2.7
+@export var detection_radius: float = 300.0
+@export var lose_target_radius: float = 310.0
 
 @export_group("Timers")
-@export var attack_cooldown: float = 3.5
-@export var get_up_time: float = 3.0
+@export var attack_cooldown: float = 1.5
+@export var get_up_time: float = 1.5
 
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 
@@ -68,42 +68,43 @@ func _physics_process(delta: float) -> void:
 
 
 func _update_state_and_movement(delta: float) -> void:
-	# ОПТИМИЗАЦИЯ: Используем distance_to_squared (работает в 5 раз быстрее)
+	# Если зомби уже атакует, принудительно держим скорость нулевой и выходим
+	if state == ZombieState.ATTACK:
+		_internal_velocity = Vector3.ZERO
+		return
+
 	var dist_sq := global_position.distance_squared_to(player.global_position)
 	
-	# 1. Состояние АТАКИ
-	if dist_sq <= attack_range_sq and attack_timer <= 0.0 and state != ZombieState.ATTACK:
+	# 1. Состояние АТАКИ (срабатывает, если подошел близко и кулдаун прошел)
+	if dist_sq <= attack_range_sq and attack_timer <= 0.0:
 		state = ZombieState.ATTACK
 		_internal_velocity = Vector3.ZERO
 		play_anim("Attack")
 		attack_timer = attack_cooldown
-		return # Выходим сразу, чтобы код ниже не выполнялся в этом кадре
+		return 
 			
-	# Прерываем движение, если сейчас идет анимация атаки
-	if state == ZombieState.ATTACK:
-		return
-
 	# 2. Состояние ПОГОНИ
 	elif dist_sq <= detection_radius_sq or (state == ZombieState.CHASE and dist_sq <= lose_target_radius_sq):
 		state = ZombieState.CHASE
 		play_anim(_chase_anim) 
 		
-		# ОПТИМИЗАЦИЯ: Быстрый способ направить вектор без деления на ноль
 		var dir := global_position.direction_to(player.global_position)
 		dir.y = 0 
 		_internal_velocity = dir * current_speed
 		
-		# ОПТИМИЗАЦИЯ: Вместо тяжелого atan2 используем встроенный look_at_from_position
 		if _internal_velocity.length_squared() > 0.01:
 			var target_look = global_position + _internal_velocity
 			look_at(target_look, Vector3.UP)
 			
-	# 3. Состояние ПОКОЯ
+	# 3. Состояние ПОКОЯ (ИСПРАВЛЕНО: теперь включает Idle, а не Walk)
 	else:
 		state = ZombieState.IDLE
-		play_anim("Walk") 
+		if anim_player.has_animation("Idle"):
+			play_anim("Idle")
+		else:
+			play_anim("Walk") # если анимации покоя нет вообще
 		_internal_velocity = _internal_velocity.move_toward(Vector3.ZERO, current_speed * delta)
-
+		
 # ОПТИМИЗАЦИЯ: Единый обработчик завершения всех анимаций (вместо await)
 func _on_animation_finished(anim_name: String) -> void:
 	if anim_name == "Attack" and state == ZombieState.ATTACK:
@@ -115,7 +116,6 @@ func _on_animation_finished(anim_name: String) -> void:
 		ZombiePool.return_zombie(self)
 	elif anim_name == "Death" and state == ZombieState.FALLEN:
 		state = ZombieState.CHASE
-
 func reset_zombie(is_running: bool = false) -> void:
 	state = ZombieState.IDLE
 	current_hp = max_hp
