@@ -4,7 +4,8 @@ extends Node
 var car_data = [
 	{"path": "res://cars/Doge_Optimizado/Doge2.tscn", "price": 0},
 	{"path": "res://cars/BTR/btr.tscn", "price": 0},
-	{"path": "res://cars/pikap/pikap.tscn", "price": 0}
+	{"path": "res://cars/pikap/pikap.tscn", "price": 0},
+	{"path": "res://cars/Mustang/mustang.tscn", "price": 0}
 ]
 
 var money: int = 0

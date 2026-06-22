@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://bqcvo1l4cmi0p"]
+
+[ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_brvut"]
+[ext_resource type="PackedScene" path="res://scene/Generator.tscn" id="2_0ha60"]
+[ext_resource type="PackedScene" path="res://scene/City_MAP.tscn" id="3_4j5ol"]
+[ext_resource type="PackedScene" path="res://scene/Brige.tscn" id="4_brvut"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_lquwl"]
+load_path = "res://.godot/imported/893483.PNG-230050ba5ad6169130c5d6919eabf779.s3tc.ctex"
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_emvy3"]
+rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
+mie_coefficient = 0.086
+ground_color = Color(0, 0, 0, 1)
+energy_multiplier = 16.86
+night_sky = SubResource("CompressedTexture2D_lquwl")
+
+[sub_resource type="Sky" id="Sky_7mycd"]
+sky_material = SubResource("PhysicalSkyMaterial_emvy3")
+radiance_size = 2
+
+[sub_resource type="Environment" id="Environment_lquwl"]
+background_mode = 2
+background_color = Color(0, 0, 0.43137255, 1)
+sky = SubResource("Sky_7mycd")
+sky_rotation = Vector3(0, 0.20245819, 0)
+ambient_light_color = Color(0.43137255, 0.44705883, 0.4745098, 1)
+ambient_light_sky_contribution = 0.17
+ambient_light_energy = 0.7
+reflected_light_source = 2
+tonemap_exposure = 0.3
+tonemap_agx_white = 16.5
+ssao_radius = 1.5
+ssao_intensity = 0.6
+ssao_power = 32.7849
+sdfgi_y_scale = 2
+glow_intensity = 2.12
+glow_bloom = 0.09
+fog_enabled = true
+fog_mode = 1
+fog_light_energy = 2.0
+fog_sun_scatter = 0.17
+fog_density = 1.0
+fog_sky_affect = 0.944
+fog_height = 2.15
+fog_height_density = 0.2
+fog_depth_curve = 0.31864014
+fog_depth_begin = 0.0
+fog_depth_end = 330.0
+adjustment_contrast = 1.125
+adjustment_saturation = 0.0
+
+[node name="Main" type="Node3D" unique_id=1305401198 node_paths=PackedStringArray("world_environment")]
+script = ExtResource("1_brvut")
+world_environment = NodePath("WorldEnvironment")
+chunk_scenes_list = Array[PackedScene]([ExtResource("2_0ha60"), ExtResource("3_4j5ol")])
+bridge_scene = ExtResource("4_brvut")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815913890]
+environment = SubResource("Environment_lquwl")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=774830370]
+transform = Transform3D(1, 0, 0, 0, 0.21567276, 0.9764657, 0, -0.9764657, 0.21567276, 0, 6.286339, 0)
+light_energy = 0.1
+light_bake_mode = 1

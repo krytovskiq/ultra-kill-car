@@ -1,0 +1,183 @@
+[gd_scene format=3 uid="uid://bynwx8ud3opku"]
+
+[ext_resource type="PackedScene" uid="uid://sffaj4bscxpa" path="res://scene/Generator.tscn" id="1_ecwwl"]
+[ext_resource type="Script" uid="uid://bl38sws02lfg6" path="res://control.gd" id="1_lti8b"]
+[ext_resource type="Script" path="res://scripts/canvas_layer.gd" id="2_ouk20"]
+[ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="4_kk3ma"]
+[ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_nrnbx"]
+[ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="6_iqepy"]
+[ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="7_h1wq0"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dwrpx"]
+load_path = "res://.godot/imported/893483.PNG-230050ba5ad6169130c5d6919eabf779.s3tc.ctex"
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_g7jxm"]
+rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
+mie_coefficient = 0.086
+ground_color = Color(0, 0, 0, 1)
+energy_multiplier = 16.86
+night_sky = SubResource("CompressedTexture2D_dwrpx")
+
+[sub_resource type="Sky" id="Sky_jspdm"]
+sky_material = SubResource("PhysicalSkyMaterial_g7jxm")
+radiance_size = 2
+
+[sub_resource type="Environment" id="Environment_oxnod"]
+background_mode = 2
+background_color = Color(0, 0, 0.43137255, 1)
+sky = SubResource("Sky_jspdm")
+sky_rotation = Vector3(0, 0.20245819, 0)
+ambient_light_color = Color(0.43137255, 0.44705883, 0.4745098, 1)
+ambient_light_sky_contribution = 0.17
+ambient_light_energy = 0.7
+reflected_light_source = 2
+tonemap_exposure = 0.3
+tonemap_agx_white = 16.5
+ssao_radius = 1.5
+ssao_intensity = 0.6
+ssao_power = 32.7849
+sdfgi_y_scale = 2
+glow_intensity = 2.12
+glow_bloom = 0.09
+fog_enabled = true
+fog_mode = 1
+fog_light_energy = 2.0
+fog_sun_scatter = 0.17
+fog_density = 1.0
+fog_sky_affect = 0.944
+fog_height = 2.15
+fog_height_density = 0.2
+fog_depth_curve = 0.31864014
+fog_depth_begin = 0.0
+fog_depth_end = 330.0
+adjustment_contrast = 1.125
+adjustment_saturation = 0.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6hrxe"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bo148"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dxkut"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yw1da"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vyjl0"]
+
+[node name="Node3D" type="Node3D" unique_id=1935835138]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2132359110]
+environment = SubResource("Environment_oxnod")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=645698339]
+transform = Transform3D(1, 0, 0, 0, 0.21567276, 0.9764657, 0, -0.9764657, 0.21567276, 0, 6.286339, 0)
+light_energy = 0.1
+light_bake_mode = 1
+
+[node name="WorldChunk" parent="." unique_id=560257719 instance=ExtResource("1_ecwwl")]
+
+[node name="Menu" type="Control" parent="." unique_id=1301859710]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lti8b")
+
+[node name="Play" type="Button" parent="Menu" unique_id=1741259866]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -575.5
+offset_top = -67.0
+offset_right = -362.5
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
+text = "ИГРАТЬ"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="Menu" unique_id=965634195]
+script = ExtResource("2_ouk20")
+
+[node name="Money" type="Label" parent="Menu/CanvasLayer" unique_id=846240893]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -141.0
+offset_bottom = 69.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 50
+
+[node name="TextureButton" type="Button" parent="Menu" unique_id=875364114]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -599.0
+offset_top = 18.5
+offset_right = -339.0
+offset_bottom = 87.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
+text = " МАГАЗИН"
+
+[node name="Object_4" parent="." unique_id=1700165015 instance=ExtResource("4_kk3ma")]
+transform = Transform3D(0.83828247, 0, -0.54523623, 0, 1, 0, 0.54523623, 0, 0.83828247, 1.5668952, 1.6913521, 19.45353)
+
+[node name="Object_8" parent="." unique_id=675548199 instance=ExtResource("5_nrnbx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.334482, 2.1627305, -20.582775)
+
+[node name="Object_6" parent="." unique_id=290781301 instance=ExtResource("6_iqepy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.083918, 1.5035449, -5.9821033)
+
+[node name="Object_10" parent="." unique_id=1420987480 instance=ExtResource("7_h1wq0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.299181, 0.6542101, 29.666916)
+
+[node name="Object_11" parent="." unique_id=1118794484 instance=ExtResource("7_h1wq0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.50773, 0.6542101, 52.823013)
+
+[node name="Object_5" parent="." unique_id=41017418 instance=ExtResource("4_kk3ma")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90.58977, 1.6913521, 22.317982)
+
+[node name="Object_7" parent="." unique_id=484461930 instance=ExtResource("6_iqepy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.624714, 1.5035449, 14.098635)
+
+[node name="Object_9" parent="." unique_id=738028621 instance=ExtResource("5_nrnbx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -62.54699, 2.162728, -43.323547)
+
+[node name="Object_12" parent="." unique_id=1975270845 instance=ExtResource("5_nrnbx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.124588, 2.16273, 36.229942)
+
+[node name="Object_13" parent="." unique_id=947952558 instance=ExtResource("4_kk3ma")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.343054, 1.6913521, 14.0756035)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1262406334]
+transform = Transform3D(0.9321285, 0, 0.36212778, 0, 1, 0, -0.36212778, 0, 0.9321285, 3.3700008, 3.145115, 29.00009)
+fov = 52.2
+
+[connection signal="pressed" from="Menu/Play" to="Menu" method="_on_play_pressed"]
+[connection signal="pressed" from="Menu/TextureButton" to="Menu" method="_on_texture_button_pressed"]
