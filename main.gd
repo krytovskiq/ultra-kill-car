@@ -75,7 +75,6 @@ func _process(delta: float) -> void:
 	var passed_500m_steps: int = floori(absf(distance) / 500.0)
 	# Каждые 500 метров уменьшаем задержку на 0.1 сек (зомби спавнятся плотнее)
 	current_spawn_cooldown = maxf(base_spawn_cooldown - (passed_500m_steps * 0.1), 0.25)
-	
 	spawn_timer += delta
 	if spawn_timer >= current_spawn_cooldown:
 		spawn_timer = 0.0

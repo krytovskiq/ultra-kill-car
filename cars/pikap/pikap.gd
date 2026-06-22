@@ -6,9 +6,9 @@ var start_z_position: float = 0.0
 @export_group("Driving")
 @export var STEER_SPEED: float = 2.8
 @export var STEER_LIMIT: float = 0.40
-@export var engine_force_value: int = 5500
+@export var engine_force_value: int = 3950
 @export var brake_force: float = 90.0
-@export var MAX_SPEED_KMH: int = 280
+@export var MAX_SPEED_KMH: int = 160
 
 @export_group("Health")
 @export var health: int = 100

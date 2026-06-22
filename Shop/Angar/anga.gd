@@ -3,7 +3,6 @@ extends Node3D
 var current_idx = 0 
 var car_instance = null 
 
-# СЛОВАРЬ ДЛЯ КЭША: Сюда мы сохраним уже загруженные файлы сцен при старте
 var loaded_car_scenes: Dictionary = {}
 
 func _ready():
@@ -46,13 +45,10 @@ func spawn_car_preview(path):
 	if car_instance:
 		car_instance.queue_free()
 	
-	# ОПТИМИЗАЦИЯ: Вместо тяжелого load(path) берем готовую сцену из словаря
 	if loaded_car_scenes.has(path):
 		var car_scene = loaded_car_scenes[path]
 		car_instance = car_scene.instantiate()
 		add_child(car_instance)
-		
-		# --- ОТКЛЮЧАЕМ КАМЕРУ МАШИНЫ ДЛЯ АНГАРА ---
 		var car_camera = car_instance.find_child("*Camera*", true, false) as Camera3D
 		if car_camera:
 			car_camera.current = false
@@ -68,9 +64,6 @@ func spawn_car_preview(path):
 func _process(delta):
 	if car_instance:
 		car_instance.rotate_y(delta * 0.5)
-
-# --- СИГНАЛЫ КНОПОК ---
-
 func _on_next_pressed():
 	current_idx = (current_idx + 1) % Game.car_data.size()
 	update_shop_ui()

@@ -3,14 +3,14 @@ extends VehicleBody3D
 var total_distance: float = 0.0
 var start_z_position: float = 0.0
 var lights_tween: Tween
-
+@export var DeadParticles: PackedScene
 @export_group("Driving")
 @export var STEER_SPEED: float = 1.5
 @export var STEER_LIMIT: float = 0.3
-@export var engine_force_value: int = 5000
+@export var engine_force_value: int = 13800
 @export var brake_force: float = 160.0
 @export var handbrake_force: float = 90.0
-@export var MAX_SPEED_KMH: int = 110
+@export var MAX_SPEED_KMH: int = 170
 
 @export_group("Health")
 @export var health: int = 100
@@ -34,16 +34,14 @@ var lights_tween: Tween
 var current_fuel: float = 0.0
 var current_hp: int = 0
 var destroyed: bool = false
-
+var death_shader = preload("res://cars/Death_shader.gdshader")
 @export_group("Enemy Damage")
 @export var damage_per_second: int = 10
 var damage_timer: float = 0.0
 
-# --- ПРОСТЫЕ НАСТРОЙКИ ПУШКИ ---
 @onready var base_gun: Node3D = $"Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun"
 var target_zombie: Node3D = null
 var can_shoot: bool = true
-# -------------------------------
 
 func _ready() -> void:
 	var kill_zone = get_node_or_null("Area3D")
@@ -70,28 +68,15 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if destroyed: return
-	
-	# --- ПРОСТАЯ ЛОГИКА ПУШКИ ---
 	_find_zombie_target() 
 	if is_instance_valid(target_zombie):
-		# 1. Вычисляем позицию зомби относительно БТР
 		var local_target_pos = base_gun.to_local(target_zombie.global_position)
-		
-		# 2. Считаем чистый угол поворота по горизонтали
 		var target_angle_y = atan2(local_target_pos.x, local_target_pos.z)
-		
-		# 3. ОГРАНИЧЕНИЕ: Переводим 70 градусов в радианы и зажимаем угол лимитом
 		var limit_radians = deg_to_rad(70.0)
 		target_angle_y = clamp(target_angle_y, -limit_radians, limit_radians)
-		
-		# 4. Плавно поворачиваем пушку в пределах разрешенного угла
 		base_gun.rotate_y(target_angle_y * STEER_SPEED * delta)
-		
-		# Если нажали ПРОБЕЛ и пушка готова — уничтожаем зомби
 		if Input.is_key_pressed(KEY_SPACE) and can_shoot:
 			_shoot_zombie()
-	# -----------------------------
-
 	total_distance = abs(global_position.z - start_z_position)
 	if has_node("Hud/Metr"):
 		$Hud/Metr.text = str(round(total_distance)) + " M"
@@ -125,7 +110,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		if not Input.is_key_pressed(KEY_SPACE):
 			brake = 0.0
-
+	if Input.is_key_pressed(KEY_ESCAPE) and not destroyed:
+		get_tree().paused = !get_tree().paused
+		$Hud/Pause.visible = get_tree().paused
+		
 	var steer_input = Input.get_axis("D", "A") 
 	var speed_factor = clamp(1.0 - (speed_kmh / MAX_SPEED_KMH), 0.3, 1.0)
 	var steer_target = steer_input * STEER_LIMIT * speed_factor
@@ -261,12 +249,31 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 			
 			print("УДАР ОБ ОБЪЕКТ! Урон машине: ", round(damage_to_car))
 
-func _destroy_car():
-	if destroyed: return
-	destroyed = true
-	print("МАШИНА УНИЧТОЖЕНА!")
-	engine_force = 0
-	brake = brake_force
+func _destroy_car() -> void:
+	if DeadParticles:
+		var Dead = DeadParticles.instantiate() as CPUParticles3D
+		get_tree().current_scene.add_child(Dead)
+		Dead.global_position = global_position
+	if DeadParticles:
+		var Dead = DeadParticles.instantiate() as CPUParticles3D
+		get_tree().current_scene.add_child(Dead)
+		Dead.global_position = global_position
+		
+		Dead.lifetime = 1.0 
+		Dead.anim_speed_min = 2.0
+		Dead.anim_speed_max = 2.5
+		Dead.emitting = true
+		Dead.restart()
+	apply_central_impulse(Vector3(0, 49000.0, 0))
+	if has_node("Hud/ColorRect"):
+		var effect_rect = $Hud/ColorRect as ColorRect
+		effect_rect.show()
+		var mat = effect_rect.material as ShaderMaterial
+		var tween_blood = create_tween()
+		tween_blood.tween_property(mat, "shader_parameter/effect_strength", 1.0, 0.0)
+		var tween_time = create_tween()
+		tween_time.tween_property(Engine, "time_scale", 0.0001, 1.0).set_trans(Tween.TRANS_SINE)
+	
 	await get_tree().create_timer(3.0).timeout
 	get_tree().reload_current_scene()
 
