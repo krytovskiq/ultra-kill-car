@@ -6,7 +6,7 @@ var car_instance = null
 var loaded_car_scenes: Dictionary = {}
 
 func _ready():
-	$CanvasLayer/Money.text = str(Game.money) + " $"
+	$CanvasLayer/money.text = str(Game.money) + " $"
 	current_idx = Game.selected_car_index
 	preload_all_cars()
 	update_shop_ui()
@@ -19,7 +19,7 @@ func preload_all_cars():
 			loaded_car_scenes[path] = scene
 
 func update_shop_ui():
-	$CanvasLayer/Money.text = str(Game.money) + " $"
+	$CanvasLayer/money.text = str(Game.money) + " $"
 	
 	var car_info = Game.car_data[current_idx]
 	$CanvasLayer/CarName.text = "Машина #" + str(current_idx + 1)

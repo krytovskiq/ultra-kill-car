@@ -11,7 +11,7 @@ var start_z_position: float = 0.0
 @export var MAX_SPEED_KMH: int = 160
 
 @export_group("Health")
-@export var health: int = 100
+@export var health: int = 1
 @export var collision_damage_multiplier: float = 0.35
 
 @export_group("Zombie Collision")
@@ -231,9 +231,10 @@ func _destroy_car() -> void:
 		var tween_blood = create_tween()
 		tween_blood.tween_property(mat, "shader_parameter/effect_strength", 1.0, 0.0)
 		var tween_time = create_tween()
-		tween_time.tween_property(Engine, "time_scale", 0.0001, 1.0).set_trans(Tween.TRANS_SINE)
+		tween_time.tween_property(Engine, "time_scale", 0.1, 0.2).set_trans(Tween.TRANS_SINE)
 	
-	await get_tree().create_timer(3.0).timeout
+	await get_tree().create_timer(1.0).timeout
+	Engine.time_scale = 1.0
 	get_tree().reload_current_scene()
 	
 func shake_camera(amount: float) -> void:

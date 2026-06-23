@@ -1,11 +1,82 @@
-[gd_scene format=3 uid="uid://bm52c2ry0p4yw"]
+[gd_scene format=3 uid="uid://cwimp001cswix"]
 
-[ext_resource type="Script" uid="uid://bt3i55n8bf2ix" path="res://Shop/shop_scene.gd" id="1_m4aye"]
+[sub_resource type="GDScript" id="GDScript_vxpnd"]
+script/source = "extends Node3D
+
+var current_idx = 0 
+var car_instance = null 
+
+func _ready():
+	$CanvasLayer/Money.text = str(Game.money) + \" $\"
+	current_idx = Game.selected_car_index
+	var car_info = Game.car_data[current_idx]
+	
+	$CanvasLayer/CarName.text = \"Машина #\" + str(current_idx + 1)
+	
+	if current_idx in Game.owned_cars:
+		$CanvasLayer/Price.text = \"КУПЛЕНО\"
+		$CanvasLayer/Buy.text = \"ВЫБРАТЬ\"
+		
+		if current_idx == Game.selected_car_index:
+			$CanvasLayer/Buy.text = \"ВЫБРАНО\"
+			$CanvasLayer/Buy.disabled = true
+		else:
+			$CanvasLayer/Buy.disabled = false
+	else:
+		$CanvasLayer/Price.text = \"ЦЕНА: \" + str(car_info.price) + \" $\"
+		$CanvasLayer/Buy.text = \"КУПИТЬ\"
+		$CanvasLayer/Buy.disabled = false
+
+	spawn_car_preview(car_info.path)
+
+func spawn_car_preview(path):
+	if car_instance:
+		car_instance.queue_free()
+	
+	var car_scene = load(path)
+	if car_scene:
+		car_instance = car_scene.instantiate()
+		add_child(car_instance)
+		
+		car_instance.global_position = $Spawn.global_position
+		
+		if car_instance is RigidBody3D:
+			car_instance.freeze = true
+		car_instance.set_physics_process(false)
+
+func _process(delta):
+	if car_instance:
+		car_instance.rotate_y(delta * 0.5)
+func _on_next_pressed():
+	current_idx = (current_idx + 1) % Game.car_data.size()
+
+func _on_back_pressed():
+	current_idx = (current_idx - 1 + Game.car_data.size()) % Game.car_data.size()
+
+func _on_buy_pressed():
+	var car_info = Game.car_data[current_idx]
+	
+	if current_idx in Game.owned_cars:
+		Game.selected_car_index = current_idx
+	else:
+		if Game.money >= car_info.price:
+			Game.money -= car_info.price
+			Game.owned_cars.append(current_idx)
+			Game.selected_car_index = current_idx
+			Game.save_data()
+		else:
+			print(\"Мало денег!\")
+	
+
+func _on_back_menu_pressed():
+	# Проверь, чтобы файл назывался именно menu.tscn
+	get_tree().change_scene_to_file(\"res://menu.tscn\") 
+"
 
 [sub_resource type="Environment" id="Environment_e2eif"]
 
 [node name="ShopScene" type="Node3D" unique_id=430265009]
-script = ExtResource("1_m4aye")
+script = SubResource("GDScript_vxpnd")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1863281194]
 current = true

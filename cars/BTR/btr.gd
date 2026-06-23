@@ -28,7 +28,7 @@ var lights_tween: Tween
 @export var wall_damage_min_speed_mps: float = 5.0
 
 @export_group("Fuel")
-@export var max_fuel: int = 1000
+@export var max_fuel: int = 150
 @export_group("Fuel")
 @export var fuel_consumption: float = 1.0
 var current_fuel: float = 0.0
@@ -51,14 +51,14 @@ func _ready() -> void:
 		push_error("ОШИБКА: Узел Area3D не найден! Создай его внутри машины.")
 
 	start_z_position = global_position.z
-	linear_velocity = -global_transform.basis.z * (20.0 / 3.6)
+	linear_velocity = -global_transform.basis.z * (20.0 / 2.6)
 	add_to_group("player")
 	
 	contact_monitor = true
 	max_contacts_reported = 24
 	current_hp = health
 	current_fuel = max_fuel
-	center_of_mass = Vector3(0, -0.2, 0)
+	center_of_mass = Vector3(0, 0, 0)
 	if has_node("Hud/HpBar"):
 		$Hud/HpBar.max_value = health
 		$Hud/HpBar.value = current_hp
@@ -71,7 +71,7 @@ func _physics_process(delta: float) -> void:
 	_find_zombie_target() 
 	if is_instance_valid(target_zombie):
 		var local_target_pos = base_gun.to_local(target_zombie.global_position)
-		var target_angle_y = atan2(local_target_pos.x, local_target_pos.z)
+		var target_angle_y = atan2(-local_target_pos.x, -local_target_pos.z)
 		var limit_radians = deg_to_rad(70.0)
 		target_angle_y = clamp(target_angle_y, -limit_radians, limit_radians)
 		base_gun.rotate_y(target_angle_y * STEER_SPEED * delta)
@@ -148,14 +148,10 @@ func _physics_process(delta: float) -> void:
 				damage_timer = 0.0
 		else:
 			damage_timer = 0.0
-
-# --- ВСЕГО ДВЕ КОРОТКИЕ ФУНКЦИИ ДЛЯ СТРЕЛЬБЫ ---
-
-# Ищем ближайшего живого зомби на всей карте
 func _find_zombie_target() -> void:
 	var zombies = get_tree().get_nodes_in_group("zombie")
 	var closest: Node3D = null
-	var min_dist = 40.0 # Дистанция атаки пушки БТР
+	var min_dist = 80.0
 	
 	for z in zombies:
 		if is_instance_valid(z) and z.get("state") != 3:
@@ -165,40 +161,28 @@ func _find_zombie_target() -> void:
 				closest = z
 	target_zombie = closest
 
-# Логика мгновенного убийства на пробел
-# Логика мгновенного убийства на пробел с эффектом шейдера
 func _shoot_zombie() -> void:
 	can_shoot = false
-	print("БТР произвел выстрел скоростным трассером!")
+	print("Выстрел")
 	
-	# Находим наш снаряд-эффект
 	var tracer = get_node_or_null("Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun/Gun_Effect")
 	
 	if tracer:
-		# 1. Возвращаем снаряд в исходную точку у дула пушки
 		tracer.position = Vector3.ZERO 
 		tracer.visible = true
-		
-		# 2. Создаем сверхбыструю анимацию полета (Tween)
 		var tween = create_tween()
 		
-		# За 60 миллисекунд (0.06 сек) двигаем снаряд вперед по локальной оси Z на 60 метров
-		# Убедитесь, какая ось у вас смотрит вперед (если X или Y, замените "position:z")
 		tween.tween_property(tracer, "position:z", -60.0, 0.06)
 		
-		# Как только анимация полета завершилась — прячем снаряд обратно
 		tween.finished.connect(func(): tracer.visible = false)
 	
-	# Зомби мгновенно погибает от выстрела
 	if target_zombie.has_method("die"):
 		target_zombie.die(linear_velocity, 50.0)
 	else:
 		target_zombie.queue_free()
 		
-	# Кулдаун между выстрелами игрока (0.3 секунды)
 	await get_tree().create_timer(0.3).timeout
 	can_shoot = true
-# -----------------------------------------------
 
 func refuel(amount: float):
 	current_fuel = clamp(current_fuel + amount, 0, max_fuel)
@@ -264,7 +248,7 @@ func _destroy_car() -> void:
 		Dead.anim_speed_max = 2.5
 		Dead.emitting = true
 		Dead.restart()
-	apply_central_impulse(Vector3(0, 49000.0, 0))
+	apply_central_impulse(Vector3(0, 13000.0, 0))
 	if has_node("Hud/ColorRect"):
 		var effect_rect = $Hud/ColorRect as ColorRect
 		effect_rect.show()
@@ -272,9 +256,10 @@ func _destroy_car() -> void:
 		var tween_blood = create_tween()
 		tween_blood.tween_property(mat, "shader_parameter/effect_strength", 1.0, 0.0)
 		var tween_time = create_tween()
-		tween_time.tween_property(Engine, "time_scale", 0.0001, 1.0).set_trans(Tween.TRANS_SINE)
+		tween_time.tween_property(Engine, "time_scale", 0.1, 0.2).set_trans(Tween.TRANS_SINE)
 	
-	await get_tree().create_timer(3.0).timeout
+	await get_tree().create_timer(1.0).timeout
+	Engine.time_scale = 1.0
 	get_tree().reload_current_scene()
 
 func shake_camera(amount: float):

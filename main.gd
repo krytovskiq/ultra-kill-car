@@ -17,7 +17,7 @@ extends Node3D
 @export var forward_axis: Vector3 = Vector3.BACK
 
 @export_group("Bridge Settings")
-@export var bridge_interval_meters: float = 2500.0
+@export var bridge_interval_meters: float = 500.0
 
 @export_group("Динамический Спавн Зомби")
 @export var base_spawn_cooldown: float = 0.25 # Интервал спавна (в секундах)
