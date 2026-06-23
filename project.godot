@@ -114,7 +114,6 @@ environment/ssao/quality=0
 environment/ssil/quality=0
 environment/ssil/adaptive_target=0.0
 environment/ssil/fadeout_to=64.0
-anti_aliasing/quality/msaa_3d=1
 anti_aliasing/screen_space_roughness_limiter/enabled=false
 anti_aliasing/quality/smaa_edge_detection_threshold=0.01
 textures/default_filters/texture_mipmap_bias=-0.5

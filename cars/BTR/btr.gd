@@ -258,9 +258,9 @@ func _destroy_car() -> void:
 		var tween_time = create_tween()
 		tween_time.tween_property(Engine, "time_scale", 0.1, 0.2).set_trans(Tween.TRANS_SINE)
 	
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(0.4).timeout
 	Engine.time_scale = 1.0
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file("res://menu.tscn")
 
 func shake_camera(amount: float):
 	var camera = get_node_or_null("look/Camera3D")
