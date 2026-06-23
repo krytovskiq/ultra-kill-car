@@ -77,3 +77,7 @@ func spawn_barn(parent_chunk: Node3D) -> void:
 
 func _on_visible_on_screen_notifier_3d_screen_exited() -> void:
 	queue_free() 
+
+
+func _on_exit_pressed() -> void:
+	get_tree().quit()

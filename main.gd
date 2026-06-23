@@ -17,18 +17,18 @@ extends Node3D
 @export var forward_axis: Vector3 = Vector3.BACK
 
 @export_group("Bridge Settings")
-@export var bridge_interval_meters: float = 2500.0
+@export var bridge_interval_meters: float = 500.0
 
 @export_group("Динамический Спавн Зомби")
-@export var base_spawn_cooldown: float = 0.25 # Интервал спавна (в секундах)
-@export var spawn_distance_ahead: float = 330.0 # Дистанция спавна перед машиной (в тумане)
-@export var road_spawn_width: float = 150.0 # Ширина дороги для спавна
+@export var base_spawn_cooldown: float = 0.25 
+@export var spawn_distance_ahead: float = 330.0 
+@export var road_spawn_width: float = 150.0 
 
 @export_group("Debug")
 @export var verbose_logs: bool = false
 
 var normal_fog_color: Color = Color("0d1117")      
-var scary_red_fog_color: Color = Color("3a0808")   
+var scary_red_fog_color: Color = Color("6c1717ff")   
 var current_fog_tween: Tween
 var is_fog_red: bool = false
 
@@ -71,17 +71,14 @@ func _process(delta: float) -> void:
 	var distance: float = _distance_along_forward(car.global_position)
 	var current_chunk_index: int = _get_chunk_index(distance)
 	
-	# 1. СИСТЕМА ДИНАМИЧЕСКОГО СПАВНА
 	var passed_500m_steps: int = floori(absf(distance) / 500.0)
-	# Каждые 500 метров уменьшаем задержку на 0.1 сек (зомби спавнятся плотнее)
 	current_spawn_cooldown = maxf(base_spawn_cooldown - (passed_500m_steps * 0.1), 0.25)
 	spawn_timer += delta
 	if spawn_timer >= current_spawn_cooldown:
 		spawn_timer = 0.0
 		_spawn_single_zombie_ahead()
 	
-	# 2. ПЕРЕКЛЮЧЕНИЕ ТУМАНА (Каждые 1500м)
-	var zone_index: int = floor(abs(distance) / 2500.0)
+	var zone_index: int = floor(abs(distance) / 20000.0)
 	var is_in_red_zone: bool = (zone_index % 2 == 1)
 	
 	if is_in_red_zone and not is_fog_red:
@@ -90,7 +87,6 @@ func _process(delta: float) -> void:
 		
 	elif not is_in_red_zone and is_fog_red:
 		is_fog_red = false
-		# ИСПРАВЛЕНО: Передаем число 1.0 (стандартная базовая энергия тумана)
 		_transition_fog(2.0)
 		
 	if current_chunk_index == int(_last_checked_distance):
@@ -166,7 +162,7 @@ func _spawn_chunk(index: int) -> void:
 	if abs_index % chunks_per_bridge == 0 and abs_index > 0:
 		how_many_bridges_passed -= 1
 		
-	chunk_z_pos -= float(how_many_bridges_passed) * 0.0 # Измени 0.0 на длину моста, если будет щель
+	chunk_z_pos -= float(how_many_bridges_passed) * 0.0
 
 	var chunk_origin: Vector3 = world_origin + _forward * chunk_z_pos
 	var chunk_basis: Basis = Basis.looking_at(_forward, Vector3.UP)
@@ -183,22 +179,14 @@ func _spawn_chunk(index: int) -> void:
 	_chunk_nodes[index] = chunk
 
 func _spawn_single_zombie_ahead() -> void:
-	# 1. Твоя машина едет вперед по оси +Z (Vector3.BACK).
-	# Чтобы закинуть зомби ДАЛЕКО ВПЕРЕД за черту тумана, 
-	# мы берем Depth End (300 метров) и прибавляем еще 20 метров запаса.
 	var safe_fog_distance: float = 320.0
 	
-	# Считаем точку строго в 320 метрах ПЕРЕД машиной в полной темноте
 	var spawn_pos: Vector3 = car.global_position + _forward * safe_fog_distance
 	
-	# 2. Рандомим позицию влево-вправо по ширине асфальта,
-	# чтобы они не выстраивались в одну идеальную линию
 	spawn_pos.x += randf_range(-road_spawn_width, road_spawn_width)
 	
-	# 3. Прижимаем зомби к высоте дорожного полотна
 	spawn_pos.y = road_y
 	
-	# Отправляем команду в пул на честный спавн в правильной точке
 	ZombiePool.spawn_zombie_at(spawn_pos)
 
 func advance_to_next_biome() -> void:
@@ -231,6 +219,4 @@ func _transition_fog(target_energy: float) -> void:
 		
 	current_fog_tween = create_tween()
 	
-	# Плавно изменяем ТОЛЬКО энергию тумана (fog_light_energy) до нужного значения за 2 секунды
-	# (Время 2.0 секунды можно изменить на свое, например 1.5 или 3.0)
 	current_fog_tween.tween_property(env, "fog_light_energy", target_energy, 1.5)

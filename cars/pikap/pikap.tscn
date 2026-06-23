@@ -1054,7 +1054,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VirtualJoystick" type="VirtualJoystick" parent="Hud" unique_id=1900567487]
-visible = false
 offset_left = 2.0
 offset_top = 344.0
 offset_right = 463.0
@@ -1066,7 +1065,6 @@ action_left = &"A"
 action_right = &"D"
 
 [node name="Brake" type="TouchScreenButton" parent="Hud" unique_id=2027772503]
-visible = false
 position = Vector2(973, 601)
 scale = Vector2(1.1900828, 0.9928641)
 texture_normal = ExtResource("16_fa5bw")
@@ -1075,7 +1073,6 @@ action = "S"
 visibility_mode = 1
 
 [node name="Gas" type="TouchScreenButton" parent="Hud" unique_id=2122780095]
-visible = false
 position = Vector2(1140, 452.00003)
 scale = Vector2(1.1150522, 0.8278051)
 texture_normal = ExtResource("17_xmiyf")

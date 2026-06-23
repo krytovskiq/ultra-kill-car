@@ -422,7 +422,7 @@ collision_mask = 525
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Stop/Stop2/StaticBody3D" unique_id=1285296415]
 shape = SubResource("ConcavePolygonShape3D_kyrh4")
 
-[node name="Barrier" parent="." unique_id=548533106 instance=ExtResource("8_vio08")]
+[node name="Barrier" parent="." unique_id=548533106 groups=["dead_wall"] instance=ExtResource("8_vio08")]
 transform = Transform3D(-0.00010472536, 0, -1, 0, 1, 0, 1, 0, -0.00010472536, -11.1149645, 0, 255.86954)
 
 [node name="Barrier2" parent="." unique_id=746593162 instance=ExtResource("8_vio08")]

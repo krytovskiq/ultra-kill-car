@@ -109,19 +109,7 @@ theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
 text = "ИГРАТЬ"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="Menu" unique_id=965634195]
-script = ExtResource("2_ouk20")
-
-[node name="Money" type="Label" parent="Menu/CanvasLayer" unique_id=846240893]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -141.0
-offset_bottom = 69.0
-grow_horizontal = 0
-theme_override_font_sizes/font_size = 50
-
-[node name="TextureButton" type="Button" parent="Menu" unique_id=875364114]
+[node name="Shop" type="Button" parent="Menu" unique_id=875364114]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -144,6 +132,42 @@ theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
 theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
 text = " МАГАЗИН"
+
+[node name="Exit" type="Button" parent="Menu" unique_id=1651690242]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -598.0
+offset_top = 95.0
+offset_right = -338.0
+offset_bottom = 164.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
+text = "ВЫХОД"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="Menu" unique_id=965634195]
+script = ExtResource("2_ouk20")
+
+[node name="Money" type="Label" parent="Menu/CanvasLayer" unique_id=846240893]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -141.0
+offset_bottom = 69.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 50
 
 [node name="Object_4" parent="." unique_id=1700165015 instance=ExtResource("4_kk3ma")]
 transform = Transform3D(0.83828247, 0, -0.54523623, 0, 1, 0, 0.54523623, 0, 0.83828247, 1.5668952, 1.6913521, 19.45353)
@@ -180,4 +204,5 @@ transform = Transform3D(0.9321285, 0, 0.36212778, 0, 1, 0, -0.36212778, 0, 0.932
 fov = 52.2
 
 [connection signal="pressed" from="Menu/Play" to="Menu" method="_on_play_pressed"]
-[connection signal="pressed" from="Menu/TextureButton" to="Menu" method="_on_texture_button_pressed"]
+[connection signal="pressed" from="Menu/Shop" to="Menu" method="_on_texture_button_pressed"]
+[connection signal="pressed" from="Menu/Exit" to="WorldChunk" method="_on_exit_pressed"]
