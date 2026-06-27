@@ -488,7 +488,7 @@ transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0.1961259, 0)
 mesh = SubResource("ArrayMesh_gk8na")
 
 [node name="body" type="MeshInstance3D" parent="." unique_id=2026824483]
-transform = Transform3D(-0.01, 0, 8.7422775e-10, 0, 0.01, 0, -8.7422775e-10, 0, -0.01, -4.5951967e-09, 0.1961259, 0.052562922)
+transform = Transform3D(-0.010722044, 0, 1.5099579e-09, 0, 0.01, 0, -1.6189836e-09, 0, -0.01, -4.5951967e-09, 0.1961259, 0.052562922)
 mesh = SubResource("ArrayMesh_sir0b")
 
 [node name="wheel2" type="MeshInstance3D" parent="." unique_id=1852424565]
@@ -516,6 +516,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VirtualJoystick" type="VirtualJoystick" parent="Hud" unique_id=1846779244]
+visible = false
 offset_left = 2.0
 offset_top = 344.0
 offset_right = 463.0
@@ -527,6 +528,7 @@ action_left = &"A"
 action_right = &"D"
 
 [node name="Brake" type="TouchScreenButton" parent="Hud" unique_id=896180891]
+visible = false
 position = Vector2(973, 601)
 scale = Vector2(1.1900828, 0.9928641)
 texture_normal = ExtResource("7_oxjpv")
@@ -535,6 +537,7 @@ action = "S"
 visibility_mode = 1
 
 [node name="Gas" type="TouchScreenButton" parent="Hud" unique_id=180112120]
+visible = false
 position = Vector2(1140, 452.00003)
 scale = Vector2(1.1150522, 0.8278051)
 texture_normal = ExtResource("8_0ecat")

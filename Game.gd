@@ -6,7 +6,7 @@ var car_data = [
 	{"path": "res://cars/Mustang/mustang.tscn", "price": 10000},
 	{"path": "res://cars/Doge_Optimizado/Doge2.tscn", "price": 1000}
 ]
-var money: int = 0
+var money: int = 1000000
 var selected_car_index: int = 0
 var owned_cars: Array = [0]
 

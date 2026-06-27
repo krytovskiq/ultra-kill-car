@@ -17,7 +17,7 @@ extends Node3D
 @export var forward_axis: Vector3 = Vector3.BACK
 
 @export_group("Bridge Settings")
-@export var bridge_interval_meters: float = 500.0
+@export var bridge_interval_meters: float = 2500.0
 
 @export_group("Динамический Спавн Зомби")
 @export var base_spawn_cooldown: float = 0.25 
@@ -78,7 +78,7 @@ func _process(delta: float) -> void:
 		spawn_timer = 0.0
 		_spawn_single_zombie_ahead()
 	
-	var zone_index: int = floor(abs(distance) / 20000.0)
+	var zone_index: int = floor(abs(distance) / 2000.0)
 	var is_in_red_zone: bool = (zone_index % 2 == 1)
 	
 	if is_in_red_zone and not is_fog_red:
