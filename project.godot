@@ -17,6 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+CarVFX="*res://core/car_vfx.gd"
+SettingsManager="*res://core/settings.gd"
 Game="*uid://ilfv05hv7cnm"
 ZombiePool="*uid://dd7y2rdsddyhk"
 YandexSDK="*uid://df67a6ypkak38"
@@ -128,3 +130,4 @@ lights_and_shadows/positional_shadow/atlas_size=2048
 viewport/canvas_textures/default_texture_filter=1
 environment/mode.macos=0
 environment/scale=0.75
+

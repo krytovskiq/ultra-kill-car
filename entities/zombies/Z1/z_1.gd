@@ -15,6 +15,7 @@ enum ZombieState { IDLE, CHASE, ATTACK, DEAD, FALLEN }
 @export var attack_cooldown: float = 1.5
 @export var get_up_time: float = 1.5
 
+@onready var skeleton: Skeleton3D = null
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 
 var player: Node3D
@@ -31,7 +32,34 @@ var _chase_anim: String = "Walk"
 @onready var detection_radius_sq: float = detection_radius * detection_radius
 @onready var lose_target_radius_sq: float = lose_target_radius * lose_target_radius
 
+
 func _ready() -> void:
+	skeleton = get_node_or_null("Run/Skeleton3D")
+	
+	# === ОПТИМИЗАЦИЯ РЭГДОЛЛА ===
+	# Удаляем мелкие кости, чтобы они не мешали и не сворачивали труп в "пакет"
+	if skeleton:
+		var sim = skeleton.get_node_or_null("PhysicalBoneSimulator3D")
+		if sim:
+			for child in sim.get_children():
+				if child is PhysicalBone3D:
+					var n = child.name
+					# Удаляем пальцы, стопы, плечи, шею и кисти
+					if "Index" in n or "Thumb" in n or "Middle" in n or "Ring" in n or "Pinky" in n or "Toe" in n:
+						child.queue_free()
+					else:
+						# Настраиваем нормальную физику для оставшихся крупных костей
+												# Выделяем рэгдоллам отдельный слой 5 (значение 16), который не видит машина.
+						# Маска: 1 (земля) + 2 (стены) + 4 (объекты) + 16 (САМИ РЭГДОЛЛЫ)
+						child.collision_layer = 16
+						child.collision_mask = 1 | 2 | 4 | 16
+						child.mass = 2.0
+						child.linear_damp = 1.0
+						child.angular_damp = 8.0
+						child.friction = 0.8
+						child.bounce = 0.0
+	# ============================
+
 	add_to_group("zombie")
 	current_hp = max_hp
 	current_speed = walk_speed
@@ -51,6 +79,12 @@ func _physics_process(delta: float) -> void:
 		return
 
 	# УДАЛЕНО: Строка position.z = move_toward..., которая уносила зомби на нулевой метр карты!
+
+
+	if player and is_instance_valid(player):
+		var dist_to_p = global_position.distance_squared_to(player.global_position)
+		if dist_to_p > 250000.0:
+			return
 
 	if attack_timer > 0.0: 
 		attack_timer -= delta
@@ -80,6 +114,8 @@ func _update_state_and_movement(delta: float) -> void:
 		state = ZombieState.ATTACK
 		_internal_velocity = Vector3.ZERO
 		play_anim("Attack")
+		if player and player.has_method("take_damage"):
+			player.take_damage(damage)
 		attack_timer = attack_cooldown
 		return 
 			
@@ -118,15 +154,16 @@ func _on_animation_finished(anim_name: String) -> void:
 		state = ZombieState.CHASE
 func reset_zombie(is_running: bool = false) -> void:
 	state = ZombieState.IDLE
-	current_hp = max_hp
-	attack_timer = 0.0
-	target_z = 0.0
-	_internal_velocity = Vector3.ZERO
+	set_physics_process(true) # Включаем обратно физику перемещения
+	# Возвращаем коллизию (слой 4 = значение 8)
+	collision_layer = 8
+	collision_mask = 1
 	
-	# Переподключаем сигнал при спавне из пула
-	if not anim_player.animation_finished.is_connected(_on_animation_finished):
-		anim_player.animation_finished.connect(_on_animation_finished)
-	
+	if skeleton:
+		var sim = skeleton.get_node_or_null("PhysicalBoneSimulator3D")
+		if sim:
+			sim.physical_bones_stop_simulation()
+		
 	if is_running:
 		current_speed = run_speed
 		_chase_anim = "Run"
@@ -141,14 +178,32 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 	state = ZombieState.DEAD
 	_internal_velocity = Vector3.ZERO
 	
-	set_collision_layer_value(3, false)
-	set_collision_mask_value(1, false)
+	# Полностью отключаем коллизию у самого зомби, чтобы он не стопил машину
+	collision_layer = 0
+	collision_mask = 0
 	
-	target_z = remap(impact_speed, 0.0, 30.0, -1.0, -4.0)
-	target_z = clamp(target_z, -4.0, -1.0)
-	
-	play_anim("Death")
-	# Логика удаления ушла в _on_animation_finished
+	var sim = skeleton.get_node_or_null("PhysicalBoneSimulator3D")
+	if sim:
+		anim_player.stop()
+		sim.physical_bones_start_simulation()
+		set_physics_process(false) # Останавливаем физику капсулы, чтобы зомби не полз вперед!
+		
+		# Чтобы рэгдолл был похож на тело, а не на "целлофановый пакет",
+		# мы применяем сильный импульс ТОЛЬКО к туловищу (таз и позвоночник).
+		# Руки и ноги просто полетят за телом по инерции.
+		var core_force = impact_force * 2.0 + Vector3(0, 4.0, 0)
+		for child in sim.get_children():
+			if child is PhysicalBone3D:
+				# Импульс даем только туловищу (Грудь и Таз), чтобы руки и ноги просто летели за ним по инерции
+				if "Hips" in child.name or "Spine" in child.name:
+					child.apply_central_impulse(core_force)
+		
+		# Труп лежит 5 секунд
+		get_tree().create_timer(5.0).timeout.connect(func(): ZombiePool.return_zombie(self))
+	else:
+		target_z = remap(impact_speed, 0.0, 30.0, -1.0, -4.0)
+		target_z = clamp(target_z, -4.0, -1.0)
+		play_anim("Death")
 
 func knockdown(impact_force: Vector3):
 	if state == ZombieState.DEAD or state == ZombieState.FALLEN: return

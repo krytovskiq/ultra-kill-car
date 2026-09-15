@@ -4,9 +4,9 @@ var total_distance: float = 0.0
 var start_z_position: float = 0.0
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 2.8
-@export var STEER_LIMIT: float = 0.40
-@export var engine_force_value: int = 3950
+@export var STEER_SPEED: float = 1.8
+@export var STEER_LIMIT: float = 0.45
+@export var engine_force_value: int = 6000
 @export var brake_force: float = 90.0
 @export var MAX_SPEED_KMH: int = 160
 
@@ -16,7 +16,7 @@ var start_z_position: float = 0.0
 
 @export_group("Zombie Collision")
 @export var wall_damage_min_speed_mps: float = 5.0
-@export var crash_death_speed_mps: float = 25.0
+@export var crash_death_speed_mps: float = 15.0
 
 @export_group("Fuel")
 @export var max_fuel: int = 100
@@ -32,7 +32,11 @@ var death_shader = preload("res://entities/vehicles/Death_shader.gdshader")
 @export var damage_per_second: int = 10
 var damage_timer: float = 0.0
 
+var _tire_smokes: Array[CPUParticles3D] = []
+var _exhaust: CPUParticles3D = null
+
 func _ready() -> void:
+	mass = 2500.0
 	var kill_zone = get_node_or_null("Area3D")
 	if kill_zone:
 		kill_zone.body_entered.connect(_on_kill_zone_body_entered)
@@ -40,7 +44,6 @@ func _ready() -> void:
 		push_error("Main: Узел Area3D не найден внутри машины!")
 
 	start_z_position = global_position.z
-	linear_velocity = -global_transform.basis.z * (20.0 / 3.6)
 	add_to_group("player")
 	
 	contact_monitor = true
@@ -54,6 +57,13 @@ func _ready() -> void:
 	if has_node("Hud/FuelBar"):
 		$Hud/FuelBar.max_value = max_fuel
 		$Hud/FuelBar.value = current_fuel
+
+	# --- VFX Setup ---
+	_exhaust = CarVFX.create_exhaust(self, Vector3(-0.5, 0.3, 1.8))
+	for wheel in get_children():
+		if wheel is VehicleWheel3D and not wheel.use_as_steering:
+			var smoke = CarVFX.create_tire_smoke(wheel, Vector3(0, -wheel.wheel_radius, 0))
+			_tire_smokes.append(smoke)
 
 func _physics_process(delta: float) -> void:
 	if destroyed: return
@@ -108,10 +118,19 @@ func _physics_process(delta: float) -> void:
 	
 	if current_fuel <= 0.0:
 		engine_force = 0.0
+		brake = brake_force * 3.0
 	
 	if has_node("Hud/FuelBar"):
 		$Hud/FuelBar.value = current_fuel
-		
+
+
+	# --- Tire Smoke ---
+	var is_drifting = absf(steering) > 0.15 and speed_kmh > 30
+	var is_braking = Input.is_action_pressed("S") and speed_kmh > 40
+	for ts in _tire_smokes:
+		if is_instance_valid(ts):
+			ts.emitting = is_drifting or is_braking
+
 	_handle_zombie_overlapping_damage(delta)
 
 func refuel(amount: float) -> void:
@@ -135,24 +154,7 @@ func take_damage(amount: int) -> void:
 		_destroy_car()
 
 func _handle_zombie_overlapping_damage(delta: float) -> void:
-	var kill_zone = get_node_or_null("Area3D")
-	if not kill_zone: return
-	
-	var bodies: Array[Node3D] = kill_zone.get_overlapping_bodies()
-	var has_active_zombie := false
-	
-	for body in bodies:
-		if body.is_in_group("zombie") and body.get("state") != 3: 
-			has_active_zombie = true
-			break 
-
-	if has_active_zombie:
-		damage_timer += delta
-		if damage_timer >= 1.0:
-			take_damage(damage_per_second)
-			damage_timer = 0.0
-	else:
-		damage_timer = 0.0
+	pass
 
 func _on_kill_zone_body_entered(body: Node3D) -> void:
 	if destroyed: return
@@ -162,15 +164,16 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 		if speed_mps >= crash_death_speed_mps:
 			take_damage(current_hp) 
 			shake_camera(2.0)
+			CarVFX.spawn_impact(global_position, "dust")
 			return
 			
 	if body.is_in_group("zombie"):
+		CarVFX.spawn_impact(body.global_position + Vector3.UP, "blood")
 		take_damage(10) 
 		if speed_kmh >= 40.0:
 			if body.has_method("die"):
 				body.die(linear_velocity, speed_mps)
 			shake_camera(0.5)
-			hit_stop(0.1)
 		elif speed_kmh >= 10.0:
 			if body.has_method("knockdown"):
 				body.knockdown(linear_velocity)
@@ -181,9 +184,15 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 			var damage_to_car := int(speed_mps * collision_damage_multiplier)
 			take_damage(damage_to_car)
 			shake_camera(clampf(float(damage_to_car) * 0.1, 0.2, 1.5))
+			CarVFX.spawn_impact(body.global_position + Vector3.UP * 0.5, "sparks")
 			if body.has_method("take_damage"):
 				body.take_damage(speed_mps * 2.0) 
 				
+	else:
+		# Любое другое столкновение — искры
+		if speed_mps > 3.0:
+			CarVFX.spawn_impact(body.global_position + Vector3.UP * 0.3, "sparks")
+
 func _destroy_car() -> void:
 	if DeadParticles:
 		var Dead = DeadParticles.instantiate() as CPUParticles3D
@@ -212,11 +221,5 @@ func _destroy_car() -> void:
 func shake_camera(amount: float) -> void:
 	var camera = get_node_or_null("look/Camera3D")
 	if not camera: return
-	
-	var tween := create_tween()
-	for i in range(5):
-		var rand_offset := Vector2(randf_range(-amount, amount), randf_range(-amount, amount))
-		tween.tween_property(camera, "h_offset", rand_offset.x, 0.02)
-		tween.tween_property(camera, "v_offset", rand_offset.y, 0.02)
-	tween.tween_property(camera, "h_offset", 0.0, 0.05)
-	tween.tween_property(camera, "v_offset", 0.0, 0.05)
+	if camera.has_method("add_shake"):
+		camera.add_shake(amount)

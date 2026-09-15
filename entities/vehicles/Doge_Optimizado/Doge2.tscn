@@ -878,11 +878,11 @@ use_as_traction = true
 use_as_steering = true
 wheel_radius = 0.36
 wheel_friction_slip = 4.5
-suspension_travel = 0.1
-suspension_stiffness = 150.0
+suspension_travel = 0.15
+suspension_stiffness = 120.0
 suspension_max_force = 20000.0
-damping_compression = 15.0
-damping_relaxation = 17.0
+damping_compression = 14.0
+damping_relaxation = 16.0
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D6" unique_id=2089244218]
 
@@ -900,12 +900,12 @@ mesh = SubResource("ArrayMesh_12ppg")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0503914, 0.367, 1.2131228)
 use_as_traction = true
 wheel_radius = 0.36
-wheel_friction_slip = 4.0
-suspension_travel = 0.1
-suspension_stiffness = 150.0
+wheel_friction_slip = 4.5
+suspension_travel = 0.15
+suspension_stiffness = 120.0
 suspension_max_force = 20000.0
-damping_compression = 15.0
-damping_relaxation = 17.0
+damping_compression = 14.0
+damping_relaxation = 16.0
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D7" unique_id=881748876]
 
@@ -925,11 +925,11 @@ use_as_traction = true
 use_as_steering = true
 wheel_radius = 0.36
 wheel_friction_slip = 4.5
-suspension_travel = 0.1
-suspension_stiffness = 150.0
+suspension_travel = 0.15
+suspension_stiffness = 120.0
 suspension_max_force = 20000.0
-damping_compression = 15.0
-damping_relaxation = 17.0
+damping_compression = 14.0
+damping_relaxation = 16.0
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D8" unique_id=779290469]
 
@@ -947,12 +947,12 @@ mesh = SubResource("ArrayMesh_12ppg")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.367, 1.213)
 use_as_traction = true
 wheel_radius = 0.36
-wheel_friction_slip = 4.0
-suspension_travel = 0.1
-suspension_stiffness = 150.0
+wheel_friction_slip = 4.5
+suspension_travel = 0.15
+suspension_stiffness = 120.0
 suspension_max_force = 20000.0
-damping_compression = 15.0
-damping_relaxation = 17.0
+damping_compression = 14.0
+damping_relaxation = 16.0
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D9" unique_id=128885941]
 
