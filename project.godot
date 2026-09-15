@@ -130,4 +130,3 @@ lights_and_shadows/positional_shadow/atlas_size=2048
 viewport/canvas_textures/default_texture_filter=1
 environment/mode.macos=0
 environment/scale=0.75
-

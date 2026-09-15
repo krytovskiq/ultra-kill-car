@@ -44,20 +44,14 @@ func _ready() -> void:
 			for child in sim.get_children():
 				if child is PhysicalBone3D:
 					var n = child.name
-					# Удаляем пальцы, стопы, плечи, шею и кисти
 					if "Index" in n or "Thumb" in n or "Middle" in n or "Ring" in n or "Pinky" in n or "Toe" in n:
 						child.queue_free()
 					else:
-						# Настраиваем нормальную физику для оставшихся крупных костей
-												# Выделяем рэгдоллам отдельный слой 5 (значение 16), который не видит машина.
-						# Маска: 1 (земля) + 2 (стены) + 4 (объекты) + 16 (САМИ РЭГДОЛЛЫ)
-						child.collision_layer = 16
-						child.collision_mask = 1 | 2 | 4 | 16
-						child.mass = 2.0
-						child.linear_damp = 1.0
-						child.angular_damp = 8.0
-						child.friction = 0.8
-						child.bounce = 0.0
+						if child.get("joint_type") != null:
+							child.set("joint_type", 2)
+							child.set("joint_constraints/swing_span", 0.4) 
+							child.set("joint_constraints/twist_span", 0.4)
+							child.set("joint_constraints/bias", 0.9)
 	# ============================
 
 	add_to_group("zombie")
@@ -191,12 +185,19 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 		# Чтобы рэгдолл был похож на тело, а не на "целлофановый пакет",
 		# мы применяем сильный импульс ТОЛЬКО к туловищу (таз и позвоночник).
 		# Руки и ноги просто полетят за телом по инерции.
-		var core_force = impact_force * 2.0 + Vector3(0, 4.0, 0)
+		# Чтобы суставы не растягивались (из-за чего сетка тянется как пакет),
+		# мы задаем ОДИНАКОВУЮ начальную скорость сразу ВСЕМ костям!
+		# Так они полетят как единое целое, не разрывая суставы.
+		# Приподнимаем зомби над землей, чтобы ноги не цеплялись за текстуры пола и не отрывались
+		global_position.y += 0.5
+		
+		var launch_vel = impact_force * 1.2 + Vector3(0, 8.0, 0)
 		for child in sim.get_children():
 			if child is PhysicalBone3D:
-				# Импульс даем только туловищу (Грудь и Таз), чтобы руки и ноги просто летели за ним по инерции
-				if "Hips" in child.name or "Spine" in child.name:
-					child.apply_central_impulse(core_force)
+				# Даем импульс пропорционально массе, чтобы движок физики не сходил с ума
+				child.apply_central_impulse(launch_vel * child.mass)
+				# Крутим сильно, чтобы пробить высокое сопротивление (angular_damp)
+				child.angular_velocity = Vector3(randf_range(-15, 15), randf_range(-15, 15), randf_range(-15, 15))
 		
 		# Труп лежит 5 секунд
 		get_tree().create_timer(5.0).timeout.connect(func(): ZombiePool.return_zombie(self))

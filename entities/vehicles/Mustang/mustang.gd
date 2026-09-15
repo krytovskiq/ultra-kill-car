@@ -11,7 +11,7 @@ var start_z_position: float = 0.0
 @export var MAX_SPEED_KMH: int = 220
 
 @export_group("Health")
-@export var health: int = 100
+@export var health: int = 10000
 @export var collision_damage_multiplier: float = 0.35
 
 @export_group("Zombie Collision")

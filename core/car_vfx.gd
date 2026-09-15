@@ -8,8 +8,8 @@ var tex_spark: GradientTexture2D
 
 func _ready() -> void:
 	tex_smoke = GradientTexture2D.new()
-	tex_smoke.width = 64
-	tex_smoke.height = 64
+	tex_smoke.width = 128
+	tex_smoke.height = 128
 	tex_smoke.fill = GradientTexture2D.FILL_RADIAL
 	tex_smoke.fill_from = Vector2(0.5, 0.5)
 	tex_smoke.fill_to = Vector2(0.9, 0.9)
@@ -19,8 +19,8 @@ func _ready() -> void:
 	tex_smoke.gradient = grad_smoke
 
 	tex_blood = GradientTexture2D.new()
-	tex_blood.width = 32
-	tex_blood.height = 32
+	tex_blood.width = 64
+	tex_blood.height = 64
 	tex_blood.fill = GradientTexture2D.FILL_RADIAL
 	tex_blood.fill_from = Vector2(0.5, 0.5)
 	tex_blood.fill_to = Vector2(0.8, 0.8)

@@ -98,4 +98,3 @@ func load_settings() -> void:
 			if val >= 0 and val <= 5:
 				current_quality = val as GraphicsQuality
 			file.close()
-
