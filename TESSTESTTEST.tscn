@@ -1,9 +1,9 @@
 [gd_scene format=4 uid="uid://bjm7rj68cp0v2"]
 
-[ext_resource type="Texture2D" uid="uid://bdofdneanwlim" path="res://Brigemap/brige/texture/asphalt_Base_color.png" id="1_mh6y5"]
-[ext_resource type="Texture2D" uid="uid://cgsxfyn23il7d" path="res://Brigemap/brige/texture/asphalt_Metallic-asphalt_Roughnesschannels=B.png" id="2_8gbyj"]
-[ext_resource type="Texture2D" uid="uid://d33l7kct56alo" path="res://Brigemap/brige/texture/asphalt_Normal_OpenGL.png" id="3_nrcbs"]
-[ext_resource type="Texture2D" uid="uid://bgysud0gv7tk4" path="res://Brigemap/brige/texture/asphalt_Metallic-asphalt_Roughnesschannels=G.png" id="4_ov67l"]
+[ext_resource type="Texture2D" uid="uid://bdofdneanwlim" path="res://environment/Brigemap/brige/texture/asphalt_Base_color.png" id="1_mh6y5"]
+[ext_resource type="Texture2D" uid="uid://cgsxfyn23il7d" path="res://environment/Brigemap/brige/texture/asphalt_Metallic-asphalt_Roughnesschannels=B.png" id="2_8gbyj"]
+[ext_resource type="Texture2D" uid="uid://d33l7kct56alo" path="res://environment/Brigemap/brige/texture/asphalt_Normal_OpenGL.png" id="3_nrcbs"]
+[ext_resource type="Texture2D" uid="uid://bgysud0gv7tk4" path="res://environment/Brigemap/brige/texture/asphalt_Metallic-asphalt_Roughnesschannels=G.png" id="4_ov67l"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bos00"]
 albedo_texture = ExtResource("1_mh6y5")

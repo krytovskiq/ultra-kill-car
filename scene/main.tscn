@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bqcvo1l4cmi0p"]
 
-[ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://main.gd" id="1_brvut"]
+[ext_resource type="Script" uid="uid://u0a7lil3s6lh" path="res://levels/main.gd" id="1_brvut"]
 [ext_resource type="PackedScene" path="res://scene/Generator.tscn" id="2_0ha60"]
 [ext_resource type="PackedScene" path="res://scene/City_MAP.tscn" id="3_4j5ol"]
 [ext_resource type="PackedScene" path="res://scene/Brige.tscn" id="4_brvut"]

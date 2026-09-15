@@ -1,12 +1,12 @@
-[gd_scene format=3 uid="uid://cb3frsqskfmc0"]
+[gd_scene format=3 uid="uid://c0ggnu65wnhmo"]
 
-[ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://Generator.tscn" id="1_ecwwl"]
-[ext_resource type="Script" uid="uid://bl38sws02lfg6" path="res://control.gd" id="1_lti8b"]
-[ext_resource type="Script" uid="uid://cx05c6ey2icc7" path="res://canvas_layer.gd" id="2_ouk20"]
-[ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="4_kk3ma"]
-[ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_nrnbx"]
-[ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="6_iqepy"]
-[ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="7_h1wq0"]
+[ext_resource type="PackedScene" path="res://Generator.tscn" id="1_ecwwl"]
+[ext_resource type="Script" path="res://control.gd" id="1_lti8b"]
+[ext_resource type="Script" path="res://canvas_layer.gd" id="2_ouk20"]
+[ext_resource type="PackedScene" path="res://model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="4_kk3ma"]
+[ext_resource type="PackedScene" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_nrnbx"]
+[ext_resource type="PackedScene" path="res://model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="6_iqepy"]
+[ext_resource type="PackedScene" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="7_h1wq0"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dwrpx"]
 load_path = "res://.godot/imported/893483.PNG-230050ba5ad6169130c5d6919eabf779.s3tc.ctex"

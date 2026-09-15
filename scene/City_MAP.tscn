@@ -2,13 +2,13 @@
 
 [ext_resource type="Script" path="res://scripts/city_map.gd" id="1_5dh3v"]
 [ext_resource type="Texture2D" uid="uid://d06ektw42udxe" path="res://icon.svg" id="1_q2idn"]
-[ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="2_ky03k"]
-[ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="3_461l5"]
-[ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="4_ccg4q"]
-[ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="5_qvukr"]
-[ext_resource type="PackedScene" uid="uid://ww4cxhxsyvpo" path="res://model/decor/wrekers_car/wagon_001a_reference_smd_4.tscn" id="6_2xmgc"]
-[ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="8_h03c6"]
-[ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://multi_mesh_instance_3d.gd" id="9_ogp54"]
+[ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://environment/model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="2_ky03k"]
+[ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://environment/model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="3_461l5"]
+[ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://environment/model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="4_ccg4q"]
+[ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://environment/model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="5_qvukr"]
+[ext_resource type="PackedScene" uid="uid://ww4cxhxsyvpo" path="res://environment/model/decor/wrekers_car/wagon_001a_reference_smd_4.tscn" id="6_2xmgc"]
+[ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://environment/model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="8_h03c6"]
+[ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://environment/multi_mesh_instance_3d.gd" id="9_ogp54"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5dh3v"]
 albedo_texture = ExtResource("1_q2idn")

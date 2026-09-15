@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://pgf4w1lj2g5g"]
 
-[ext_resource type="Script" uid="uid://dgqacjcsyergi" path="res://Shop/Angar/anga.gd" id="1_fe0ub"]
-[ext_resource type="Texture2D" uid="uid://54ju6qilp8ee" path="res://Shop/Angar/burnin_rubber_3_hangar_0.png" id="2_ebm8y"]
+[ext_resource type="Script" uid="uid://dgqacjcsyergi" path="res://ui/shop/Angar/anga.gd" id="1_fe0ub"]
+[ext_resource type="Texture2D" uid="uid://54ju6qilp8ee" path="res://ui/shop/Angar/burnin_rubber_3_hangar_0.png" id="2_ebm8y"]
 [ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="3_137o6"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5o6op"]
