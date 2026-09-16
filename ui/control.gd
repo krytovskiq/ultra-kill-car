@@ -31,4 +31,3 @@ func _on_btn_very_high_pressed() -> void:
 
 func _on_btn_maximum_pressed() -> void:
 	SettingsManager.set_quality(SettingsManager.GraphicsQuality.MAXIMUM)
-

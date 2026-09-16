@@ -957,11 +957,11 @@ bg_color = Color(0, 0.92156863, 0, 1)
 corner_detail = 1
 anti_aliasing = false
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_uwabd"]
-size = Vector3(2.180805, 0.9343625, 0.8129669)
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6086m"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_isn3x"]
-size = Vector3(1.580448, 2.1274843, 4.775509)
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2u6gl"]
+radius = 0.832
+height = 4.777
 
 [node name="pikap" type="VehicleBody3D" unique_id=1275802987]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -983,9 +983,9 @@ mesh = SubResource("ArrayMesh_ixvxa")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7663876, 0.3728347, -1.3843995)
 use_as_traction = true
 use_as_steering = true
+wheel_roll_influence = 0.655
 wheel_radius = 0.377
 wheel_friction_slip = 4.0
-suspension_travel = 0.2
 suspension_stiffness = 80.0
 suspension_max_force = 20000.0
 damping_compression = 10.0
@@ -998,25 +998,25 @@ mesh = SubResource("ArrayMesh_qyvxa")
 [node name="VehicleWheel3D7" type="VehicleWheel3D" parent="." unique_id=450442478]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.766, 0.373, 1.426)
 use_as_traction = true
+wheel_roll_influence = 0.655
 wheel_radius = 0.377
 wheel_friction_slip = 4.0
-suspension_travel = 0.2
 suspension_stiffness = 80.0
 suspension_max_force = 20000.0
 damping_compression = 10.0
 damping_relaxation = 12.0
 
 [node name="Wheel3" type="MeshInstance3D" parent="VehicleWheel3D7" unique_id=108954237]
-transform = Transform3D(-4.371139e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.371139e-08, 0.6129941, -0.373, -1.426)
+transform = Transform3D(-4.371139e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.371139e-08, 0.673067, -0.373, -1.4259999)
 mesh = SubResource("ArrayMesh_oomhd")
 
 [node name="VehicleWheel3D8" type="VehicleWheel3D" parent="." unique_id=182629625]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.768, 0.373, -1.384)
 use_as_traction = true
 use_as_steering = true
+wheel_roll_influence = 0.655
 wheel_radius = 0.377
 wheel_friction_slip = 4.0
-suspension_travel = 0.2
 suspension_stiffness = 80.0
 suspension_max_force = 20000.0
 damping_compression = 10.0
@@ -1029,16 +1029,16 @@ mesh = SubResource("ArrayMesh_lhu12")
 [node name="VehicleWheel3D9" type="VehicleWheel3D" parent="." unique_id=770729457]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.367, 1.4223075)
 use_as_traction = true
+wheel_roll_influence = 0.655
 wheel_radius = 0.36
 wheel_friction_slip = 4.0
-suspension_travel = 0.2
 suspension_stiffness = 80.0
 suspension_max_force = 20000.0
 damping_compression = 10.0
 damping_relaxation = 12.0
 
 [node name="Wheel2" type="MeshInstance3D" parent="VehicleWheel3D9" unique_id=1680400734]
-transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, -0.6769698, -0.367, -1.4223075)
+transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, -0.7410472, -0.367, -1.4223076)
 mesh = SubResource("ArrayMesh_u8t3y")
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=1620227068]
@@ -1147,12 +1147,12 @@ collision_layer = 0
 collision_mask = 13
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=1936966897]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07924707, -0.15406555, 0.14954066)
-shape = SubResource("BoxShape3D_uwabd")
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0.032888338, -0.15406555, 0.27778935)
+shape = SubResource("CapsuleShape3D_6086m")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=1502293925]
-transform = Transform3D(-4.371139e-08, -1, -1.8474111e-13, 1, -4.371139e-08, -7.919965e-21, 0, -1.8474111e-13, 1, -0.10005678, 1.039434, 0.003900221)
-shape = SubResource("BoxShape3D_isn3x")
+transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, -0.99999994, 0, 0.99999994, -4.3711385e-08, -0.042439595, 1.001566, 0.04143682)
+shape = SubResource("CapsuleShape3D_2u6gl")
 
 [node name="look" type="Node3D" parent="." unique_id=966506642]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)

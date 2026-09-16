@@ -46,12 +46,6 @@ func _ready() -> void:
 					var n = child.name
 					if "Index" in n or "Thumb" in n or "Middle" in n or "Ring" in n or "Pinky" in n or "Toe" in n:
 						child.queue_free()
-					else:
-						if child.get("joint_type") != null:
-							child.set("joint_type", 2)
-							child.set("joint_constraints/swing_span", 0.4) 
-							child.set("joint_constraints/twist_span", 0.4)
-							child.set("joint_constraints/bias", 0.9)
 	# ============================
 
 	add_to_group("zombie")
