@@ -4,7 +4,6 @@ var zombie_scene: PackedScene = preload("res://entities/zombies/Z1/Z1.tscn")
 var pool: Array[Node3D] = []
 var active_zombies: Array[Node3D] = []
 
-# Timer for cleaning up distant zombies
 var cleanup_timer: float = 0.0
 
 func _process(delta: float) -> void:
@@ -12,6 +11,23 @@ func _process(delta: float) -> void:
 	if cleanup_timer > 1.0:
 		cleanup_timer = 0.0
 		_cleanup_distant_zombies()
+
+func prewarm_zombies(count: int, parent_node: Node) -> void:
+	for i in range(count):
+		var zombie = zombie_scene.instantiate() as Node3D
+		parent_node.add_child(zombie)
+		
+		# ПОЛНОСТЬЮ выключаем узел из физического движка (Godot больше не просчитывает его кости и коллизии)
+		zombie.process_mode = Node.PROCESS_MODE_DISABLED 
+		zombie.hide()
+		
+		# На всякий случай (как было)
+		zombie.set_process(false)
+		zombie.set_physics_process(false)
+		zombie.set_collision_layer_value(3, false)
+		zombie.set_collision_mask_value(1, false)
+		
+		pool.append(zombie)
 
 func _cleanup_distant_zombies() -> void:
 	var main_node = get_tree().current_scene
@@ -21,7 +37,6 @@ func _cleanup_distant_zombies() -> void:
 	var car = main_node.car
 	var forward_vector: Vector3 = main_node.get("_forward") if "_forward" in main_node else Vector3.BACK
 	
-	# We iterate backwards to allow safe removal from array
 	for i in range(active_zombies.size() - 1, -1, -1):
 		var zombie = active_zombies[i]
 		if not is_instance_valid(zombie):
@@ -40,19 +55,20 @@ func _cleanup_distant_zombies() -> void:
 
 func spawn_zombie_at(global_pos: Vector3) -> Node3D:
 	if zombie_scene == null:
-		push_error("ZombiePool: Сцена зомби не задана!")
+		push_error("ZombiePool: Сцена зомби не загружена!")
 		return null
 		
 	var zombie: Node3D = null
 	
 	if pool.size() > 0:
 		zombie = pool.pop_back()
+		
+		# Включаем зомби обратно в физический движок
+		zombie.process_mode = Node.PROCESS_MODE_INHERIT
 		zombie.show()
+		
 		zombie.set_process(true)
 		zombie.set_physics_process(true)
-		
-		# Only reset collision if we previously disabled it, but die() does it anyway.
-		# Let's re-enable standard layers. 
 		zombie.set_collision_layer_value(3, true)
 		zombie.set_collision_mask_value(1, true)
 	else:
@@ -76,10 +92,14 @@ func spawn_zombie_at(global_pos: Vector3) -> Node3D:
 	
 func return_zombie(zombie: Node3D):
 	if is_instance_valid(zombie) and not zombie in pool:
+		# ПОЛНОСТЬЮ выключаем
+		zombie.process_mode = Node.PROCESS_MODE_DISABLED
 		zombie.hide()
+		
 		zombie.set_process(false)
 		zombie.set_physics_process(false)
 		zombie.set_collision_layer_value(3, false)
 		zombie.set_collision_mask_value(1, false)
+		
 		active_zombies.erase(zombie)
 		pool.append(zombie)

@@ -1,7 +1,8 @@
 extends Area3D
 
 func _ready() -> void:
-	body_entered.connect(_on_body_entered)
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
 	
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("player"):
@@ -11,5 +12,6 @@ func _on_body_entered(body: Node) -> void:
 		for child in get_children():
 			if child is CollisionShape3D:
 				child.set_deferred("disabled", true)
+
 func advance_to_next_biome() -> void:
 	pass

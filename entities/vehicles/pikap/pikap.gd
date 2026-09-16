@@ -4,11 +4,11 @@ var total_distance: float = 0.0
 var start_z_position: float = 0.0
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 1.8
+@export var STEER_SPEED: float = 1.4
 @export var STEER_LIMIT: float = 0.45
-@export var engine_force_value: int = 7000
+@export var engine_force_value: int = 4000
 @export var brake_force: float = 90.0
-@export var MAX_SPEED_KMH: int = 160
+@export var MAX_SPEED_KMH: int = 100
 
 @export_group("Health")
 @export var health: int = 1000
@@ -70,13 +70,16 @@ func _physics_process(delta: float) -> void:
 	
 	total_distance = absf(global_position.z - start_z_position)
 	if has_node("Hud/Metr"):
-		$Hud/Metr.text = str(round(total_distance)) + " M"
+		var _m = get_node_or_null("Hud/Metr")
+		if is_instance_valid(_m): _m.text = str(round(total_distance)) + " M"
 		
-	var speed_mps: float = linear_velocity.length()
-	var speed_kmh: int = floori(speed_mps * 2.6)
+	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
+	var speed_mps: float = horizontal_vel.length()
+	var speed_kmh: int = int(speed_mps * 1.8)
 	
 	if has_node("Hud/speed"):
-		$Hud/speed.text = str(speed_kmh) + "  KM/H"
+		var _s = get_node_or_null("Hud/speed")
+		if is_instance_valid(_s): _s.text = str(speed_kmh) + "  KM/H"
 	
 	# Управление двигателем (W)
 	if Input.is_action_pressed("W"):
@@ -99,7 +102,8 @@ func _physics_process(delta: float) -> void:
 		engine_force = -(engine_force_value * 0.3)
 	if Input.is_key_pressed(KEY_ESCAPE) and not destroyed:
 		get_tree().paused = !get_tree().paused
-		$Hud/Pause.visible = get_tree().paused
+		var _p = get_node_or_null("Hud/Pause")
+		if is_instance_valid(_p): _p.visible = get_tree().paused
 
 	# Плавное динамическое рулевое управление
 	var steer_input := Input.get_axis("D", "A") 
@@ -153,17 +157,18 @@ func take_damage(amount: int) -> void:
 	if current_hp <= 0: 
 		_destroy_car()
 
-func _handle_zombie_overlapping_damage(delta: float) -> void:
+func _handle_zombie_overlapping_damage(_delta: float) -> void:
 	pass
 
 func _on_kill_zone_body_entered(body: Node3D) -> void:
 	if destroyed: return
-	var speed_mps := linear_velocity.length()
+	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
+	var speed_mps := horizontal_vel.length()
 	var speed_kmh := speed_mps * 3.6 
 	if body.is_in_group("dead_wall"):
 		if speed_mps >= crash_death_speed_mps:
 			take_damage(current_hp) 
-			shake_camera(2.0)
+			shake_camera(clampf(speed_mps / 10.0, 1.0, 4.0))
 			CarVFX.spawn_impact(global_position, "dust")
 			return
 			
@@ -173,7 +178,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 		if speed_kmh >= 40.0:
 			if body.has_method("die"):
 				body.die(linear_velocity, speed_mps)
-			shake_camera(0.5)
+			shake_camera(clampf(speed_mps / 20.0, 0.2, 1.5))
 		elif speed_kmh >= 10.0:
 			if body.has_method("knockdown"):
 				body.knockdown(linear_velocity)

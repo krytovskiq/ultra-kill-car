@@ -2430,7 +2430,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_Hips"
 joint_constraints/swing_span = 45.0
 joint_constraints/twist_span = 180.0
-joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2451,7 +2450,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_Spine"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2472,7 +2470,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_Spine1"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2493,7 +2490,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_Spine2"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2515,7 +2511,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_Neck"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2536,7 +2531,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_Head"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2557,7 +2551,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_LeftShoulder"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2578,7 +2571,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_LeftArm"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2600,7 +2592,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_LeftForeArm"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2621,7 +2612,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_RightShoulder"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2643,7 +2633,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_RightArm"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2665,7 +2654,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_RightForeArm"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2686,7 +2674,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_LeftUpLeg"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2707,7 +2694,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_LeftLeg"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2729,7 +2715,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_RightUpLeg"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2750,7 +2735,6 @@ angular_damp = 15.0
 bone_name = "mixamorig_RightLeg"
 joint_constraints/swing_span = 0.39999992
 joint_constraints/twist_span = 0.39999992
-joint_constraints/bias = 0.9
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 

@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://vpxtbi7gmv0u"]
 
-[ext_resource type="Script" path="res://scripts/city_map.gd" id="1_5dh3v"]
+[ext_resource type="Script" path="res://levels/city_map.gd" id="1_5dh3v"]
 [ext_resource type="Texture2D" uid="uid://d06ektw42udxe" path="res://icon.svg" id="1_q2idn"]
 [ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://environment/model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="2_ky03k"]
 [ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://environment/model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="3_461l5"]

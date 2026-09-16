@@ -20,7 +20,7 @@ extends Node3D
 @export var bridge_interval_meters: float = 2500.0
 
 @export_group("Динамический Спавн Зомби")
-@export var base_spawn_cooldown: float = 0.25 
+@export var base_spawn_cooldown: float = 0.15 
 @export var spawn_distance_ahead: float = 330.0 
 @export var road_spawn_width: float = 150.0 
 
@@ -46,8 +46,8 @@ func _ready() -> void:
 	car = car_scene.instantiate() as VehicleBody3D
 	add_child(car)
 	car.global_position = Vector3.ZERO
-	car.add_to_group("player") 
-	
+	car.add_to_group("player")
+	ZombiePool.prewarm_zombies(150, self)
 	current_spawn_cooldown = base_spawn_cooldown
 	
 	if chunk_scenes_list.is_empty() or bridge_scene == null or car == null:
@@ -181,13 +181,15 @@ func _spawn_chunk(index: int) -> void:
 func _spawn_single_zombie_ahead() -> void:
 	var safe_fog_distance: float = 320.0
 	
-	var spawn_pos: Vector3 = car.global_position + _forward * safe_fog_distance
-	
-	spawn_pos.x += randf_range(-road_spawn_width, road_spawn_width)
-	
-	spawn_pos.y = road_y
-	
-	ZombiePool.spawn_zombie_at(spawn_pos)
+	# Спавним не по 1 зомби, а сразу группами от 2 до 5 штук (в 3 раза больше зомби!)
+	var cluster_size = randi() % 4 + 2 # от 2 до 5
+	for i in range(cluster_size):
+		var spawn_pos: Vector3 = car.global_position + _forward * safe_fog_distance
+		spawn_pos.x += randf_range(-road_spawn_width * 0.5, road_spawn_width * 0.5)
+		spawn_pos.z += randf_range(-15.0, 15.0) # разброс вперед/назад
+		spawn_pos.y = road_y
+		
+		ZombiePool.spawn_zombie_at(spawn_pos)
 
 func advance_to_next_biome() -> void:
 	pass

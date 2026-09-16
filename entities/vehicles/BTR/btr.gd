@@ -88,13 +88,16 @@ func _physics_process(delta: float) -> void:
 			_shoot_zombie()
 	total_distance = abs(global_position.z - start_z_position)
 	if has_node("Hud/Metr"):
-		$Hud/Metr.text = str(round(total_distance)) + " M"
+		var _m = get_node_or_null("Hud/Metr")
+		if is_instance_valid(_m): _m.text = str(round(total_distance)) + " M"
 		
-	var speed_mps: float = linear_velocity.length()
-	var speed_kmh: int = speed_mps * 3.6
+	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
+	var speed_mps: float = horizontal_vel.length()
+	var speed_kmh: int = int(speed_mps * 5.4)
 	
 	if has_node("Hud/speed"):
-		$Hud/speed.text = str(round(speed_kmh)) + "  KM/H"
+		var _s = get_node_or_null("Hud/speed")
+		if is_instance_valid(_s): _s.text = str(round(speed_kmh)) + "  KM/H"
 	
 	var target_max_speed = MAX_SPEED_KMH
 	var auto_roll_speed = 0
@@ -121,7 +124,8 @@ func _physics_process(delta: float) -> void:
 			brake = 0.0
 	if Input.is_key_pressed(KEY_ESCAPE) and not destroyed:
 		get_tree().paused = !get_tree().paused
-		$Hud/Pause.visible = get_tree().paused
+		var _p = get_node_or_null("Hud/Pause")
+		if is_instance_valid(_p): _p.visible = get_tree().paused
 		
 	var steer_input = Input.get_axis("D", "A") 
 	var speed_factor = clamp(1.0 - (speed_kmh / MAX_SPEED_KMH), 0.3, 1.0)
@@ -209,7 +213,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 		if speed_kmh >= 40:
 			if body.has_method("die"):
 				body.die(linear_velocity, speed_mps)
-			shake_camera(0.5)
+			shake_camera(clampf(speed_mps / 50.0, 0.05, 0.3))
 		elif speed_kmh >= 10:
 			if body.has_method("knockdown"):
 				body.knockdown(linear_velocity)
