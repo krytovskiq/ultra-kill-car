@@ -19,3 +19,5 @@ func _on_body_entered(body: Node3D) -> void:
 		
 	# 3. Все остальные объекты (коробки, препятствия и т.д.) просто удаляем
 	body.queue_free()
+
+

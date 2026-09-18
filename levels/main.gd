@@ -46,6 +46,9 @@ func _ready() -> void:
 	car = car_scene.instantiate() as VehicleBody3D
 	add_child(car)
 	car.global_position = Vector3.ZERO
+	# Сброс счетчика сараев для нового заезда
+	var WorldChunk = load("res://levels/world_chunk.gd")
+	WorldChunk.global_distance_counter = 0.0
 	car.add_to_group("player")
 	ZombiePool.prewarm_zombies(150, self)
 	current_spawn_cooldown = base_spawn_cooldown

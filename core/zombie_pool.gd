@@ -11,17 +11,29 @@ func _process(delta: float) -> void:
 	if cleanup_timer > 1.0:
 		cleanup_timer = 0.0
 		_cleanup_distant_zombies()
+		
+		# Очистка пула от удаленных объектов (например, при перезапуске уровня)
+		_validate_pool()
+
+func _validate_pool() -> void:
+	# Если сцена сменилась, зомби могли быть удалены движком.
+	# Чистим массивы от невалидных (удаленных) ссылок
+	for i in range(pool.size() - 1, -1, -1):
+		if not is_instance_valid(pool[i]):
+			pool.remove_at(i)
+			
+	for i in range(active_zombies.size() - 1, -1, -1):
+		if not is_instance_valid(active_zombies[i]):
+			active_zombies.remove_at(i)
 
 func prewarm_zombies(count: int, parent_node: Node) -> void:
 	for i in range(count):
 		var zombie = zombie_scene.instantiate() as Node3D
 		parent_node.add_child(zombie)
 		
-		# ПОЛНОСТЬЮ выключаем узел из физического движка (Godot больше не просчитывает его кости и коллизии)
 		zombie.process_mode = Node.PROCESS_MODE_DISABLED 
 		zombie.hide()
 		
-		# На всякий случай (как было)
 		zombie.set_process(false)
 		zombie.set_physics_process(false)
 		zombie.set_collision_layer_value(3, false)
@@ -43,37 +55,39 @@ func _cleanup_distant_zombies() -> void:
 			active_zombies.remove_at(i)
 			continue
 			
-		# 3 = ZombieState.DEAD
-		if zombie.get("state") == 3:
-			continue
+
 			
 		var rel_pos = zombie.global_position - car.global_position
 		var dist_along_forward = rel_pos.dot(forward_vector)
 		
-		if dist_along_forward < -40.0:
+		if dist_along_forward < -150.0:
 			return_zombie(zombie)
 
 func spawn_zombie_at(global_pos: Vector3) -> Node3D:
 	if zombie_scene == null:
-		push_error("ZombiePool: Сцена зомби не загружена!")
 		return null
 		
 	var zombie: Node3D = null
 	
-	if pool.size() > 0:
-		zombie = pool.pop_back()
-		
-		# Включаем зомби обратно в физический движок
+	# Ищем валидного зомби в пуле
+	while pool.size() > 0:
+		var candidate = pool.pop_back()
+		if is_instance_valid(candidate):
+			zombie = candidate
+			break
+	
+	if zombie != null:
 		zombie.process_mode = Node.PROCESS_MODE_INHERIT
 		zombie.show()
-		
 		zombie.set_process(true)
 		zombie.set_physics_process(true)
 		zombie.set_collision_layer_value(3, true)
 		zombie.set_collision_mask_value(1, true)
 	else:
 		zombie = zombie_scene.instantiate() as Node3D
-		get_tree().current_scene.add_child(zombie)
+		var current_scene = get_tree().current_scene
+		if current_scene:
+			current_scene.add_child(zombie)
 		
 	zombie.global_position = global_pos
 	
@@ -92,7 +106,6 @@ func spawn_zombie_at(global_pos: Vector3) -> Node3D:
 	
 func return_zombie(zombie: Node3D):
 	if is_instance_valid(zombie) and not zombie in pool:
-		# ПОЛНОСТЬЮ выключаем
 		zombie.process_mode = Node.PROCESS_MODE_DISABLED
 		zombie.hide()
 		

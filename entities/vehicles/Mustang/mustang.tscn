@@ -668,7 +668,6 @@ transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, -0.99999994, 0, 0.99999994, 
 shape = SubResource("CapsuleShape3D_a6jqw")
 
 [node name="look" type="Node3D" parent="." unique_id=315968556]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 
 [node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("13_0ecat")]
-transform = Transform3D(0.21579377, 0.93885624, -0.26829472, 0.38785973, -0.3345797, -0.8588488, -0.8961015, 0.08127349, -0.4363447, 0, 2.2495344, 5.018093)
+transform = Transform3D(-0.99980897, 0, -0.01954637, 0, 1, 0, 0.01954637, 0, -0.99980897, 0, 2.3638306, -4.552657)

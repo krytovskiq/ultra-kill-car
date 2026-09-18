@@ -38,7 +38,12 @@ func _ready() -> void:
 	
 	# === ОПТИМИЗАЦИЯ РЭГДОЛЛА ===
 	# Удаляем мелкие кости, чтобы они не мешали и не сворачивали труп в "пакет"
+
 	if skeleton:
+		for child in skeleton.get_children():
+			if child is MeshInstance3D:
+				child.extra_cull_margin = 250.0 # Предотвращает мгновенное исчезновение при рэгдолле!
+
 		var sim = skeleton.get_node_or_null("PhysicalBoneSimulator3D")
 		if sim:
 			for child in sim.get_children():
@@ -147,7 +152,12 @@ func reset_zombie(is_running: bool = false) -> void:
 	collision_layer = 8
 	collision_mask = 1
 	
+
 	if skeleton:
+		for child in skeleton.get_children():
+			if child is MeshInstance3D:
+				child.extra_cull_margin = 250.0 # Предотвращает мгновенное исчезновение при рэгдолле!
+
 		var sim = skeleton.get_node_or_null("PhysicalBoneSimulator3D")
 		if sim:
 			sim.physical_bones_stop_simulation()
@@ -185,7 +195,7 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 		# Приподнимаем зомби над землей, чтобы ноги не цеплялись за текстуры пола и не отрывались
 		global_position.y += 0.5
 		
-		var launch_vel = impact_force * 1.2 + Vector3(0, 8.0, 0)
+		var launch_vel = impact_force * 0.4 + Vector3(0, 10.0, 0)
 		for child in sim.get_children():
 			if child is PhysicalBone3D:
 				# Даем импульс пропорционально массе, чтобы движок физики не сходил с ума

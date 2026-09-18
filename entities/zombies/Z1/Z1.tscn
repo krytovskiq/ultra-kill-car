@@ -2418,11 +2418,11 @@ skeleton = NodePath("..")
 [node name="PhysicalBoneSimulator3D" type="PhysicalBoneSimulator3D" parent="Run/Skeleton3D" unique_id=506511737]
 
 [node name="Physical Bone mixamorig_Hips" type="PhysicalBone3D" parent="Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=305408690]
-transform = Transform3D(-100, -1.6496331e-14, 1.509958e-05, -1.509958e-05, 1.09252596e-07, -100, -2.7105054e-19, -100, -1.09252596e-07, 1.0614992, 0.15347044, -119.34378)
+transform = Transform3D(-100, -1.6954874e-14, 1.509958e-05, -1.509958e-05, 1.122894e-07, -100, -2.7105054e-19, -100, -1.122894e-07, 1.0614992, 0.15347044, -119.34378)
 collision_layer = 16
 collision_mask = 513
 joint_type = 2
-body_offset = Transform3D(100, -3.2526065e-19, -9.094947e-13, 2.1684043e-19, 100, 1.0925214e-07, 9.094947e-13, -1.0925214e-07, 100, 0, 0, 0)
+body_offset = Transform3D(100, -3.2526065e-19, -9.094947e-13, 2.1684043e-19, 100, 1.12288944e-07, 9.094947e-13, -1.12288944e-07, 100, 0, 0, 0)
 mass = 2.0
 friction = 0.8
 linear_damp = 1.0
@@ -2430,6 +2430,7 @@ angular_damp = 15.0
 bone_name = "mixamorig_Hips"
 joint_constraints/swing_span = 45.0
 joint_constraints/twist_span = 180.0
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2448,8 +2449,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_Spine"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2468,8 +2470,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_Spine1"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2488,8 +2491,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_Spine2"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2509,8 +2513,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_Neck"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2519,18 +2524,19 @@ transform = Transform3D(1, 0, 8.82744e-36, 1.2037062e-35, 0, 1, 0, -1, 0, 0, 0, 
 shape = SubResource("CapsuleShape3D_2u6gl")
 
 [node name="Physical Bone mixamorig_Head" type="PhysicalBone3D" parent="Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=1480829174]
-transform = Transform3D(-100, -2.3628497e-14, 8.7422795e-06, -8.7422795e-06, 7.158906e-08, -100, 1.7369949e-14, -100, -7.158906e-08, 1.0614996, 3.317655, -176.76547)
+transform = Transform3D(-100, -2.3377098e-14, 8.7422795e-06, -8.7422795e-06, 7.158906e-08, -100, 1.711855e-14, -100, -7.158906e-08, 1.0614996, 3.317655, -176.76547)
 collision_layer = 16
 collision_mask = 513
 joint_type = 2
-body_offset = Transform3D(100, -7.748302e-14, -9.094947e-13, 9.04436e-15, 100.000015, 4.5474735e-13, 0, -4.5474735e-13, 100.00001, 0, 0, 0)
+body_offset = Transform3D(100, -7.773442e-14, -9.094947e-13, 9.29576e-15, 100.000015, 4.5474735e-13, 0, -4.5474735e-13, 100.00001, 0, 0, 0)
 mass = 2.0
 friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_Head"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2549,8 +2555,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_LeftShoulder"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2569,8 +2576,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_LeftArm"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2579,19 +2587,20 @@ transform = Transform3D(0.995149, 0.05770011, -0.07995417, 0.06538999, -0.993140
 shape = SubResource("CapsuleShape3D_mwlvj")
 
 [node name="Physical Bone mixamorig_LeftForeArm" type="PhysicalBone3D" parent="Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=576351209]
-transform = Transform3D(-0.38145787, -99.99631, 0.7695808, 99.73072, -0.43678588, -7.320752, 7.3238435, 0.73958284, 99.72871, -42.07932, 3.4997566, -166.24063)
+transform = Transform3D(-0.38145787, -99.99631, 0.7695808, 99.73071, -0.43678588, -7.320753, 7.3238435, 0.73958284, 99.72871, -42.07932, 3.4997566, -166.24063)
 collision_layer = 16
 collision_mask = 513
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8610227e-08, 3.8146972e-08, -2.7569043e-16)
-body_offset = Transform3D(100, -3.993511e-06, 3.8146973e-06, -4.4703484e-07, 100, -2.0116568e-06, -2.861023e-06, -1.4230609e-06, 100.000015, 2.861023e-06, -3.8146973e-06, 0)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8610227e-08, 3.8146972e-08, -4.1211467e-16)
+body_offset = Transform3D(100.00001, -3.993511e-06, 4.7683716e-06, -4.7683716e-07, 100, -2.015382e-06, -3.33786e-06, -1.4230609e-06, 100.000015, 2.861023e-06, -3.8146973e-06, 0)
 mass = 2.0
 friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_LeftForeArm"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2600,18 +2609,19 @@ transform = Transform3D(0.9947565, 0.06688329, -0.07743795, 0.06893497, -0.99733
 shape = SubResource("CapsuleShape3D_4afpy")
 
 [node name="Physical Bone mixamorig_RightShoulder" type="PhysicalBone3D" parent="Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=912277150]
-transform = Transform3D(2.812692, 95.86074, -28.333849, -99.72952, 0.76554215, -7.3100896, -6.790599, 28.462822, 95.622986, 8.709994, 3.903785, -171.4964)
+transform = Transform3D(2.812692, 95.86074, -28.333849, -99.72952, 0.76554215, -7.3100896, -6.790599, 28.462822, 95.62299, 8.709994, 3.903785, -171.4964)
 collision_layer = 16
 collision_mask = 513
 joint_type = 2
-body_offset = Transform3D(100.00001, 2.6226044e-06, 1.4305115e-06, -5.9604645e-08, 100.000015, -4.0084124e-06, 9.536743e-07, -1.4901161e-07, 100, 0, 0, 0)
+body_offset = Transform3D(100.00001, 2.6226044e-06, 1.9073486e-06, -5.9604645e-08, 100.000015, -5.915761e-06, 9.536743e-07, -1.4901161e-07, 99.99999, 0, 0, 0)
 mass = 2.0
 friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_RightShoulder"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2631,8 +2641,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_RightArm"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2652,8 +2663,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_RightForeArm"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2662,18 +2674,19 @@ transform = Transform3D(0.9970495, -0.02910868, -0.071058996, 0.027567083, 0.999
 shape = SubResource("CapsuleShape3D_ryi2i")
 
 [node name="Physical Bone mixamorig_LeftUpLeg" type="PhysicalBone3D" parent="Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=847228763]
-transform = Transform3D(99.93852, -3.5059988, -0.00012374148, -0.10669779, -3.0378945, -99.95379, 3.5043745, 99.89234, -3.0397675, -7.2848625, 0.17534663, -113.29038)
+transform = Transform3D(99.93852, -3.5059984, -0.00012372709, -0.10669779, -3.0378942, -99.9538, 3.5043745, 99.892334, -3.0397675, -7.2848625, 0.17534663, -113.29038)
 collision_layer = 16
 collision_mask = 513
 joint_type = 2
-body_offset = Transform3D(99.99993, -0.00014850241, 3.1888485e-06, 0.00014809915, 100.00003, -3.2186508e-05, -3.1590462e-06, 3.2901764e-05, 99.99997, 0, 0, 0)
+body_offset = Transform3D(99.99993, -0.00014850218, 3.1664968e-06, 0.00014809915, 100.00004, -3.2424927e-05, -3.1590462e-06, 3.2901764e-05, 99.99996, 0, 0, 0)
 mass = 2.0
 friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_LeftUpLeg"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2692,8 +2705,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_LeftLeg"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2702,19 +2716,20 @@ transform = Transform3D(0.99989814, -0.009217001, -0.0109560015, -0.008888001, -
 shape = SubResource("CapsuleShape3D_7ya4g")
 
 [node name="Physical Bone mixamorig_RightUpLeg" type="PhysicalBone3D" parent="Run/Skeleton3D/PhysicalBoneSimulator3D" unique_id=1314344733]
-transform = Transform3D(99.93851, 3.5066073, 4.0956194e-05, 0.07828561, -2.2299762, -99.975105, -3.5057335, 99.91361, -2.2313502, 9.407849, -0.12842523, -213.7474)
+transform = Transform3D(99.93851, 3.5066073, 4.0956194e-05, 0.07828561, -2.2299762, -99.975105, -3.5057335, 99.91361, -2.2313502, 9.407849, -0.12602279, -213.7474)
 collision_layer = 16
 collision_mask = 513
 joint_type = 2
-joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0352181, 1.0037215, -0.021569222)
-body_offset = Transform3D(99.99994, 7.3080882e-06, -1.21071935e-05, -6.9699017e-06, 99.999985, -9.536743e-07, 1.21071935e-05, 4.7683716e-07, 99.999985, 3.5218, -100.37213, 2.1569219)
+joint_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03521812, 1.0037221, -0.021545203)
+body_offset = Transform3D(99.99994, 7.3080882e-06, -1.21071935e-05, -6.9699017e-06, 99.999985, -9.536743e-07, 1.21071935e-05, 4.7683716e-07, 99.999985, 3.521802, -100.37219, 2.15452)
 mass = 2.0
 friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_RightUpLeg"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 
@@ -2733,8 +2748,9 @@ friction = 0.8
 linear_damp = 1.0
 angular_damp = 15.0
 bone_name = "mixamorig_RightLeg"
-joint_constraints/swing_span = 0.39999992
-joint_constraints/twist_span = 0.39999992
+joint_constraints/swing_span = 0.3999999
+joint_constraints/twist_span = 0.3999999
+joint_constraints/bias = 0.3
 joint_constraints/softness = 0.8
 joint_constraints/relaxation = 1.0
 

@@ -4,9 +4,9 @@ var total_distance: float = 0.0
 var start_z_position: float = 0.0
 
 @export_group("Driving")
-@export var STEER_SPEED: float = 1.4
+@export var STEER_SPEED: float = 1.5
 @export var STEER_LIMIT: float = 0.45
-@export var engine_force_value: int = 4000
+@export var engine_force_value: int = 4500
 @export var brake_force: float = 90.0
 @export var MAX_SPEED_KMH: int = 100
 
@@ -164,7 +164,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 	if destroyed: return
 	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
 	var speed_mps := horizontal_vel.length()
-	var speed_kmh := speed_mps * 3.6 
+	var speed_kmh := speed_mps * 5.4
 	if body.is_in_group("dead_wall"):
 		if speed_mps >= crash_death_speed_mps:
 			take_damage(current_hp) 
@@ -178,7 +178,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 		if speed_kmh >= 40.0:
 			if body.has_method("die"):
 				body.die(linear_velocity, speed_mps)
-			shake_camera(clampf(speed_mps / 20.0, 0.2, 1.5))
+			shake_camera(clampf(speed_mps / 50.0, 0.05, 0.3))
 		elif speed_kmh >= 10.0:
 			if body.has_method("knockdown"):
 				body.knockdown(linear_velocity)

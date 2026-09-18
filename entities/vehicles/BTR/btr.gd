@@ -93,7 +93,7 @@ func _physics_process(delta: float) -> void:
 		
 	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
 	var speed_mps: float = horizontal_vel.length()
-	var speed_kmh: int = int(speed_mps * 5.4)
+	var speed_kmh: int = int(speed_mps * 1.8)
 	
 	if has_node("Hud/speed"):
 		var _s = get_node_or_null("Hud/speed")
@@ -205,7 +205,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 	if destroyed: return
 	
 	var speed_mps = linear_velocity.length()
-	var speed_kmh = speed_mps * 3.6 
+	var speed_kmh = speed_mps * 5.4 
 
 	if body.is_in_group("zombie"):
 		CarVFX.spawn_impact(body.global_position + Vector3.UP, "blood")

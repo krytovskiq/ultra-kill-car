@@ -1154,8 +1154,8 @@ shape = SubResource("CapsuleShape3D_6086m")
 transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, -0.99999994, 0, 0.99999994, -4.3711385e-08, -0.042439595, 1.001566, 0.04143682)
 shape = SubResource("CapsuleShape3D_2u6gl")
 
-[node name="look" type="Node3D" parent="." unique_id=1886731508]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
+[node name="look" type="Node3D" parent="." unique_id=1483723752]
+transform = Transform3D(0.38779354, 0, -0.92174625, 0, 1, 0, 0.92174625, 0, 0.38779354, 0, 1.2149, 0)
 
 [node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("21_fa5bw")]
 transform = Transform3D(0.21579377, 0.93885624, -0.26829472, 0.38785973, -0.3345797, -0.8588488, -0.8961015, 0.08127349, -0.4363447, 0, 2.2495344, 5.018093)

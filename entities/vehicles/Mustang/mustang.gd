@@ -164,7 +164,7 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 	if destroyed: return
 	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
 	var speed_mps := horizontal_vel.length()
-	var speed_kmh := speed_mps * 3.6 
+	var speed_kmh := speed_mps * 5.4
 	if body.is_in_group("dead_wall"):
 		if speed_mps >= crash_death_speed_mps:
 			take_damage(current_hp) 
