@@ -72,7 +72,7 @@ func _generate_simple_multimesh_city() -> void:
 		var pos_x = side * rng.randf_range(chunk_width / 2.0, chunk_width / 2.0 + background_depth)
 		var pos_z = rng.randf_range(-chunk_length / 2.0, chunk_length / 2.0)
 		var pos_y = rng.randf_range(-5.0, surface_y)
-		var position = Vector3(pos_x, pos_y, pos_z)
+		var b_pos = Vector3(pos_x, pos_y, pos_z)
 		
 		var scale_x = rng.randf_range(1.0, 2.5)
 		var max_height = 28.0 if abs(pos_x) > (chunk_width / 2.0 + 40.0) else 10.0
@@ -84,7 +84,7 @@ func _generate_simple_multimesh_city() -> void:
 		t = t.rotated(Vector3(0, 1, 0), rng.randf_range(0, TAU)) 
 		t = t.rotated(Vector3(1, 0, 0), rng.randf_range(-0.12, 0.12)) 
 		t = t.rotated(Vector3(0, 0, 1), rng.randf_range(-0.12, 0.12)) 
-		t.origin = position
+		t.origin = b_pos
 		
 		mm_res.set_instance_transform(i, t)
 
@@ -94,7 +94,7 @@ func _on_car_entered_trigger(body: Node3D) -> void:
 		return
 		
 	# Проверяем, что коснулся именно игрок (машина)
-	if body.is_in_group("player") or body is VehicleBody3D:
+	if body.is_in_group("player") or body is RigidBody3D:
 		_is_trigger_activated = true
 		
 		# Отправляем команду в main.gd на спавн следующего куска дороги

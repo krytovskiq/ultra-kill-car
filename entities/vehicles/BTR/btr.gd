@@ -1,270 +1,359 @@
-extends VehicleBody3D
+extends "res://entities/vehicles/vehicle_base.gd"
 
-var total_distance: float = 0.0
-var start_z_position: float = 0.0
-var lights_tween: Tween
-@export var DeadParticles: PackedScene
-@export_group("Driving")
-@export var STEER_SPEED: float = 1.2
-@export var STEER_LIMIT: float = 0.3
-@export var engine_force_value: int = 12000
-@export var brake_force: float = 160.0
+const BTR_SHADOW_TEX: Texture2D = preload("res://entities/vehicles/textures/shadow_btr.png")
+const SHADER_MUZZLE_FIRE: Shader = preload("res://entities/vehicles/shaders/muzzle_fire.gdshader")
+
 @export var handbrake_force: float = 90.0
-@export var MAX_SPEED_KMH: int = 110
 
-@export_group("Health")
-@export var health: int = 100
-@export_group("Driving")
-@export var collision_damage_multiplier: float = 0.35
+@onready var base_gun: Node3D = get_node_or_null("Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun")
+@onready var _gun_tracer: Node3D = get_node_or_null("Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun/Gun_Effect")
 
-@export_group("Zombie Collision")
-@export var zombie_hit_min_speed_mps: float = 0.8
-@export var zombie_hit_max_speed_mps: float = 24.0
-@export var zombie_damage_at_min_speed: float = 20.0
-@export var zombie_damage_at_max_speed: float = 150.0
-@export var zombie_impulse_at_min_speed: float = 30.0 
-@export var zombie_impulse_at_max_speed: float = 80.0 
-@export var zombie_upward_impulse: float = 15.0 
-@export var wall_damage_min_speed_mps: float = 5.0
-
-@export_group("Fuel")
-@export var max_fuel: int = 150
-@export_group("Fuel")
-@export var fuel_consumption: float = 1.0
-var current_fuel: float = 0.0
-var current_hp: int = 0
-var destroyed: bool = false
-var death_shader = preload("res://entities/vehicles/Death_shader.gdshader")
-@export_group("Enemy Damage")
-@export var damage_per_second: int = 10
-var damage_timer: float = 0.0
-
-var _tire_smokes: Array[CPUParticles3D] = []
-var _exhaust: CPUParticles3D = null
-
-@onready var base_gun: Node3D = $"Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun"
 var target_zombie: Node3D = null
 var can_shoot: bool = true
+var _turret_scan_timer: float = 0.0
+
+var _gun_mesh: Node3D = null
+var _gun_base_z: float = -2.6554387
+var _muzzle_point: Marker3D = null
+var _muzzle_flash_rig: Node3D = null
+var _muzzle_flash_mats: Array[ShaderMaterial] = []
+var _barrel_linger_smoke: CPUParticles3D = null
+var _muzzle_flash_timer: float = 0.0
+var _barrel_heat_timer: float = 0.0
+
+func _init() -> void:
+	# ==============================================================================
+	# НАСТРОЙКИ БРОНЕВИКА (BTR) — МОЖНО РЕДАКТИРОВАТЬ ПОД СЕБЯ
+	# ==============================================================================
+
+	# --- Руль и вес управления ---
+	STEER_SPEED = 0.82                  ## Скорость поворота руля (ниже = тяжелее крутить)
+	STEER_LIMIT = 0.28                  ## Максимальный угол поворота колёс (рад)
+	steer_inertia = 2.6                 ## Инерция рулевой рейки (тяжесть руля)
+	high_speed_steer_min_ratio = 0.28   ## Доля угла поворота на макс. скорости
+
+	# --- Двигатель, разгон и максималка (реалистичный тяжёлый дизельный разгон) ---
+	throttle_response = 1.15            ## Скорость набора газа (меньше = тяжелее разгон)
+	throttle_release_rate = 2.9         ## Спад тяги при отпускании W
+	engine_force_value = 14800          ## Сила дизеля (уменьшите для ещё более медленного старта)
+	MAX_SPEED_KMH = 104                 ## Макс. скорость в стоке (км/ч, качается в гараже)
+	brake_force = 92.0                  ## Сила тормоза
+	max_brake_decel_mps2 = 4.9          ## Тормозное замедление (м/с², тяжёлый тормозной путь)
+	aero_drag_coeff = 1.75              ## Сопротивление воздуха крупного бронекорпуса
+
+	# --- Передачи КПП (пороги % скорости и множители тяги) ---
+	gear_speed_ratios = [0.22, 0.46, 0.74, 1.02]
+	gear_torque_multipliers = [1.45, 1.14, 0.86, 0.64]
+
+	# --- Подвеска, колёса и устойчивость ---
+	suspension_firmness = 1.32          ## Общая жёсткость торсионной подвески
+	compression_damping_ratio = 0.68    ## Гашение удара при пробое и прыжках с моста
+	rebound_damping_ratio = 0.82        ## Гашение отбоя без подпрыгивания 9-тонного корпуса
+	can_deform_body = false             ## Тяжёлый бронированный корпус БТР не деформируется при столкновениях
+	anti_roll_stiffness = 46000.0       ## Мощный стабилизатор против кренов 9-тонного корпуса
+	front_spring_stiffness = 225000.0   ## Жёсткость передних пружин (Н/м)
+	rear_spring_stiffness = 235000.0    ## Жёсткость задних пружин (Н/м)
+	front_rest_length_scale = 1.18      ## Ход / клиренс передней подвески
+	rear_rest_length_scale = 1.18       ## Ход / клиренс задней подвески
+	front_grip_bias = 0.90              ## Баланс сцепления передней оси
+	rear_grip_bias = 1.15               ## Баланс сцепления ведущей задней оси
+	suspension_travel_speed = 14.0      ## Скорость визуального хода тяжёлых колёс
+	weight_transfer_long = 0.18         ## Перенос веса вперёд/назад при разгоне и тормозе
+	weight_transfer_lat = 0.20          ## Перенос веса в стороны при маневре
+	com_height = 0.44                   ## Высота центра масс
+	com_z_offset = -0.18                ## Смещение центра масс вперёд
+	wheelbase_m = 3.45                  ## Колёсная база (м)
+	steering_scrub_drag = 0.24          ## Потери скорости тяжёлых колёс в повороте
+	impact_momentum_keep = 0.96         ## Броневик почти не замедляется при сбитии преград
+	body_roll_torque_factor = 0.42      ## Сила крена корпуса в повороте
+	body_pitch_torque_factor = 0.46     ## Сила клевка при тормозе
+	lateral_stiffness = 10.6            ## Боковая жёсткость крупных шин
+	tire_friction = 2.40                ## Сцепление тяжёлых покрышек
+	drift_grip_factor = 0.84            ## Сцепление при срыве в занос
+	yaw_stability_assist = 2.7          ## Курсовая устойчивость (ESC)
+	hull_half_extents = Vector2(1.38, 2.95) ## Габариты половины бронекорпуса (ширина, длина)
+
+	# --- Звук и свет ---
+	engine_sound_id = "btr"
+	engine_pitch_scale = 0.95
+	has_exhaust_backfire = false
+	gear_shift_pitch_base = 0.76
+	shadow_texture = BTR_SHADOW_TEX
+	headlight_positions = [Vector3(-0.73, 0.90, -2.64), Vector3(1.04, 1.04, -2.57)]
+	taillight_positions = [Vector3(-0.54, 0.88, 2.50), Vector3(0.54, 0.88, 2.50)]
+	headlight_lens_size = Vector2(0.25, 0.25)
+	taillight_lens_size = Vector2(0.22, 0.22)
+	headlight_proj_size = Vector2(16.0, 38.0)
+	headlight_proj_z_start = -2.65
+	taillight_proj_size = Vector2(4.2, 2.5)
+	taillight_proj_z_start = 2.46
+	shadow_blob_size = Vector2(5.88, 10.16)
+	shadow_offset = Vector2(-0.06, -0.09)
+
+	# --- Броня, урон и топливный бак ---
+	health = 3500                       ## Базовая прочность HP (качается в гараже)
+	engine_hood_offset = Vector3(0.0, 1.15, -1.55)
+	car_paint_color = Color(0.28, 0.31, 0.27)
+	max_fuel = 200                      ## Базовый объём бака в литрах (качается в гараже)
+	fuel_per_100m = 3.8                 ## Расход на 100 м
+	idle_fuel_per_sec = 0.26            ## Холостой расход (л/сек)
+	zombie_damage_taken = 2             ## Урон по броне за зомби
+	crash_death_speed_mps = 38.0        ## Смертельная скорость лобового удара (м/с)
+	downforce_multiplier = 42.0
+	exhaust_offset = Vector3(-0.92, 0.96, 2.68)
+	exhaust_offsets = [Vector3(-0.92, 0.96, 2.68), Vector3(0.92, 0.96, 2.68)]
+	exhaust_style = "diesel"
 
 func _ready() -> void:
-	var kill_zone = get_node_or_null("Area3D")
-	if kill_zone:
-		kill_zone.connect("body_entered", _on_kill_zone_body_entered)
-	else:
-		push_error("ОШИБКА: Узел Area3D не найден! Создай его внутри машины.")
+	mass = 9400.0                       ## Реальная боевая масса (кг) — 9.4 тонны
+	super()
+	_setup_muzzle_vfx()
 
-	start_z_position = global_position.z
-	add_to_group("player")
-	
-	contact_monitor = true
-	max_contacts_reported = 24
-	current_hp = health
-	current_fuel = max_fuel
-	center_of_mass = Vector3(0, 0, 0)
-	if has_node("Hud/HpBar"):
-		$Hud/HpBar.max_value = health
-		$Hud/HpBar.value = current_hp
-	if has_node("Hud/FuelBar"):
-		$Hud/FuelBar.max_value = max_fuel
-		$Hud/FuelBar.value = current_fuel
+func _setup_muzzle_vfx() -> void:
+	if not is_instance_valid(base_gun):
+		return
+	_gun_mesh = base_gun.get_node_or_null("Gun") as Node3D
+	if _gun_mesh:
+		_gun_base_z = _gun_mesh.position.z
 
-	# --- VFX Setup ---
-	_exhaust = CarVFX.create_exhaust(self, Vector3(-0.6, 0.4, 2.5))
-	for wheel in get_children():
-		if wheel is VehicleWheel3D and not wheel.use_as_steering:
-			var smoke = CarVFX.create_tire_smoke(wheel, Vector3(0, -wheel.wheel_radius, 0))
-			_tire_smokes.append(smoke)
+	_muzzle_point = Marker3D.new()
+	_muzzle_point.name = "MuzzlePoint"
+	_muzzle_point.position = Vector3(0.0, 1.95, -23.6)
+	base_gun.add_child(_muzzle_point)
 
-func _physics_process(delta: float) -> void:
-	if destroyed: return
-	_find_zombie_target() 
-	if is_instance_valid(target_zombie):
-		var local_target_pos = base_gun.to_local(target_zombie.global_position)
-		var target_angle_y = atan2(-local_target_pos.x, -local_target_pos.z)
-		var limit_radians = deg_to_rad(70.0)
-		target_angle_y = clamp(target_angle_y, -limit_radians, limit_radians)
-		base_gun.rotate_y(target_angle_y * STEER_SPEED * delta)
-		if Input.is_key_pressed(KEY_SPACE) and can_shoot:
-			_shoot_zombie()
-	total_distance = abs(global_position.z - start_z_position)
-	if has_node("Hud/Metr"):
-		var _m = get_node_or_null("Hud/Metr")
-		if is_instance_valid(_m): _m.text = str(round(total_distance)) + " M"
-		
-	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
-	var speed_mps: float = horizontal_vel.length()
-	var speed_kmh: int = int(speed_mps * 1.8)
-	
-	if has_node("Hud/speed"):
-		var _s = get_node_or_null("Hud/speed")
-		if is_instance_valid(_s): _s.text = str(round(speed_kmh)) + "  KM/H"
-	
-	var target_max_speed = MAX_SPEED_KMH
-	var auto_roll_speed = 0
-	
-	if Input.is_key_pressed(KEY_W):
-		engine_force = -engine_force_value if speed_kmh < target_max_speed else 0.0
-		brake = 0.0
-	else:
-		engine_force = -(engine_force_value * 0.5) if speed_kmh < auto_roll_speed else 0.0
+	_setup_muzzle_flash_rig()
+	if not is_preview:
+		_barrel_linger_smoke = CarVFX.create_barrel_linger_smoke(_muzzle_point, Vector3.ZERO)
 
-	var min_speed_kmh = 25
-	if Input.is_key_pressed(KEY_S):
-		if speed_kmh > min_speed_kmh:
-			brake = brake_force
-			engine_force = 0.0
+func _setup_muzzle_flash_rig() -> void:
+	if not is_instance_valid(_muzzle_point):
+		return
+	_muzzle_flash_rig = Node3D.new()
+	_muzzle_flash_rig.name = "MuzzleFlashRig"
+	_muzzle_flash_rig.visible = false
+	_muzzle_point.add_child(_muzzle_flash_rig)
+
+	# Crossed 3-plane flame tongues along -Z in barrel-tip space (~2.1m long x 1.0m wide in world)
+	var strip_mesh := QuadMesh.new()
+	strip_mesh.size = Vector2(10.5, 22.0)
+	for i in range(3):
+		var mat := ShaderMaterial.new()
+		mat.shader = SHADER_MUZZLE_FIRE
+		mat.render_priority = 3
+		mat.set_shader_parameter("flash_strength", 0.0)
+		_muzzle_flash_mats.append(mat)
+
+		var mi := MeshInstance3D.new()
+		mi.name = "FlamePlane_%d" % i
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.mesh = strip_mesh
+		mi.material_override = mat
+		var roll_ang := deg_to_rad(float(i) * 60.0)
+		# QuadMesh lies in XY with +Y top -> tilt -90 on X so top (+Y -> UV.y=0) extends along -Z
+		mi.transform = Transform3D(Basis(Vector3.FORWARD, roll_ang) * Basis(Vector3.RIGHT, -PI * 0.5), Vector3(0.0, 0.0, -10.5))
+		_muzzle_flash_rig.add_child(mi)
+
+	var mouth_mesh := QuadMesh.new()
+	mouth_mesh.size = Vector2(12.5, 12.5)
+	var mouth_mat := ShaderMaterial.new()
+	mouth_mat.shader = SHADER_MUZZLE_FIRE
+	mouth_mat.render_priority = 4
+	mouth_mat.set_shader_parameter("flash_strength", 0.0)
+	_muzzle_flash_mats.append(mouth_mat)
+
+	var mouth_mi := MeshInstance3D.new()
+	mouth_mi.name = "MouthHalo"
+	mouth_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mouth_mi.mesh = mouth_mesh
+	mouth_mi.material_override = mouth_mat
+	mouth_mi.position = Vector3(0.0, 0.0, -0.8)
+	_muzzle_flash_rig.add_child(mouth_mi)
+
+func set_preview_mode(enabled: bool, showcase_mode: bool = false) -> void:
+	super(enabled, showcase_mode)
+	if enabled:
+		if is_instance_valid(_muzzle_flash_rig):
+			_muzzle_flash_rig.visible = false
+		if is_instance_valid(_barrel_linger_smoke):
+			_barrel_linger_smoke.emitting = false
+			_barrel_linger_smoke.visible = false
+
+func _process_vehicle_extras(delta: float) -> void:
+	_turret_scan_timer -= delta
+	if _turret_scan_timer <= 0.0 or not is_instance_valid(target_zombie) or not target_zombie.visible or target_zombie.get("state") == 3:
+		_turret_scan_timer = 0.12
+		_find_zombie_target()
+
+	if is_instance_valid(base_gun):
+		if is_instance_valid(target_zombie):
+			var gun_parent := base_gun.get_parent() as Node3D
+			if gun_parent:
+				var local_target := gun_parent.to_local(target_zombie.global_position)
+				var target_angle_y := atan2(-local_target.x, -local_target.z)
+				var limit_radians := deg_to_rad(70.0)
+				target_angle_y = clampf(target_angle_y, -limit_radians, limit_radians)
+				base_gun.rotation.y = move_toward(base_gun.rotation.y, target_angle_y, STEER_SPEED * 2.5 * delta)
 		else:
-			brake = 0.0
-			engine_force = -(engine_force_value * 0.2)
-	elif not Input.is_key_pressed(KEY_W) and speed_kmh < min_speed_kmh:
-		brake = 0.0
-		engine_force = -(engine_force_value * 0.3)
-	else:
-		if not Input.is_key_pressed(KEY_SPACE):
-			brake = 0.0
-	if Input.is_key_pressed(KEY_ESCAPE) and not destroyed:
-		get_tree().paused = !get_tree().paused
-		var _p = get_node_or_null("Hud/Pause")
-		if is_instance_valid(_p): _p.visible = get_tree().paused
-		
-	var steer_input = Input.get_axis("D", "A") 
-	var speed_factor = clamp(1.0 - (speed_kmh / MAX_SPEED_KMH), 0.3, 1.0)
-	var steer_target = steer_input * STEER_LIMIT * speed_factor
-	steering = move_toward(steering, steer_target, STEER_SPEED * delta)
+			base_gun.rotation.y = move_toward(base_gun.rotation.y, 0.0, STEER_SPEED * 1.4 * delta)
 
-	traction(speed_mps)
-	
-	if not destroyed and speed_mps > 0.1:
-		current_fuel -= fuel_consumption * delta
-	
-	if current_fuel <= 0:
-		current_fuel = 0
-		engine_force = 0
-	
-	if has_node("Hud/FuelBar"):
-		$Hud/FuelBar.value = current_fuel
+	if _muzzle_flash_timer > 0.0:
+		_muzzle_flash_timer = maxf(_muzzle_flash_timer - delta, 0.0)
+		var strength := clampf(_muzzle_flash_timer / 0.14, 0.0, 1.0)
+		for m in _muzzle_flash_mats:
+			m.set_shader_parameter("flash_strength", sqrt(strength))
+		if _muzzle_flash_timer <= 0.001 and is_instance_valid(_muzzle_flash_rig):
+			_muzzle_flash_rig.visible = false
 
+	if _barrel_heat_timer > 0.0:
+		_barrel_heat_timer = maxf(_barrel_heat_timer - delta, 0.0)
+	if is_instance_valid(_barrel_linger_smoke):
+		_barrel_linger_smoke.emitting = (_barrel_heat_timer > 0.0 and not destroyed and not is_preview)
+
+	if (Input.is_action_pressed("space") or Input.is_key_pressed(KEY_SPACE)) and can_shoot:
+		_shoot_zombie()
 
 func _find_zombie_target() -> void:
-	var zombies = get_tree().get_nodes_in_group("zombie")
 	var closest: Node3D = null
-	var min_dist = 80.0
-	
-	for z in zombies:
-		if is_instance_valid(z) and z.get("state") != 3:
-			var dist = global_position.distance_to(z.global_position)
-			if dist < min_dist:
-				min_dist = dist
-				closest = z
+	var min_dist_sq := 80.0 * 80.0
+	var forward_dir := -global_transform.basis.z
+	forward_dir.y = 0.0
+	if forward_dir.length_squared() > 0.0001:
+		forward_dir = forward_dir.normalized()
+
+	for z in ZombiePool.active_zombies:
+		if not is_instance_valid(z) or not z.visible or z.process_mode == Node.PROCESS_MODE_DISABLED:
+			continue
+		if z.get("state") == 3:
+			continue
+		var to_z := z.global_position - global_position
+		if to_z.dot(forward_dir) < -5.0:
+			continue
+		var dist_sq := to_z.length_squared()
+		if dist_sq < min_dist_sq:
+			min_dist_sq = dist_sq
+			closest = z
 	target_zombie = closest
 
 func _shoot_zombie() -> void:
+	if destroyed or is_preview:
+		return
 	can_shoot = false
-	print("Выстрел")
-	
-	var tracer = get_node_or_null("Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun/Gun_Effect")
-	
-	if tracer:
-		tracer.position = Vector3.ZERO 
-		tracer.visible = true
-		var tween = create_tween()
-		
-		tween.tween_property(tracer, "position:z", -60.0, 0.06)
-		
-		tween.finished.connect(func(): tracer.visible = false)
-	
-	if target_zombie.has_method("die"):
-		target_zombie.die(linear_velocity, 50.0)
-	else:
-		target_zombie.queue_free()
-		
-	await get_tree().create_timer(0.3).timeout
-	can_shoot = true
+	_muzzle_flash_timer = 0.14
+	_barrel_heat_timer = 1.9
 
-func refuel(amount: float):
-	current_fuel = clamp(current_fuel + amount, 0, max_fuel)
+	var sm: Node = get_node_or_null("/root/SoundManager")
+	if sm and sm.has_method("play_sfx"):
+		sm.call("play_sfx", "btr_gunshot", -1.0, randf_range(0.76, 0.86))
 
-func traction(speed: float) -> void:
-	var downforce = clamp(speed * 50.0, 0, 8000)
-	apply_central_force(Vector3.DOWN * downforce)
+	if is_instance_valid(_muzzle_flash_rig):
+		_muzzle_flash_rig.visible = true
+		_muzzle_flash_rig.rotation.z = randf_range(0.0, TAU)
+		var phase := randf_range(0.0, 50.0)
+		for m in _muzzle_flash_mats:
+			m.set_shader_parameter("seed_phase", phase)
+			m.set_shader_parameter("flash_strength", 1.0)
 
-func hit_stop(duration: float):
-	Engine.time_scale = 0.1
-	await get_tree().create_timer(duration * 0.1, true, false, true).timeout
-	Engine.time_scale = 1.0
+	if is_instance_valid(_muzzle_point):
+		var muzzle_world := _muzzle_point.global_position
+		var muzzle_fwd := (-_muzzle_point.global_transform.basis.z).normalized()
+		CarVFX.spawn_muzzle_blast(muzzle_world, muzzle_fwd, linear_velocity)
 
-func take_damage(amount: int) -> void:
-	if destroyed: return
-	current_hp = maxf(current_hp - amount, 0)
-	if has_node("Hud/HpBar"):
-		$Hud/HpBar.value = current_hp
-		print("ХП Машины: ", current_hp)
-		if current_hp <= 0: _destroy_car()
+	if is_instance_valid(_gun_mesh):
+		_gun_mesh.position.z = _gun_base_z + 1.85
+		var rec_tw := create_tween()
+		rec_tw.tween_property(_gun_mesh, "position:z", _gun_base_z, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
-func _on_kill_zone_body_entered(body: Node3D) -> void:
-	if destroyed: return
-	
-	var speed_mps = linear_velocity.length()
-	var speed_kmh = speed_mps * 5.4 
+	if is_instance_valid(_gun_tracer):
+		_gun_tracer.position = Vector3(0.0, 1.95, -25.0)
+		_gun_tracer.visible = true
+		var tween := create_tween()
+		tween.tween_property(_gun_tracer, "position:z", -140.0, 0.065)
+		var wr_tr: WeakRef = weakref(_gun_tracer)
+		tween.finished.connect(
+			func():
+				var tracer_node = wr_tr.get_ref()
+				if tracer_node and is_instance_valid(tracer_node):
+					tracer_node.visible = false
+		)
 
-	if body.is_in_group("zombie"):
-		CarVFX.spawn_impact(body.global_position + Vector3.UP, "blood")
-		take_damage(2)
-		if speed_kmh >= 40:
-			if body.has_method("die"):
-				body.die(linear_velocity, speed_mps)
-			shake_camera(clampf(speed_mps / 50.0, 0.05, 0.3))
-		elif speed_kmh >= 10:
-			if body.has_method("knockdown"):
-				body.knockdown(linear_velocity)
-		return 
+	shake_camera(0.14)
 
-	if body != self and not body.is_in_group("player") and body.is_in_group("object_hit"):
-		if speed_mps > wall_damage_min_speed_mps:
-			var damage_to_car = speed_mps * collision_damage_multiplier
-			take_damage(damage_to_car)
-			shake_camera(clamp(damage_to_car * 0.1, 0.2, 1.5))
-			CarVFX.spawn_impact(body.global_position + Vector3.UP * 0.5, "sparks")
-			if body.has_method("take_damage"):
-				body.take_damage(speed_mps * 2.0) 
-			
-			print("Врезался! Урон машине: ", round(damage_to_car))
-	else:
-		if speed_mps > 3.0 and body != self and not body.is_in_group("player"):
-			CarVFX.spawn_impact(body.global_position + Vector3.UP * 0.3, "sparks")
+	var aim_dir := (-global_transform.basis.z)
+	aim_dir.y = 0.0
+	aim_dir = aim_dir.normalized() if aim_dir.length_squared() > 0.0001 else Vector3.FORWARD
+	if is_instance_valid(base_gun):
+		var g_fwd := -base_gun.global_transform.basis.z
+		g_fwd.y = 0.0
+		if g_fwd.length_squared() > 0.0001:
+			aim_dir = g_fwd.normalized()
 
-func _destroy_car() -> void:
-	if DeadParticles:
-		var Dead = DeadParticles.instantiate() as CPUParticles3D
-		get_tree().current_scene.add_child(Dead)
-		Dead.global_position = global_position
-		
-		Dead.lifetime = 1.0 
-		Dead.anim_speed_min = 2.0
-		Dead.anim_speed_max = 2.5
-		Dead.emitting = true
-		Dead.restart()
-	apply_central_impulse(Vector3(0, 13000.0, 0))
-	if has_node("Hud/ColorRect"):
-		var effect_rect = $Hud/ColorRect as ColorRect
-		effect_rect.show()
-		var mat = effect_rect.material as ShaderMaterial
-		var tween_blood = create_tween()
-		tween_blood.tween_property(mat, "shader_parameter/effect_strength", 1.0, 0.0)
-		var tween_time = create_tween()
-		tween_time.tween_property(Engine, "time_scale", 0.1, 0.2).set_trans(Tween.TRANS_SINE)
-	
-	await get_tree().create_timer(0.4).timeout
-	Engine.time_scale = 1.0
-	get_tree().change_scene_to_file("res://ui/menu.tscn")
+	var hit_pos: Vector3 = global_position + aim_dir * 34.0
+	hit_pos.y = 0.0
+	if is_instance_valid(target_zombie):
+		var t_pos := target_zombie.global_position
+		var sum_pos := t_pos
+		var cnt := 1
+		var near_pack := ZombiePool.get_nearby_zombies(t_pos)
+		for nz: Node3D in near_pack:
+			if is_instance_valid(nz) and nz.visible and nz.get("state") != 3:
+				if (nz.global_position - t_pos).length_squared() <= 64.0:
+					sum_pos += nz.global_position
+					cnt += 1
+		hit_pos = sum_pos / float(cnt)
+		hit_pos.y = 0.0
 
-func shake_camera(amount: float):
-	var camera = get_node_or_null("look/Camera3D")
-	if camera:
-		var tween = create_tween()
-		for i in range(5):
-			var rand_offset = Vector2(randf_range(-amount, amount), randf_range(-amount, amount))
-			tween.tween_property(camera, "h_offset", rand_offset.x, 0.003)
-			tween.tween_property(camera, "v_offset", rand_offset.y, 0.003)
-		tween.tween_property(camera, "h_offset", 0.0, 0.003)
-		tween.tween_property(camera, "v_offset", 0.0, 0.003)
+	CarVFX.spawn_he_explosion(hit_pos, 9.5)
+	if sm and sm.has_method("play_btr_explosion"):
+		sm.call("play_btr_explosion")
+
+	const BTR_BLAST_RADIUS_SQ := 9.5 * 9.5
+	const BTR_SHOCK_RADIUS_SQ := 14.0 * 14.0
+	var kills: int = 0
+	var snapshot: Array[Node3D] = ZombiePool.active_zombies.duplicate()
+	for z: Node3D in snapshot:
+		if not is_instance_valid(z) or not z.visible or z.process_mode == Node.PROCESS_MODE_DISABLED:
+			continue
+		if z.get("state") == 3:
+			continue
+		var delta_v := z.global_position - hit_pos
+		delta_v.y = 0.0
+		var d2 := delta_v.length_squared()
+		if d2 <= BTR_BLAST_RADIUS_SQ:
+			var d := sqrt(d2)
+			var out_dir := (delta_v / d) if d > 0.15 else aim_dir
+			var falloff := 1.0 - clampf(d / 9.5, 0.0, 0.65)
+			var impulse := out_dir * (22.0 * falloff)
+			if z.has_method("die"):
+				z.die(impulse, 28.0 * falloff)
+				_on_zombie_killed()
+				kills += 1
+			else:
+				z.queue_free()
+		elif d2 <= BTR_SHOCK_RADIUS_SQ:
+			var d := maxf(sqrt(d2), 0.1)
+			var out_dir := delta_v / d
+			if z.has_method("knockdown"):
+				z.knockdown(out_dir * 12.5)
+
+	if kills > 0:
+		CarVFX.spawn_impact(hit_pos + Vector3.UP, "blood")
+	for b_node in get_tree().get_nodes_in_group("explosive_barrel"):
+		if not is_instance_valid(b_node) or not (b_node is Node3D):
+			continue
+		var bd := (b_node as Node3D).global_position - hit_pos
+		bd.y = 0.0
+		if bd.length_squared() <= 121.0 and b_node.has_method("detonate"):
+			b_node.call("detonate", self)
+	target_zombie = null
+
+	var reload_sec: float = clampf(0.32 - float(_chassis_upgrade_lvl) * 0.014, 0.18, 0.35)
+	await get_tree().create_timer(reload_sec).timeout
+	if is_instance_valid(self):
+		can_shoot = true
+
+func _destroy_car(death_reason: String = "МАШИНА УНИЧТОЖЕНА") -> void:
+	if is_instance_valid(_muzzle_flash_rig):
+		_muzzle_flash_rig.visible = false
+	if is_instance_valid(_barrel_linger_smoke):
+		_barrel_linger_smoke.emitting = false
+	super(death_reason)

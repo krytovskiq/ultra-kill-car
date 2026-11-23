@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://qlfobs7v7t5o" path="res://levels/dungeon_chunk.gd" id="1_jxjpd"]
 [ext_resource type="PackedScene" uid="uid://btk65abugxc3d" path="res://entities/zombies/Z1/Z1.tscn" id="2_sa7cs"]
-[ext_resource type="PackedScene" uid="uid://bggtemdkmx3qq" path="res://environment/model/decor/Ambar/ambar.tscn" id="3_bnois"]
 [ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://environment/model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="4_iuauh"]
 [ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://environment/model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="5_ti1a1"]
 [ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://environment/model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="6_5rmd6"]
@@ -88,7 +87,6 @@ is_tunnel = true
 tunnel_color = Color(0.15, 0.15, 0.16, 1)
 script = ExtResource("1_jxjpd")
 zombie_scene = ExtResource("2_sa7cs")
-barn_scene = ExtResource("3_bnois")
 object1 = ExtResource("4_iuauh")
 object2 = ExtResource("5_ti1a1")
 object3 = ExtResource("6_5rmd6")

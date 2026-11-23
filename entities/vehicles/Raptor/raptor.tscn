@@ -1,0 +1,179 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://entities/vehicles/Raptor/raptor.gd" id="1_raptor_gd"]
+[ext_resource type="PackedScene" uid="uid://dyolsb8cihih5" path="res://entities/vehicles/deadparticles.tscn" id="2_ojd4x"]
+[ext_resource type="Shader" uid="uid://baa1v3ttxc68m" path="res://entities/vehicles/Death_shader.gdshader" id="6_sir0b"]
+[ext_resource type="Texture2D" uid="uid://dflunt5pvepti" path="res://entities/vehicles/texture/Brake.png" id="7_oxjpv"]
+[ext_resource type="Texture2D" uid="uid://duvq5xocns3d8" path="res://entities/vehicles/texture/Gas.png" id="8_0ecat"]
+[ext_resource type="Texture2D" uid="uid://dymyu702nhlow" path="res://entities/vehicles/texture/check.png" id="9_ojd4x"]
+[ext_resource type="Texture2D" uid="uid://du5lan442km8" path="res://entities/vehicles/texture/fuel.png" id="10_naguo"]
+[ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://ui/pause.tscn" id="11_8277n"]
+[ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://entities/camera/camera_3d.tscn" id="13_0ecat"]
+[ext_resource type="Script" path="res://entities/vehicles/raycast_wheel.gd" id="14_rcwhl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_death"]
+shader = ExtResource("6_sir0b")
+shader_parameter/effect_strength = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp"]
+bg_color = Color(0.84, 0.14, 0.14, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fuel"]
+bg_color = Color(0.92, 0.56, 0.12, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_raptor_kill"]
+size = Vector3(2.44, 1.48, 1.55)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_raptor_hull"]
+size = Vector3(2.14, 1.24, 5.18)
+
+[node name="Raptor" type="RigidBody3D"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+collision_mask = 517
+mass = 2450.0
+gravity_scale = 2.0
+center_of_mass_mode = 1
+center_of_mass = Vector3(0, 0.38, 0)
+contact_monitor = true
+max_contacts_reported = 24
+script = ExtResource("1_raptor_gd")
+DeadParticles = ExtResource("2_ojd4x")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="ColorRect" type="ColorRect" parent="Hud"]
+visible = false
+material = SubResource("ShaderMaterial_death")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VirtualJoystick" type="VirtualJoystick" parent="Hud"]
+visible = false
+offset_left = 2.0
+offset_top = 344.0
+offset_right = 463.0
+offset_bottom = 712.0
+joystick_mode = 1
+joystick_size = 190.0
+initial_offset_ratio = Vector2(0.5, 0.67)
+action_left = &"A"
+action_right = &"D"
+
+[node name="Brake" type="TouchScreenButton" parent="Hud"]
+position = Vector2(780, 460)
+scale = Vector2(0.35, 0.35)
+texture_normal = ExtResource("7_oxjpv")
+action = "S"
+
+[node name="Gas" type="TouchScreenButton" parent="Hud"]
+position = Vector2(960, 420)
+scale = Vector2(0.35, 0.35)
+texture_normal = ExtResource("8_0ecat")
+action = "W"
+
+[node name="speed" type="Label" parent="Hud"]
+offset_left = 478.0
+offset_top = 568.0
+offset_right = 682.0
+offset_bottom = 638.0
+text = "0 KM/H"
+
+[node name="HpBar" type="ProgressBar" parent="Hud"]
+offset_left = 54.0
+offset_top = 54.0
+offset_right = 238.0
+offset_bottom = 81.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp")
+value = 100.0
+show_percentage = false
+
+[node name="FuelBar" type="ProgressBar" parent="Hud"]
+offset_left = 54.0
+offset_top = 12.0
+offset_right = 238.0
+offset_bottom = 39.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_fuel")
+value = 100.0
+show_percentage = false
+
+[node name="Metr" type="Label" parent="Hud"]
+offset_left = 920.0
+offset_top = 18.0
+offset_right = 1120.0
+offset_bottom = 62.0
+text = "0 M"
+
+[node name="Check" type="Sprite2D" parent="Hud"]
+position = Vector2(28, 67)
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("9_ojd4x")
+
+[node name="Fuel" type="Sprite2D" parent="Hud"]
+position = Vector2(25, 26)
+scale = Vector2(0.36, 0.36)
+texture = ExtResource("10_naguo")
+
+[node name="Pause" parent="Hud" instance=ExtResource("11_8277n")]
+visible = false
+
+[node name="VehicleWheelFL" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91365, 0.458, -1.722)
+script = ExtResource("14_rcwhl")
+is_front = true
+is_left = true
+use_as_steering = true
+use_as_traction = true
+wheel_radius = 0.458
+rest_length = 0.22
+
+[node name="VehicleWheelFR" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.887, 0.458, -1.722)
+script = ExtResource("14_rcwhl")
+is_front = true
+is_left = false
+use_as_steering = true
+use_as_traction = true
+wheel_radius = 0.458
+rest_length = 0.22
+
+[node name="VehicleWheelRL" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91365, 0.458, 1.722)
+script = ExtResource("14_rcwhl")
+is_front = false
+is_left = true
+use_as_steering = false
+use_as_traction = true
+wheel_radius = 0.458
+rest_length = 0.22
+
+[node name="VehicleWheelRR" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.887, 0.458, 1.722)
+script = ExtResource("14_rcwhl")
+is_front = false
+is_left = false
+use_as_steering = false
+use_as_traction = true
+wheel_radius = 0.458
+rest_length = 0.22
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, -2.25)
+collision_layer = 0
+collision_mask = 13
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_raptor_kill")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.06, 0.08)
+shape = SubResource("BoxShape3D_raptor_hull")
+
+[node name="look" type="Node3D" parent="."]
+
+[node name="Camera3D" parent="look" instance=ExtResource("13_0ecat")]
+transform = Transform3D(-0.999809, 0, -0.0195464, 0, 1, 0, 0.0195464, 0, -0.999809, 0, 2.55, -5.05)

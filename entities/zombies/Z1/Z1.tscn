@@ -19,8 +19,8 @@ cull_mode = 2
 albedo_texture = ExtResource("2_blhav")
 metallic_specular = 1.0
 emission_enabled = true
-emission = Color(1, 1, 1, 1)
-emission_energy_multiplier = 16.0
+emission = Color(0.95, 0.85, 0.7, 1)
+emission_energy_multiplier = 2.2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fksjv"]
 resource_name = "5_em10023_1_0_0.002"
@@ -1442,6 +1442,7 @@ tracks/49/keys = PackedFloat32Array(0, 1, 0.24464592, -0.07789467, 0.017923178, 
 [sub_resource type="Animation" id="Animation_vxmjh"]
 resource_name = "Run"
 length = 0.81666666
+loop_mode = 1
 tracks/0/type = "position_3d"
 tracks/0/imported = true
 tracks/0/enabled = true
@@ -1796,6 +1797,7 @@ tracks/49/keys = PackedFloat32Array(0, 1, 0.2809356, -0.06542409, 0.019199718, 0
 [sub_resource type="Animation" id="Animation_0awok"]
 resource_name = "Walk"
 length = 4.05
+loop_mode = 1
 tracks/0/type = "position_3d"
 tracks/0/imported = true
 tracks/0/enabled = true
@@ -2161,12 +2163,12 @@ radius = 0.214
 height = 0.4386673
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_igjkd"]
-radius = 0.189
-height = 2.1816769
+radius = 0.36
+height = 1.84
 
 [node name="Z1" type="CharacterBody3D" unique_id=260525653 groups=["zombie"]]
 collision_layer = 8
-collision_mask = 525
+collision_mask = 5
 axis_lock_angular_x = true
 axis_lock_angular_z = true
 script = ExtResource("1_igjkd")
@@ -2409,8 +2411,7 @@ bones/32/scale = Vector3(1, 1, 1.0000001)
 
 [node name="zOMBIES_001" type="MeshInstance3D" parent="Run/Skeleton3D" unique_id=1399862712]
 cast_shadow = 0
-ignore_occlusion_culling = true
-visibility_range_end = 120.0
+visibility_range_end = 165.0
 mesh = SubResource("ArrayMesh_w1ph2")
 skin = SubResource("Skin_uxnxb")
 skeleton = NodePath("..")
@@ -2759,17 +2760,8 @@ shape = SubResource("CapsuleShape3D_pgfi3")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1567967197]
 libraries/ = SubResource("AnimationLibrary_mpmed")
-speed_scale = 1.6
-
-[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=2120966854]
-path_search_max_polygons = 1
-
-[node name="Hit" type="Area3D" parent="." unique_id=812945280]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Hit" unique_id=877296404]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 1.3046986, -0.17136234)
-shape = SubResource("CapsuleShape3D_25gfb")
+speed_scale = 1.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=295459017]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0034270883, 1.0005827, -0.014587492)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94, 0)
 shape = SubResource("CapsuleShape3D_igjkd")

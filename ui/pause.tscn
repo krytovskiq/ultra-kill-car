@@ -1,16 +1,23 @@
 [gd_scene format=3 uid="uid://20fvn6sc06vd"]
 
 [ext_resource type="Script" uid="uid://brpq438fbrxpb" path="res://ui/pause.gd" id="1_45vjg"]
+[ext_resource type="Shader" path="res://ui/shaders/menu_accent_bar.gdshader" id="2_acc"]
+[ext_resource type="FontFile" path="res://assets/fonts/RubikDirt-Regular.ttf" id="3_dirt"]
+[ext_resource type="FontFile" path="res://assets/fonts/RussoOne-Regular.ttf" id="4_russo"]
+[ext_resource type="FontFile" path="res://assets/fonts/Jura-Variable.ttf" id="5_jura"]
+[ext_resource type="Shader" path="res://ui/shaders/menu_atmosphere_overlay.gdshader" id="6_atmos"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6hrxe"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pause_acc"]
+shader = ExtResource("2_acc")
+shader_parameter/base_color = Color(0.76, 0.22, 0.09, 1)
+shader_parameter/shimmer_color = Color(1, 0.62, 0.24, 1)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bo148"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dxkut"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yw1da"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vyjl0"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pause_atmos"]
+shader = ExtResource("6_atmos")
+shader_parameter/fog_tint = Color(0.28, 0.31, 0.32, 1)
+shader_parameter/ember_color = Color(0.96, 0.44, 0.16, 1)
+shader_parameter/scrim_strength = 0.72
+shader_parameter/fog_strength = 0.34
 
 [node name="Pause" type="CanvasLayer" unique_id=1078680632]
 process_mode = 3
@@ -18,57 +25,160 @@ script = ExtResource("1_45vjg")
 
 [node name="Control" type="Control" parent="." unique_id=1996119271]
 layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Control" unique_id=94034149]
+[node name="Backdrop" type="ColorRect" parent="Control" unique_id=1700200101]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+material = SubResource("ShaderMaterial_pause_atmos")
+
+[node name="PauseCard" type="PanelContainer" parent="Control" unique_id=1700200102]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -190.0
-offset_top = -70.5
-offset_right = 190.0
-offset_bottom = 70.5
+offset_left = -245.0
+offset_top = -215.0
+offset_right = 245.0
+offset_bottom = 215.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="contiue" type="Button" parent="Control/VBoxContainer" unique_id=1600546371]
+[node name="CardVBox" type="VBoxContainer" parent="Control/PauseCard" unique_id=1700200103]
 layout_mode = 2
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-text = "Продолжить"
+theme_override_constants/separation = 0
 
-[node name="menu" type="Button" parent="Control/VBoxContainer" unique_id=1812241365]
+[node name="TopAccent" type="ColorRect" parent="Control/PauseCard/CardVBox" unique_id=1700200104]
+custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-text = "Меню"
+material = SubResource("ShaderMaterial_pause_acc")
 
-[connection signal="pressed" from="Control/VBoxContainer/contiue" to="." method="_on_contiue_pressed"]
-[connection signal="pressed" from="Control/VBoxContainer/menu" to="." method="_on_menu_pressed"]
+[node name="CardMargin" type="MarginContainer" parent="Control/PauseCard/CardVBox" unique_id=1700200105]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/PauseCard/CardVBox/CardMargin" unique_id=94034149]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PauseTitle" type="Label" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer" unique_id=1700200106]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.87, 1)
+theme_override_fonts/font = ExtResource("3_dirt")
+theme_override_font_sizes/font_size = 38
+text = "ПАУЗА"
+horizontal_alignment = 1
+
+[node name="contiue" type="Button" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer" unique_id=1600546371]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.94, 0.9, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.98, 0.94, 1)
+theme_override_fonts/font = ExtResource("4_russo")
+theme_override_font_sizes/font_size = 26
+text = "ПРОДОЛЖИТЬ"
+
+[node name="GraphicsBtn" type="Button" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer" unique_id=1812249001]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.9, 0.92, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.9, 1)
+theme_override_fonts/font = ExtResource("4_russo")
+theme_override_font_sizes/font_size = 21
+text = "Графика: Высокое"
+
+[node name="Divider" type="HSeparator" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer" unique_id=1700200107]
+layout_mode = 2
+
+[node name="VolHeader" type="Label" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer" unique_id=1700200108]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.46, 0.22, 1)
+theme_override_fonts/font = ExtResource("4_russo")
+theme_override_font_sizes/font_size = 16
+text = "ГРОМКОСТЬ"
+
+[node name="RowMaster" type="HBoxContainer" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer" unique_id=1700200110]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LblMaster" type="Label" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/RowMaster" unique_id=1700200111]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.88, 0.9, 1)
+theme_override_fonts/font = ExtResource("5_jura")
+theme_override_font_sizes/font_size = 16
+text = "Общая"
+
+[node name="SliderMaster" type="HSlider" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/RowMaster" unique_id=1700200112]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+value = 85.0
+
+[node name="ValMaster" type="Label" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/RowMaster" unique_id=1700200113]
+custom_minimum_size = Vector2(46, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.4, 1)
+theme_override_fonts/font = ExtResource("4_russo")
+theme_override_font_sizes/font_size = 16
+text = "85%"
+horizontal_alignment = 2
+
+[node name="RowSfx" type="HBoxContainer" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer" unique_id=1700200114]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LblSfx" type="Label" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/RowSfx" unique_id=1700200115]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.88, 0.9, 1)
+theme_override_fonts/font = ExtResource("5_jura")
+theme_override_font_sizes/font_size = 16
+text = "Эффекты"
+
+[node name="SliderSfx" type="HSlider" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/RowSfx" unique_id=1700200116]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+value = 90.0
+
+[node name="ValSfx" type="Label" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/RowSfx" unique_id=1700200117]
+custom_minimum_size = Vector2(46, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.4, 1)
+theme_override_fonts/font = ExtResource("4_russo")
+theme_override_font_sizes/font_size = 16
+text = "90%"
+horizontal_alignment = 2
+
+[node name="menu" type="Button" parent="Control/PauseCard/CardVBox/CardMargin/VBoxContainer" unique_id=1812241365]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.72, 0.66, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.3, 0.2, 1)
+theme_override_colors/font_hover_color = Color(1, 0.88, 0.85, 1)
+theme_override_fonts/font = ExtResource("4_russo")
+theme_override_font_sizes/font_size = 24
+text = "В МЕНЮ"
+
+[connection signal="pressed" from="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/contiue" to="." method="_on_contiue_pressed"]
+[connection signal="pressed" from="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/GraphicsBtn" to="." method="_on_graphics_btn_pressed"]
+[connection signal="pressed" from="Control/PauseCard/CardVBox/CardMargin/VBoxContainer/menu" to="." method="_on_menu_pressed"]

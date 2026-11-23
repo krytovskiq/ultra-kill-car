@@ -2,77 +2,99 @@
 
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://levels/Generator.tscn" id="1_ecwwl"]
 [ext_resource type="Script" uid="uid://bl38sws02lfg6" path="res://ui/control.gd" id="1_lti8b"]
-[ext_resource type="Script" uid="uid://cx05c6ey2icc7" path="res://ui/canvas_layer.gd" id="2_ouk20"]
-[ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://environment/model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="4_kk3ma"]
-[ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://environment/model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_nrnbx"]
-[ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://environment/model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="6_iqepy"]
-[ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://environment/model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="7_h1wq0"]
+[ext_resource type="Shader" path="res://environment/shaders/atmospheric_sky.gdshader" id="2_skysh"]
+[ext_resource type="Script" path="res://ui/menu_diorama.gd" id="3_dior"]
+[ext_resource type="Shader" path="res://ui/shaders/menu_atmosphere_overlay.gdshader" id="4_atmos"]
+[ext_resource type="Shader" path="res://ui/shaders/menu_accent_bar.gdshader" id="5_acc"]
+[ext_resource type="FontFile" path="res://assets/fonts/RubikDirt-Regular.ttf" id="6_dirt"]
+[ext_resource type="FontFile" path="res://assets/fonts/RussoOne-Regular.ttf" id="7_russo"]
+[ext_resource type="FontFile" path="res://assets/fonts/Jura-Variable.ttf" id="8_jura"]
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dwrpx"]
-load_path = "res://.godot/imported/893483.PNG-230050ba5ad6169130c5d6919eabf779.s3tc.ctex"
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_epic"]
-sky_top_color = Color(0.25, 0.35, 0.5, 1)
-sky_horizon_color = Color(0.6, 0.65, 0.7, 1)
-sky_curve = 0.1
-ground_bottom_color = Color(0.1, 0.1, 0.1, 1)
-ground_horizon_color = Color(0.5, 0.5, 0.52, 1)
-ground_curve = 0.05
-sun_angle_max = 30.0
-sun_curve = 0.15
-
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_menu_sky"]
+shader = ExtResource("2_skysh")
+shader_parameter/sky_top_color = Color(0.13, 0.16, 0.19, 1)
+shader_parameter/sky_horizon_color = Color(0.34, 0.36, 0.35, 1)
+shader_parameter/ground_horizon_color = Color(0.28, 0.29, 0.28, 1)
+shader_parameter/ground_bottom_color = Color(0.12, 0.13, 0.13, 1)
+shader_parameter/cloud_lit_color = Color(0.48, 0.49, 0.48, 1)
+shader_parameter/cloud_shadow_color = Color(0.19, 0.22, 0.25, 1)
+shader_parameter/sun_glow_color = Color(0.82, 0.48, 0.28, 1)
+shader_parameter/sun_direction = Vector3(-0.42, 0.32, 0.85)
+shader_parameter/cloud_coverage = 0.72
+shader_parameter/cloud_speed = 0.02
+shader_parameter/haze_strength = 0.85
 
 [sub_resource type="Sky" id="Sky_jspdm"]
-sky_material = SubResource("ProceduralSkyMaterial_epic")
+sky_material = SubResource("ShaderMaterial_menu_sky")
 radiance_size = 2
 
 [sub_resource type="Environment" id="Environment_oxnod"]
 background_mode = 2
-background_color = Color(0.1, 0.1, 0.1, 1)
 sky = SubResource("Sky_jspdm")
-ambient_light_color = Color(0.45, 0.5, 0.55, 1)
-ambient_light_sky_contribution = 0.7
-ambient_light_energy = 1.0
-tonemap_mode = 3
+ambient_light_source = 3
+ambient_light_color = Color(0.38, 0.42, 0.44, 1)
+ambient_light_sky_contribution = 0.55
+ambient_light_energy = 0.44
+reflected_light_source = 2
+tonemap_mode = 2
 tonemap_exposure = 1.0
+tonemap_white = 6.0
 glow_enabled = true
-glow_intensity = 0.8
-glow_bloom = 0.05
-glow_blend_mode = 1
+glow_intensity = 0.28
+glow_bloom = 0.02
+glow_blend_mode = 2
+glow_hdr_threshold = 1.35
 fog_enabled = true
-fog_mode = 0
-fog_light_color = Color(0.55, 0.58, 0.6, 1)
-fog_light_energy = 1.0
-fog_density = 0.002
-fog_sky_affect = 0.05
-fog_height = 2.0
-fog_height_density = 0.04
-adjustment_enabled = true
-adjustment_contrast = 1.05
-adjustment_saturation = 0.85
+fog_mode = 1
+fog_light_color = Color(0.32, 0.35, 0.36, 1)
+fog_light_energy = 0.72
+fog_sun_scatter = 0.08
+fog_density = 0.94
+fog_sky_affect = 0.85
+fog_depth_curve = 1.25
+fog_depth_begin = 11.0
+fog_depth_end = 98.0
+adjustment_enabled = false
+adjustment_brightness = 1.0
+adjustment_contrast = 1.0
+adjustment_saturation = 1.0
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6hrxe"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_atmos"]
+shader = ExtResource("4_atmos")
+shader_parameter/fog_tint = Color(0.32, 0.36, 0.37, 1)
+shader_parameter/ember_color = Color(0.96, 0.46, 0.16, 1)
+shader_parameter/scrim_strength = 0.78
+shader_parameter/fog_strength = 0.44
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bo148"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_accent"]
+shader = ExtResource("5_acc")
+shader_parameter/base_color = Color(0.76, 0.22, 0.09, 1)
+shader_parameter/shimmer_color = Color(1, 0.62, 0.24, 1)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dxkut"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yw1da"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vyjl0"]
-
-[node name="Node3D" type="Node3D" unique_id=1935835138]
+[node name="MainMenu" type="Node3D" unique_id=1935835138]
+script = ExtResource("3_dior")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2132359110]
 environment = SubResource("Environment_oxnod")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=645698339]
-transform = Transform3D(1, 0, 0, 0, 0.21567276, 0.9764657, 0, -0.9764657, 0.21567276, 0, 6.286339, 0)
-light_bake_mode = 1light_energy = 0.8
-light_color = Color(0.95, 0.95, 0.9, 1)
-
+transform = Transform3D(0.882948, 0.262525, -0.38921, 0, 0.829038, 0.559193, 0.469472, -0.493738, 0.731997, 0, 12, 0)
+light_color = Color(0.78, 0.8, 0.82, 1)
+light_energy = 0.68
+light_bake_mode = 1
+shadow_enabled = false
+shadow_bias = 0.06
+shadow_normal_bias = 1.5
+directional_shadow_mode = 1
+directional_shadow_max_distance = 135.0
 
 [node name="WorldChunk" parent="." unique_id=560257719 instance=ExtResource("1_ecwwl")]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1262406334]
+transform = Transform3D(0.9321285, 0, 0.36212778, 0, 1, 0, -0.36212778, 0, 0.9321285, 3.35, 2.08, 28.2)
+current = true
+fov = 52.0
+far = 160.0
 
 [node name="Menu" type="Control" parent="." unique_id=1301859710]
 process_mode = 3
@@ -84,103 +106,153 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lti8b")
 
-[node name="Play" type="Button" parent="Menu" unique_id=1741259866]
+[node name="AtmosphereOverlay" type="ColorRect" parent="Menu" unique_id=1700100101]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -575.5
-offset_top = -67.0
-offset_right = -362.5
-offset_bottom = 2.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
+mouse_filter = 2
+material = SubResource("ShaderMaterial_atmos")
+
+[node name="LeftMargin" type="MarginContainer" parent="Menu" unique_id=1700100102]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 510.0
+grow_vertical = 2
+theme_override_constants/margin_left = 56
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 42
+
+[node name="LeftVBox" type="VBoxContainer" parent="Menu/LeftMargin" unique_id=1700100103]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SectorTag" type="Label" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100104]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.46, 0.24, 1)
+theme_override_fonts/font = ExtResource("8_jura")
+theme_override_font_sizes/font_size = 15
+text = "КАРАНТИННАЯ ТРАССА // СЕКТОР 04"
+
+[node name="TitleLabel" type="Label" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100105]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.92, 0.88, 1)
+theme_override_colors/font_shadow_color = Color(0.02, 0.02, 0.03, 0.85)
+theme_override_colors/font_outline_color = Color(0.05, 0.04, 0.04, 0.95)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 4
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("6_dirt")
+theme_override_font_sizes/font_size = 62
+text = "ULTRA KILL CAR"
+
+[node name="SubtitleLabel" type="Label" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100106]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.76, 0.78, 1)
+theme_override_fonts/font = ExtResource("8_jura")
+theme_override_font_sizes/font_size = 18
+text = "ПРОРВИСЬ СКВОЗЬ ТУМАН И ОРДУ"
+
+[node name="AccentBar" type="ColorRect" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100107]
+custom_minimum_size = Vector2(360, 4)
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+material = SubResource("ShaderMaterial_accent")
+
+[node name="NavSpacer" type="Control" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100108]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+
+[node name="Play" type="Button" parent="Menu/LeftMargin/LeftVBox" unique_id=1741259866]
+custom_minimum_size = Vector2(340, 56)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(0.98, 0.94, 0.88, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.72, 0.45, 1)
+theme_override_colors/font_hover_color = Color(1, 0.98, 0.94, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 30
 text = "ИГРАТЬ"
+alignment = 0
 
-[node name="Shop" type="Button" parent="Menu" unique_id=875364114]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -599.0
-offset_top = 18.5
-offset_right = -339.0
-offset_bottom = 87.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-text = " МАГАЗИН"
+[node name="Shop" type="Button" parent="Menu/LeftMargin/LeftVBox" unique_id=875364114]
+custom_minimum_size = Vector2(340, 50)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(0.88, 0.9, 0.91, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.94, 0.88, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 26
+text = "ГАРАЖ"
+alignment = 0
 
-[node name="Exit" type="Button" parent="Menu" unique_id=1651690242]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -598.0
-offset_top = 95.0
-offset_right = -338.0
-offset_bottom = 164.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-text = "ВЫХОД"
-
-[node name="SettingsButton" type="Button" parent="Menu"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -598.0
-offset_top = 175.0
-offset_right = -338.0
-offset_bottom = 244.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
+[node name="SettingsButton" type="Button" parent="Menu/LeftMargin/LeftVBox" unique_id=1805267227]
+custom_minimum_size = Vector2(340, 50)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(0.88, 0.9, 0.91, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.94, 0.88, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 26
 text = "НАСТРОЙКИ"
+alignment = 0
 
-[node name="SettingsPanel" type="ColorRect" parent="Menu"]
+[node name="Exit" type="Button" parent="Menu/LeftMargin/LeftVBox" unique_id=1651690242]
+custom_minimum_size = Vector2(340, 46)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(0.72, 0.74, 0.76, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.38, 0.28, 1)
+theme_override_colors/font_hover_color = Color(0.98, 0.65, 0.58, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 24
+text = "ВЫХОД"
+alignment = 0
+
+[node name="BottomSpacer" type="Control" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100109]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SelectedCarBadge" type="PanelContainer" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100110]
+custom_minimum_size = Vector2(390, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="BadgeLabel" type="Label" parent="Menu/LeftMargin/LeftVBox/SelectedCarBadge" unique_id=1700100111]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.84, 0.84, 1)
+theme_override_fonts/font = ExtResource("8_jura")
+theme_override_font_sizes/font_size = 16
+text = "ТЕХНИКА: PIKAP  |  ГРАФИКА: ВЫСОКОЕ"
+
+[node name="MoneyPanel" type="PanelContainer" parent="Menu" unique_id=1700100112]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_top = 28.0
+offset_right = -34.0
+offset_bottom = 84.0
+grow_horizontal = 0
+
+[node name="Money" type="Label" parent="Menu/MoneyPanel" unique_id=846240893]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.78, 0.32, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 28
+text = "0 $"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SettingsPanel" type="ColorRect" parent="Menu" unique_id=2136731717]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -188,73 +260,241 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.8)
+color = Color(0.02, 0.03, 0.04, 0.82)
 
-[node name="VBox" type="VBoxContainer" parent="Menu/SettingsPanel"]
+[node name="SettingsCard" type="PanelContainer" parent="Menu/SettingsPanel" unique_id=1700100120]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -150.0
-offset_right = 200.0
-offset_bottom = 150.0
+offset_left = -310.0
+offset_top = -255.0
+offset_right = 310.0
+offset_bottom = 255.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
 
-[node name="Label" type="Label" parent="Menu/SettingsPanel/VBox"]
+[node name="CardVBox" type="VBoxContainer" parent="Menu/SettingsPanel/SettingsCard" unique_id=1700100121]
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
-text = "ГРАФИКА"
+theme_override_constants/separation = 0
+
+[node name="TopAccent" type="ColorRect" parent="Menu/SettingsPanel/SettingsCard/CardVBox" unique_id=1700100122]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+material = SubResource("ShaderMaterial_accent")
+
+[node name="CardMargin" type="MarginContainer" parent="Menu/SettingsPanel/SettingsCard/CardVBox" unique_id=1700100123]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
+
+[node name="VBox" type="VBoxContainer" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin" unique_id=1255960889]
+layout_mode = 2
+theme_override_constants/separation = 11
+
+[node name="Header" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100124]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.87, 1)
+theme_override_fonts/font = ExtResource("6_dirt")
+theme_override_font_sizes/font_size = 34
+text = "НАСТРОЙКИ"
 horizontal_alignment = 1
 
-[node name="BtnPotato" type="Button" parent="Menu/SettingsPanel/VBox"]
+[node name="Label" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=374479701]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Картошка"
+theme_override_colors/font_color = Color(0.88, 0.46, 0.22, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 18
+text = "ГРАФИКА"
 
-[node name="BtnLow" type="Button" parent="Menu/SettingsPanel/VBox"]
+[node name="GraphicsRow" type="HBoxContainer" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100125]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Низкое"
+theme_override_constants/separation = 10
 
-[node name="BtnMedium" type="Button" parent="Menu/SettingsPanel/VBox"]
+[node name="BtnLow" type="Button" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow" unique_id=703374941]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Среднее"
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 18
+text = "НИЗКОЕ"
 
-[node name="BtnHigh" type="Button" parent="Menu/SettingsPanel/VBox"]
+[node name="BtnMedium" type="Button" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow" unique_id=1908523261]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Высокое"
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 18
+text = "СРЕДНЕЕ"
 
-[node name="BtnVeryHigh" type="Button" parent="Menu/SettingsPanel/VBox"]
+[node name="BtnHigh" type="Button" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow" unique_id=1926656651]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Очень высокое"
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 18
+text = "ВЫСОКОЕ"
 
-[node name="BtnMaximum" type="Button" parent="Menu/SettingsPanel/VBox"]
+[node name="BtnUltra" type="Button" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow" unique_id=777183532]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Максимальное"
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 18
+text = "УЛЬТРА"
 
-[node name="BtnClose" type="Button" parent="Menu/SettingsPanel/VBox"]
+[node name="PresetInfo" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=985124311]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
-theme_override_font_sizes/font_size = 35
-text = "Закрыть"
+theme_override_colors/font_color = Color(0.78, 0.82, 0.85, 1)
+theme_override_fonts/font = ExtResource("8_jura")
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+autowrap_mode = 2
 
-[connection signal="pressed" from="Menu/Play" to="Menu" method="_on_play_pressed"]
-[connection signal="pressed" from="Menu/Shop" to="Menu" method="_on_texture_button_pressed"]
-[connection signal="pressed" from="Menu/Exit" to="WorldChunk" method="_on_exit_pressed"]
-[connection signal="pressed" from="Menu/SettingsButton" to="Menu" method="_on_settings_pressed"]
-[connection signal="pressed" from="Menu/SettingsPanel/VBox/BtnPotato" to="Menu" method="_on_btn_potato_pressed"]
-[connection signal="pressed" from="Menu/SettingsPanel/VBox/BtnLow" to="Menu" method="_on_btn_low_pressed"]
-[connection signal="pressed" from="Menu/SettingsPanel/VBox/BtnMedium" to="Menu" method="_on_btn_medium_pressed"]
-[connection signal="pressed" from="Menu/SettingsPanel/VBox/BtnHigh" to="Menu" method="_on_btn_high_pressed"]
-[connection signal="pressed" from="Menu/SettingsPanel/VBox/BtnVeryHigh" to="Menu" method="_on_btn_very_high_pressed"]
-[connection signal="pressed" from="Menu/SettingsPanel/VBox/BtnMaximum" to="Menu" method="_on_btn_maximum_pressed"]
-[connection signal="pressed" from="Menu/SettingsPanel/VBox/BtnClose" to="Menu" method="_on_btn_close_pressed"]
+[node name="Divider" type="HSeparator" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100126]
+layout_mode = 2
+
+[node name="VolumeTitle" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100127]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.46, 0.22, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 18
+text = "ГРОМКОСТЬ"
+
+[node name="RowMaster" type="HBoxContainer" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100130]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LblMaster" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowMaster" unique_id=1700100131]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.9, 0.9, 1)
+theme_override_fonts/font = ExtResource("8_jura")
+theme_override_font_sizes/font_size = 17
+text = "Общая громкость"
+
+[node name="SliderMaster" type="HSlider" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowMaster" unique_id=1700100132]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+value = 85.0
+
+[node name="ValMaster" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowMaster" unique_id=1700100133]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.4, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 17
+text = "85%"
+horizontal_alignment = 2
+
+[node name="RowVehicles" type="HBoxContainer" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100134]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LblVehicles" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowVehicles" unique_id=1700100135]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.9, 0.9, 1)
+theme_override_fonts/font = ExtResource("8_jura")
+theme_override_font_sizes/font_size = 17
+text = "Двигатели и шины"
+
+[node name="SliderVehicles" type="HSlider" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowVehicles" unique_id=1700100136]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+value = 85.0
+
+[node name="ValVehicles" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowVehicles" unique_id=1700100137]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.4, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 17
+text = "85%"
+horizontal_alignment = 2
+
+[node name="RowSfx" type="HBoxContainer" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100138]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LblSfx" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowSfx" unique_id=1700100139]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.9, 0.9, 1)
+theme_override_fonts/font = ExtResource("8_jura")
+theme_override_font_sizes/font_size = 17
+text = "Эффекты и зомби"
+
+[node name="SliderSfx" type="HSlider" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowSfx" unique_id=1700100140]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+value = 90.0
+
+[node name="ValSfx" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowSfx" unique_id=1700100141]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.4, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 17
+text = "90%"
+horizontal_alignment = 2
+
+[node name="RowAmbience" type="HBoxContainer" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100142]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LblAmbience" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowAmbience" unique_id=1700100143]
+custom_minimum_size = Vector2(185, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.9, 0.9, 1)
+theme_override_fonts/font = ExtResource("8_jura")
+theme_override_font_sizes/font_size = 17
+text = "Атмосфера"
+
+[node name="SliderAmbience" type="HSlider" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowAmbience" unique_id=1700100144]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+value = 80.0
+
+[node name="ValAmbience" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowAmbience" unique_id=1700100145]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.4, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 17
+text = "80%"
+horizontal_alignment = 2
+
+[node name="CloseSpacer" type="Control" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=1700100146]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="BtnClose" type="Button" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox" unique_id=470927783]
+custom_minimum_size = Vector2(220, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.98, 0.78, 0.68, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.9, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 22
+text = "ЗАКРЫТЬ"
+
+[connection signal="pressed" from="Menu/LeftMargin/LeftVBox/Play" to="Menu" method="_on_play_pressed"]
+[connection signal="pressed" from="Menu/LeftMargin/LeftVBox/Shop" to="Menu" method="_on_texture_button_pressed"]
+[connection signal="pressed" from="Menu/LeftMargin/LeftVBox/SettingsButton" to="Menu" method="_on_settings_pressed"]
+[connection signal="pressed" from="Menu/LeftMargin/LeftVBox/Exit" to="Menu" method="_on_exit_pressed"]
+[connection signal="pressed" from="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow/BtnLow" to="Menu" method="_on_btn_low_pressed"]
+[connection signal="pressed" from="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow/BtnMedium" to="Menu" method="_on_btn_medium_pressed"]
+[connection signal="pressed" from="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow/BtnHigh" to="Menu" method="_on_btn_high_pressed"]
+[connection signal="pressed" from="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow/BtnUltra" to="Menu" method="_on_btn_ultra_pressed"]
+[connection signal="pressed" from="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/BtnClose" to="Menu" method="_on_btn_close_pressed"]

@@ -1,0 +1,254 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/death_screen.gd" id="1_dscr"]
+[ext_resource type="Shader" path="res://ui/shaders/menu_atmosphere_overlay.gdshader" id="2_atmos"]
+[ext_resource type="Shader" path="res://ui/shaders/menu_accent_bar.gdshader" id="3_acc"]
+[ext_resource type="FontFile" path="res://assets/fonts/RubikDirt-Regular.ttf" id="4_dirt"]
+[ext_resource type="FontFile" path="res://assets/fonts/RussoOne-Regular.ttf" id="5_russo"]
+[ext_resource type="FontFile" path="res://assets/fonts/Jura-Variable.ttf" id="6_jura"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_death_atmos"]
+shader = ExtResource("2_atmos")
+shader_parameter/fog_tint = Color(0.28, 0.07, 0.06, 1)
+shader_parameter/ember_color = Color(1, 0.34, 0.12, 1)
+shader_parameter/scrim_strength = 0.84
+shader_parameter/fog_strength = 0.56
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_death_acc"]
+shader = ExtResource("3_acc")
+shader_parameter/base_color = Color(0.76, 0.16, 0.08, 1)
+shader_parameter/shimmer_color = Color(1, 0.48, 0.2, 1)
+
+[node name="DeathScreen" type="CanvasLayer"]
+process_mode = 3
+layer = 20
+script = ExtResource("1_dscr")
+
+[node name="RootControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AtmosphereOverlay" type="ColorRect" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+material = SubResource("ShaderMaterial_death_atmos")
+
+[node name="DeathCard" type="PanelContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -285.0
+offset_top = -245.0
+offset_right = 285.0
+offset_bottom = 245.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardVBox" type="VBoxContainer" parent="RootControl/DeathCard"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TopAccent" type="ColorRect" parent="RootControl/DeathCard/CardVBox"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+mouse_filter = 2
+material = SubResource("ShaderMaterial_death_acc")
+
+[node name="CardMargin" type="MarginContainer" parent="RootControl/DeathCard/CardVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 24
+
+[node name="InnerVBox" type="VBoxContainer" parent="RootControl/DeathCard/CardVBox/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectorTag" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.42, 0.22, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 14
+text = "СИГНАЛ ПОТЕРЯН // РЕЙД ЗАВЕРШЁН"
+horizontal_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.91, 0.87, 1)
+theme_override_colors/font_shadow_color = Color(0.02, 0.01, 0.01, 0.9)
+theme_override_colors/font_outline_color = Color(0.18, 0.03, 0.03, 0.95)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 4
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("4_dirt")
+theme_override_font_sizes/font_size = 56
+text = "ТЫ ПОГИБ"
+horizontal_alignment = 1
+
+[node name="ReasonLabel" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.42, 0.26, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 18
+text = "МАШИНА УНИЧТОЖЕНА"
+horizontal_alignment = 1
+
+[node name="CarTag" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.7, 0.72, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 13
+text = "ТЕХНИКА: PIKAP  //  ПОТЕРИ ПОДТВЕРЖДЕНЫ"
+horizontal_alignment = 1
+
+[node name="StatsGrid" type="GridContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="StatDistance" type="PanelContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatDistance"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Lbl" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatDistance/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.68, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 13
+text = "ПРОЙДЕНО"
+
+[node name="ValDistance" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatDistance/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.93, 0.9, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 24
+text = "0 М"
+
+[node name="StatKills" type="PanelContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatKills"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Lbl" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatKills/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.68, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 13
+text = "УБИТО ЗОМБИ"
+
+[node name="ValKills" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatKills/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.34, 0.24, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 24
+text = "0 ЗОМБИ"
+
+[node name="StatEarned" type="PanelContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatEarned"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Lbl" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatEarned/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.68, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 13
+text = "ЗАРАБОТАНО"
+
+[node name="ValEarned" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatEarned/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.78, 0.32, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 24
+text = "+0 $"
+
+[node name="StatBalance" type="PanelContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatBalance"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Lbl" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatBalance/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.68, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 13
+text = "БАЛАНС"
+
+[node name="ValBalance" type="Label" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/StatsGrid/StatBalance/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.78, 0.32, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 24
+text = "0 $"
+
+[node name="BtnSpacer" type="Control" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="BtnRetry" type="Button" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.94, 0.88, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.72, 0.45, 1)
+theme_override_colors/font_hover_color = Color(1, 0.98, 0.94, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 26
+text = "ЗАНОВО"
+
+[node name="SecondaryRow" type="HBoxContainer" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BtnGarage" type="Button" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/SecondaryRow"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.88, 0.9, 0.91, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.9, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 20
+text = "ГАРАЖ"
+
+[node name="BtnMenu" type="Button" parent="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/SecondaryRow"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.84, 0.86, 0.88, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.9, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 20
+text = "В МЕНЮ"
+
+[connection signal="pressed" from="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/BtnRetry" to="." method="_on_retry_pressed"]
+[connection signal="pressed" from="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/SecondaryRow/BtnGarage" to="." method="_on_garage_pressed"]
+[connection signal="pressed" from="RootControl/DeathCard/CardVBox/CardMargin/InnerVBox/SecondaryRow/BtnMenu" to="." method="_on_menu_pressed"]

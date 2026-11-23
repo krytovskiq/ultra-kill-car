@@ -23,6 +23,7 @@
 [ext_resource type="Texture2D" uid="uid://du5lan442km8" path="res://entities/vehicles/texture/fuel.png" id="19_swx1t"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://ui/pause.tscn" id="20_4q5ps"]
 [ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://entities/camera/camera_3d.tscn" id="21_fa5bw"]
+[ext_resource type="Script" uid="uid://dq0g0awqtu4c8" path="res://entities/vehicles/raycast_wheel.gd" id="22_rcwhl"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dj3lu"]
 resource_name = "2E_15_1C_1F"
@@ -957,21 +958,18 @@ bg_color = Color(0, 0.92156863, 0, 1)
 corner_detail = 1
 anti_aliasing = false
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6086m"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_pikap_kill"]
+size = Vector3(2.14, 1.28, 1.35)
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2u6gl"]
-radius = 0.832
-height = 4.777
+[sub_resource type="BoxShape3D" id="BoxShape3D_pikap_hull"]
+size = Vector3(1.92, 1.06, 4.56)
 
-[node name="pikap" type="VehicleBody3D" unique_id=1275802987]
+[node name="pikap" type="RigidBody3D" unique_id=1275802987]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 collision_mask = 517
-mass = 1800.0
-gravity_scale = 0.9
+mass = 2100.0
 center_of_mass_mode = 1
 can_sleep = false
-linear_damp = 0.05
-angular_damp = 5.0
 script = ExtResource("1_xmiyf")
 DeadParticles = ExtResource("2_m3jsh")
 
@@ -979,63 +977,47 @@ DeadParticles = ExtResource("2_m3jsh")
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = SubResource("ArrayMesh_ixvxa")
 
-[node name="VehicleWheel3D6" type="VehicleWheel3D" parent="." unique_id=777896494]
+[node name="VehicleWheel3D6" type="RayCast3D" parent="." unique_id=777896494]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7663876, 0.3728347, -1.3843995)
-use_as_traction = true
-use_as_steering = true
-wheel_roll_influence = 0.655
+script = ExtResource("22_rcwhl")
 wheel_radius = 0.377
-wheel_friction_slip = 4.0
-suspension_stiffness = 80.0
-suspension_max_force = 20000.0
-damping_compression = 10.0
-damping_relaxation = 12.0
+rest_length = 0.2
 
 [node name="Wheel4" type="MeshInstance3D" parent="VehicleWheel3D6" unique_id=1291120298]
 transform = Transform3D(-4.371139e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.371139e-08, 0.7663876, -0.3728347, 1.3843995)
 mesh = SubResource("ArrayMesh_qyvxa")
 
-[node name="VehicleWheel3D7" type="VehicleWheel3D" parent="." unique_id=450442478]
+[node name="VehicleWheel3D7" type="RayCast3D" parent="." unique_id=450442478]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.766, 0.373, 1.426)
-use_as_traction = true
-wheel_roll_influence = 0.655
+script = ExtResource("22_rcwhl")
+is_front = false
+use_as_steering = false
 wheel_radius = 0.377
-wheel_friction_slip = 4.0
-suspension_stiffness = 80.0
-suspension_max_force = 20000.0
-damping_compression = 10.0
-damping_relaxation = 12.0
+rest_length = 0.2
 
 [node name="Wheel3" type="MeshInstance3D" parent="VehicleWheel3D7" unique_id=108954237]
 transform = Transform3D(-4.371139e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.371139e-08, 0.673067, -0.373, -1.4259999)
 mesh = SubResource("ArrayMesh_oomhd")
 
-[node name="VehicleWheel3D8" type="VehicleWheel3D" parent="." unique_id=182629625]
+[node name="VehicleWheel3D8" type="RayCast3D" parent="." unique_id=182629625]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.768, 0.373, -1.384)
-use_as_traction = true
-use_as_steering = true
-wheel_roll_influence = 0.655
+script = ExtResource("22_rcwhl")
+is_left = false
 wheel_radius = 0.377
-wheel_friction_slip = 4.0
-suspension_stiffness = 80.0
-suspension_max_force = 20000.0
-damping_compression = 10.0
-damping_relaxation = 12.0
+rest_length = 0.2
 
 [node name="Wheel" type="MeshInstance3D" parent="VehicleWheel3D8" unique_id=1948288338]
 transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, -0.768, -0.373, 1.384)
 mesh = SubResource("ArrayMesh_lhu12")
 
-[node name="VehicleWheel3D9" type="VehicleWheel3D" parent="." unique_id=770729457]
+[node name="VehicleWheel3D9" type="RayCast3D" parent="." unique_id=770729457]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.367, 1.4223075)
-use_as_traction = true
-wheel_roll_influence = 0.655
-wheel_radius = 0.36
-wheel_friction_slip = 4.0
-suspension_stiffness = 80.0
-suspension_max_force = 20000.0
-damping_compression = 10.0
-damping_relaxation = 12.0
+script = ExtResource("22_rcwhl")
+is_front = false
+is_left = false
+use_as_steering = false
+wheel_radius = 0.377
+rest_length = 0.2
 
 [node name="Wheel2" type="MeshInstance3D" parent="VehicleWheel3D9" unique_id=1680400734]
 transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, -0.7410472, -0.367, -1.4223076)
@@ -1142,17 +1124,16 @@ texture = ExtResource("19_swx1t")
 visible = false
 
 [node name="Area3D" type="Area3D" parent="." unique_id=1628694363]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.9563277e-08, 0.94620615, -2.1634161)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.86, -2.06)
 collision_layer = 0
 collision_mask = 13
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=1936966897]
-transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0.032888338, -0.15406555, 0.27778935)
-shape = SubResource("CapsuleShape3D_6086m")
+shape = SubResource("BoxShape3D_pikap_kill")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=1502293925]
-transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, -0.99999994, 0, 0.99999994, -4.3711385e-08, -0.042439595, 1.001566, 0.04143682)
-shape = SubResource("CapsuleShape3D_2u6gl")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.91, 0.04)
+shape = SubResource("BoxShape3D_pikap_hull")
 
 [node name="look" type="Node3D" parent="." unique_id=1483723752]
 transform = Transform3D(0.38779354, 0, -0.92174625, 0, 1, 0, 0.92174625, 0, 0.38779354, 0, 1.2149, 0)

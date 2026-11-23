@@ -22,129 +22,171 @@
 [ext_resource type="Texture2D" uid="uid://dymyu702nhlow" path="res://entities/vehicles/texture/check.png" id="15_mye8l"]
 [ext_resource type="Texture2D" uid="uid://du5lan442km8" path="res://entities/vehicles/texture/fuel.png" id="16_olbw5"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://ui/pause.tscn" id="19_v458n"]
+[ext_resource type="Script" uid="uid://dq0g0awqtu4c8" path="res://entities/vehicles/raycast_wheel.gd" id="20_rcwhl"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mcq5y"]
 resource_name = "6A_F3_A5_32.001"
 cull_mode = 2
-albedo_color = Color(0.8, 0.8, 0.8, 1)
 albedo_texture = ExtResource("2_36car")
-metallic = 0.3
-roughness = 0.25
+metallic = 0.62
+roughness = 0.3
+rim_enabled = true
+rim = 0.2
+rim_tint = 0.4
+clearcoat_enabled = true
+clearcoat = 0.7
+clearcoat_roughness = 0.16
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t02o5"]
 resource_name = "77_AB_51_6E.001"
 cull_mode = 2
 albedo_texture = ExtResource("3_axoys")
-roughness = 0.5
+metallic = 0.65
+roughness = 0.36
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_crkhi"]
 resource_name = "FA_4C_DE_E9.001"
 cull_mode = 2
 albedo_texture = ExtResource("4_miysu")
-roughness = 0.5
+metallic = 0.65
+roughness = 0.36
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hqe4a"]
 resource_name = "3C_43_A9_7B.001"
-transparency = 4
+transparency = 2
+alpha_scissor_threshold = 0.35
+alpha_antialiasing_mode = 0
 cull_mode = 2
 albedo_texture = ExtResource("5_mye8l")
-metallic = 0.3
-roughness = 0.5
+metallic = 0.55
+roughness = 0.25
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0lnim"]
 resource_name = "60_E9_8F_09.001"
 cull_mode = 2
-albedo_color = Color(0.061008543, 0.061008543, 0.061008543, 1)
-metallic = 0.1
-roughness = 0.3
+albedo_color = Color(0.1, 0.1, 0.12, 1)
+metallic = 0.45
+roughness = 0.38
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_640h7"]
 resource_name = "90_81_47_6D.001"
 cull_mode = 2
-albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-metallic = 1.0
-roughness = 0.05
+albedo_color = Color(0.96, 0.98, 1, 1)
+metallic = 0.96
+roughness = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vkgct"]
 resource_name = "A2_BA_7A_35.001"
 cull_mode = 2
-albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
-roughness = 0.5
+albedo_color = Color(0.88, 0.9, 0.94, 1)
+metallic = 0.75
+roughness = 0.25
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dc15m"]
 resource_name = "DE_AD_8F_7A.001"
 transparency = 4
 cull_mode = 2
 albedo_texture = ExtResource("6_olbw5")
-metallic = 0.3
-roughness = 0.5
+metallic = 0.45
+roughness = 0.35
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_auwln"]
 resource_name = "BF_99_00_F4.001"
 cull_mode = 2
 albedo_texture = ExtResource("7_qbdnx")
-roughness = 0.5
+metallic = 0.2
+roughness = 0.6
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mrkt0"]
 resource_name = "87_43_AC_1F.001"
 cull_mode = 2
 albedo_texture = ExtResource("8_nb2yy")
-roughness = 0.5
+metallic = 0.15
+roughness = 0.65
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htwnt"]
 resource_name = "A1_18_D1_83.001"
 transparency = 4
 cull_mode = 2
-albedo_color = Color(1, 1, 1, 0.25)
+albedo_color = Color(0.08, 0.13, 0.18, 0.58)
 albedo_texture = ExtResource("9_v458n")
-roughness = 0.0
+metallic = 0.85
+roughness = 0.06
+clearcoat_enabled = true
+clearcoat = 0.9
+clearcoat_roughness = 0.05
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ri1wh"]
 resource_name = "C0_2D_32_0D.001"
 transparency = 4
 cull_mode = 2
-albedo_color = Color(1, 1, 1, 0.25)
+albedo_color = Color(0.08, 0.13, 0.18, 0.58)
 albedo_texture = ExtResource("10_0d7se")
-roughness = 0.0
+metallic = 0.85
+roughness = 0.06
+clearcoat_enabled = true
+clearcoat = 0.9
+clearcoat_roughness = 0.05
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oohv5"]
 resource_name = "80_8B_90_5B.001"
 cull_mode = 2
 albedo_texture = ExtResource("4_miysu")
-roughness = 0.5
+metallic = 0.65
+roughness = 0.36
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gjust"]
 resource_name = "8D_59_E9_AE.001"
 cull_mode = 2
 albedo_texture = ExtResource("11_cse3p")
-roughness = 0.5
+metallic = 0.2
+roughness = 0.2
+emission_enabled = true
+emission = Color(1, 0.16, 0.1, 1)
+emission_energy_multiplier = 2.6
+emission_operator = 1
+emission_texture = ExtResource("11_cse3p")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2qf0r"]
 resource_name = "15_33_35_A0.001"
 cull_mode = 2
 albedo_texture = ExtResource("11_cse3p")
-roughness = 0.5
+metallic = 0.2
+roughness = 0.15
+emission_enabled = true
+emission = Color(1, 0.94, 0.8, 1)
+emission_energy_multiplier = 3.5
+emission_operator = 1
+emission_texture = ExtResource("11_cse3p")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x5vcg"]
 resource_name = "38_50_87_0A.001"
 cull_mode = 2
 albedo_texture = ExtResource("11_cse3p")
-metallic = 1.0
-roughness = 0.0
+metallic = 0.35
+roughness = 0.12
+emission_enabled = true
+emission = Color(1, 0.85, 0.72, 1)
+emission_energy_multiplier = 1.8
+emission_operator = 1
+emission_texture = ExtResource("11_cse3p")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i4e87"]
 resource_name = "30_D3_9B_B7.001"
 cull_mode = 2
 albedo_texture = ExtResource("11_cse3p")
-roughness = 0.5
+metallic = 0.75
+roughness = 0.28
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5ejjv"]
 resource_name = "04_86_B6_B7.001"
-transparency = 4
+transparency = 2
+alpha_scissor_threshold = 0.35
+alpha_antialiasing_mode = 0
 cull_mode = 2
 albedo_texture = ExtResource("12_plfow")
-metallic = 0.3
-roughness = 0.5
+metallic = 0.65
+roughness = 0.36
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_uwyn7"]
 _surfaces = [{
@@ -621,23 +663,24 @@ corner_detail = 1
 anti_aliasing = false
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_36car"]
-size = Vector3(2.180805, 0.6887671, 0.77432853)
+size = Vector3(2.3, 1.24, 1.38)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_miysu"]
-size = Vector3(1.1137769, 2.1274843, 4.9941254)
+size = Vector3(2.08, 1.02, 4.98)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_miysu"]
+cull_mode = 2
+albedo_color = Color(0.92, 0.95, 0.98, 1)
 albedo_texture = ExtResource("14_36car")
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_3kmr4"]
-resource_name = "carson_fastback_0"
+metallic = 0.9
+roughness = 0.2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d6hn0"]
 resource_name = "01_7C_BB_4D"
-transparency = 4
 cull_mode = 2
-albedo_texture = SubResource("CompressedTexture2D_3kmr4")
-metallic = 1.0
+albedo_color = Color(0.92, 0.95, 0.98, 1)
+albedo_texture = ExtResource("14_36car")
+metallic = 0.9
 roughness = 0.2
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_v458n"]
@@ -675,15 +718,23 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_v458n")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_olbw5"]
+cull_mode = 2
+albedo_color = Color(0.78, 0.78, 0.82, 1)
 albedo_texture = ExtResource("15_axoys")
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_4gv03"]
-resource_name = "carson_fastback_1"
+roughness = 0.84
+rim_enabled = true
+rim = 0.12
+rim_tint = 0.25
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_row8u"]
 resource_name = "7D_A9_87_75"
 cull_mode = 2
-albedo_texture = SubResource("CompressedTexture2D_4gv03")
+albedo_color = Color(0.78, 0.78, 0.82, 1)
+albedo_texture = ExtResource("15_axoys")
+roughness = 0.84
+rim_enabled = true
+rim = 0.12
+rim_tint = 0.25
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_0d7se"]
 _surfaces = [{
@@ -738,15 +789,13 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_v458n")
 
-[node name="Doge" type="VehicleBody3D" unique_id=2028712422]
+[node name="Doge" type="RigidBody3D" unique_id=2028712422]
 transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0, 0, 0)
 collision_mask = 517
-mass = 1500.0
-gravity_scale = 0.9
+mass = 1800.0
 center_of_mass_mode = 1
+center_of_mass = Vector3(0, 0.25, 0)
 can_sleep = false
-linear_damp = 0.05
-angular_damp = 5.0
 script = ExtResource("1_36car")
 DeadParticles = ExtResource("2_qbdnx")
 
@@ -756,7 +805,7 @@ transform = Transform3D(1, 0, 0, 0, 2.220446e-16, 1, 0, -1, 2.220446e-16, 0, 0, 
 [node name="root" type="Node3D" parent="Sketchfab_model" unique_id=1705233765]
 
 [node name="Object_83" type="MeshInstance3D" parent="Sketchfab_model/root" unique_id=1907011278]
-transform = Transform3D(-1.1, -8.8953905e-10, 1.0193107e-07, 0, 1.1659555, 0.010175141, -9.616505e-08, 0.010175141, -1.1659555, -1.015, 1.957, 0.6)
+transform = Transform3D(-1.1, 0, 0, 0, 1.166, 0, 0, 0, -1.166, -0.879, 1.602, 0.62)
 mesh = SubResource("ArrayMesh_p51e5")
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=689880926]
@@ -860,30 +909,21 @@ texture = ExtResource("16_olbw5")
 visible = false
 
 [node name="Area3D" type="Area3D" parent="." unique_id=900741093]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94620615, -2.8447406)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.82, -2.28)
 collision_layer = 0
 collision_mask = 13
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=1503142467]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07924715, -0.34108055, 0.18280149)
 shape = SubResource("BoxShape3D_36car")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=1769451812]
-transform = Transform3D(-4.371139e-08, -1, -1.8474111e-13, 1, -4.371139e-08, -7.919965e-21, 0, -1.8474111e-13, 1, -0.100056775, 0.80609834, -0.17389329)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0.05)
 shape = SubResource("BoxShape3D_miysu")
 
-[node name="VehicleWheel3D6" type="VehicleWheel3D" parent="." unique_id=682092696]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.367, -2.027)
-use_as_traction = true
-use_as_steering = true
-wheel_roll_influence = 0.8
-wheel_radius = 0.36
-wheel_friction_slip = 4.5
-suspension_travel = 0.15
-suspension_stiffness = 120.0
-suspension_max_force = 20000.0
-damping_compression = 14.0
-damping_relaxation = 16.0
+[node name="VehicleWheel3D6" type="RayCast3D" parent="." unique_id=682092696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.96, 0.36, -1.605)
+script = ExtResource("20_rcwhl")
+grip_multiplier = 0.755
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D6" unique_id=2089244218]
 
@@ -897,17 +937,12 @@ transform = Transform3D(-0.285, 0, -1.0766001e-07, 0, 0.713, 0, 4.3033804e-08, 0
 material_override = SubResource("StandardMaterial3D_olbw5")
 mesh = SubResource("ArrayMesh_12ppg")
 
-[node name="VehicleWheel3D7" type="VehicleWheel3D" parent="." unique_id=1306647167]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0503914, 0.367, 1.2131228)
-use_as_traction = true
-wheel_roll_influence = 0.8
-wheel_radius = 0.36
-wheel_friction_slip = 4.5
-suspension_travel = 0.15
-suspension_stiffness = 120.0
-suspension_max_force = 20000.0
-damping_compression = 14.0
-damping_relaxation = 16.0
+[node name="VehicleWheel3D7" type="RayCast3D" parent="." unique_id=1306647167]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.96, 0.36, 1.605)
+script = ExtResource("20_rcwhl")
+is_front = false
+use_as_steering = false
+grip_multiplier = 0.755
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D7" unique_id=881748876]
 
@@ -921,18 +956,11 @@ transform = Transform3D(-0.285, 0, -1.0766001e-07, 0, 0.713, 0, 4.3033804e-08, 0
 material_override = SubResource("StandardMaterial3D_olbw5")
 mesh = SubResource("ArrayMesh_12ppg")
 
-[node name="VehicleWheel3D8" type="VehicleWheel3D" parent="." unique_id=28814378]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.367, -2.027)
-use_as_traction = true
-use_as_steering = true
-wheel_roll_influence = 0.8
-wheel_radius = 0.36
-wheel_friction_slip = 4.5
-suspension_travel = 0.15
-suspension_stiffness = 120.0
-suspension_max_force = 20000.0
-damping_compression = 14.0
-damping_relaxation = 16.0
+[node name="VehicleWheel3D8" type="RayCast3D" parent="." unique_id=28814378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.96, 0.36, -1.605)
+script = ExtResource("20_rcwhl")
+is_left = false
+grip_multiplier = 0.755
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D8" unique_id=779290469]
 
@@ -946,17 +974,13 @@ transform = Transform3D(0.285, 0, 0, 0, 0.713, 0, 0, 0, 0.713, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_olbw5")
 mesh = SubResource("ArrayMesh_12ppg")
 
-[node name="VehicleWheel3D9" type="VehicleWheel3D" parent="." unique_id=1483567243]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.367, 1.213)
-use_as_traction = true
-wheel_roll_influence = 0.8
-wheel_radius = 0.36
-wheel_friction_slip = 4.5
-suspension_travel = 0.15
-suspension_stiffness = 120.0
-suspension_max_force = 20000.0
-damping_compression = 14.0
-damping_relaxation = 16.0
+[node name="VehicleWheel3D9" type="RayCast3D" parent="." unique_id=1483567243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.96, 0.36, 1.605)
+script = ExtResource("20_rcwhl")
+is_front = false
+is_left = false
+use_as_steering = false
+grip_multiplier = 0.755
 
 [node name="C2_33_8B_35_66" type="Node3D" parent="VehicleWheel3D9" unique_id=128885941]
 
@@ -974,4 +998,4 @@ mesh = SubResource("ArrayMesh_12ppg")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2149, 0)
 
 [node name="Camera3D" parent="look" unique_id=1271028786 instance=ExtResource("2_ti1hc")]
-transform = Transform3D(0.21579377, 0.93885624, -0.26829472, 0.38785973, -0.3345797, -0.8588488, -0.8961015, 0.08127349, -0.4363447, 0, 2.2495344, 5.018093)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 5.2)

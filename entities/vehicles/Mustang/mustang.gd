@@ -1,230 +1,86 @@
-extends VehicleBody3D
+extends "res://entities/vehicles/vehicle_base.gd"
 
-var total_distance: float = 0.0
-var start_z_position: float = 0.0
+const MUSTANG_SHADOW_TEX: Texture2D = preload("res://entities/vehicles/textures/shadow_mustang.png")
 
-@export_group("Driving")
-@export var STEER_SPEED: float = 2.5
-@export var STEER_LIMIT: float = 0.35
-@export var engine_force_value: int = 7500
-@export var brake_force: float = 90.0
-@export var MAX_SPEED_KMH: int = 220
+func _init() -> void:
+	# ==============================================================================
+	# НАСТРОЙКИ СПОРТКАРА MUSTANG — МОЖНО РЕДАКТИРОВАТЬ ПОД СЕБЯ
+	# ==============================================================================
 
-@export_group("Health")
-@export var health: int = 10000
-@export var collision_damage_multiplier: float = 0.35
+	# --- Руль и управление ---
+	STEER_SPEED = 2.15                  ## Быстрый спортивный отклик руля
+	STEER_LIMIT = 0.39                  ## Макс. выворот колёс
+	steer_inertia = 7.6
+	high_speed_steer_min_ratio = 0.21
 
-@export_group("Zombie Collision")
-@export var wall_damage_min_speed_mps: float = 5.0
-@export var crash_death_speed_mps: float = 20.0
+	# --- Двигатель, разгон и максималка ---
+	throttle_response = 6.2             ## Резкий отклик спортивного мотора
+	throttle_release_rate = 6.8
+	engine_force_value = 8200           ## Сила двигателя
+	MAX_SPEED_KMH = 232                 ## Макс. скорость в стоке (км/ч, качается в гараже)
+	brake_force = 104.0                 ## Цепкие дисковые тормоза
+	max_brake_decel_mps2 = 9.8
+	aero_drag_coeff = 0.42
+	gear_speed_ratios = [0.19, 0.38, 0.58, 0.80, 1.04]
+	gear_torque_multipliers = [1.78, 1.44, 1.12, 0.88, 0.66]
 
-@export_group("Fuel")
-@export var max_fuel: int = 100
-@export var fuel_consumption: float = 1.0
+	# --- Подвеска, колёса и устойчивость ---
+	suspension_firmness = 1.24          ## Жёсткая спортивная подвеска
+	compression_damping_ratio = 0.50    ## Демпфирование сжатия на кочках и ямах
+	rebound_damping_ratio = 0.68        ## Демпфирование отбоя пружин
+	anti_roll_stiffness = 9200.0        ## Жёсткий стабилизатор против кренов
+	front_spring_stiffness = 62000.0    ## Жёсткость передних пружин (Н/м)
+	rear_spring_stiffness = 60000.0     ## Жёсткость задних пружин (Н/м)
+	front_rest_length_scale = 0.90      ## Заниженный передний клиренс (множитель хода)
+	rear_rest_length_scale = 0.94       ## Задний клиренс (множитель хода)
+	front_grip_bias = 1.04              ## Баланс цепкости передних шин
+	rear_grip_bias = 1.06               ## Баланс цепкости задних шин
+	suspension_travel_speed = 23.0      ## Быстрая отработка визуала колёс
+	weight_transfer_long = 0.20         ## Продольный перенос веса (клевки/приседания)
+	weight_transfer_lat = 0.21          ## Поперечный перенос веса в поворотах
+	com_height = 0.29                   ## Низкий центр масс спорткара
+	com_z_offset = -0.06                ## Почти нейтральная развесовка по осям
+	wheelbase_m = 2.78                  ## Короткая манёвренная база (м)
+	steering_scrub_drag = 0.11          ## Сопротивление шин при повороте
+	impact_momentum_keep = 0.64         ## Лёгкий кузов сильнее тормозится о преграды (0..1)
+	body_roll_torque_factor = 0.46      ## Минимальный боковой крен
+	body_pitch_torque_factor = 0.44     ## Минимальный клевок при торможении
+	lateral_stiffness = 13.4            ## Цепкие широкие спортивные шины
+	tire_friction = 2.50                ## Высокий коэффициент сцепления с асфальтом
+	drift_grip_factor = 0.78            ## Сцепление при скольжении в заносе
+	yaw_stability_assist = 2.3          ## Стабилизация курса на высокой скорости
+	hull_half_extents = Vector2(0.96, 2.30) ## Габариты половины кузова (ширина, длина)
 
-@export var DeadParticles: PackedScene
+	# --- Звук и свет ---
+	engine_sound_id = "mustang"
+	engine_pitch_scale = 1.02
+	has_exhaust_backfire = true
+	gear_shift_pitch_base = 1.08
+	shadow_texture = MUSTANG_SHADOW_TEX
+	headlight_positions = [Vector3(-0.75, 0.78, -1.98), Vector3(0.75, 0.78, -1.98)]
+	taillight_positions = [Vector3(-0.62, 0.84, 2.34), Vector3(0.62, 0.84, 2.34)]
+	headlight_lens_size = Vector2(0.28, 0.28)
+	taillight_lens_size = Vector2(0.42, 0.22)
+	headlight_proj_size = Vector2(13.5, 36.0)
+	headlight_proj_z_start = -2.12
+	taillight_proj_size = Vector2(3.6, 2.2)
+	taillight_proj_z_start = 2.30
+	shadow_blob_size = Vector2(4.40, 8.26)
+	shadow_offset = Vector2(-0.02, 0.07)
 
-var current_fuel: float = 0.0
-var current_hp: int = 0
-var destroyed: bool = false
-var death_shader = preload("res://entities/vehicles/Death_shader.gdshader")
-@export_group("Enemy Damage")
-@export var damage_per_second: int = 10
-var damage_timer: float = 0.0
-
-var _tire_smokes: Array[CPUParticles3D] = []
-var _exhaust: CPUParticles3D = null
+	# --- Прочность и топливо ---
+	health = 1500                       ## Базовая прочность HP (качается в гараже)
+	engine_hood_offset = Vector3(0.0, 0.84, -1.65)
+	car_paint_color = Color(0.68, 0.64, 0.16)
+	zombie_damage_taken = 5
+	crash_death_speed_mps = 26.0
+	max_fuel = 130                      ## Базовый объём бака (л)
+	fuel_per_100m = 3.3
+	idle_fuel_per_sec = 0.24
+	exhaust_offset = Vector3(-0.52, 0.28, 2.26)
+	exhaust_offsets = [Vector3(-0.52, 0.28, 2.26), Vector3(0.52, 0.28, 2.26)]
+	exhaust_style = "muscle"
 
 func _ready() -> void:
-	mass = 1500.0
-	var kill_zone = get_node_or_null("Area3D")
-	if kill_zone:
-		kill_zone.body_entered.connect(_on_kill_zone_body_entered)
-	else:
-		push_error("Main: Узел Area3D не найден внутри машины!")
-
-	start_z_position = global_position.z
-	add_to_group("player")
-	
-	contact_monitor = true
-	max_contacts_reported = 24
-	current_hp = health
-	current_fuel = max_fuel
-	
-	if has_node("Hud/HpBar"):
-		$Hud/HpBar.max_value = health
-		$Hud/HpBar.value = current_hp
-	if has_node("Hud/FuelBar"):
-		$Hud/FuelBar.max_value = max_fuel
-		$Hud/FuelBar.value = current_fuel
-
-	# --- VFX Setup ---
-	_exhaust = CarVFX.create_exhaust(self, Vector3(-0.4, 0.15, 1.4))
-	for wheel in get_children():
-		if wheel is VehicleWheel3D and not wheel.use_as_steering:
-			var smoke = CarVFX.create_tire_smoke(wheel, Vector3(0, -wheel.wheel_radius, 0))
-			_tire_smokes.append(smoke)
-
-func _physics_process(delta: float) -> void:
-	if destroyed: return
-	
-	total_distance = absf(global_position.z - start_z_position)
-	if has_node("Hud/Metr"):
-		var _m = get_node_or_null("Hud/Metr")
-		if is_instance_valid(_m): _m.text = str(round(total_distance)) + " M"
-		
-	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
-	var speed_mps: float = horizontal_vel.length()
-	var speed_kmh: int = int(speed_mps * 1.8)
-	
-	if has_node("Hud/speed"):
-		var _s = get_node_or_null("Hud/speed")
-		if is_instance_valid(_s): _s.text = str(speed_kmh) + "  KM/H"
-	
-	# Управление двигателем (W)
-	if Input.is_action_pressed("W"):
-		engine_force = -engine_force_value if speed_kmh < MAX_SPEED_KMH else 0.0
-		brake = 0.0
-	else:
-		engine_force = 0.0
-		
-	# Тормоз и задний ход (S)
-	var min_speed_kmh: int = 25
-	if Input.is_action_pressed("S"):
-		if speed_kmh > min_speed_kmh:
-			brake = brake_force
-			engine_force = 0.0
-		else:
-			brake = 0.0
-			engine_force = -(engine_force_value * 0.2)
-	elif not Input.is_key_pressed(KEY_W) and speed_kmh < min_speed_kmh:
-		brake = 0.0
-		engine_force = -(engine_force_value * 0.3)
-	if Input.is_key_pressed(KEY_ESCAPE) and not destroyed:
-		get_tree().paused = !get_tree().paused
-		var _p = get_node_or_null("Hud/Pause")
-		if is_instance_valid(_p): _p.visible = get_tree().paused
-
-	# Плавное динамическое рулевое управление
-	var steer_input := Input.get_axis("D", "A") 
-	var speed_ratio := clampf(float(speed_kmh) / float(MAX_SPEED_KMH), 0.0, 1.0)
-	var dynamic_steer_limit: float = STEER_LIMIT * lerp(1.0, 0.25, speed_ratio)
-	var steer_target: float = steer_input * dynamic_steer_limit
-	var dynamic_steer_speed: float = STEER_SPEED * lerp(1.0, 0.3, speed_ratio)
-	
-	# ИСПРАВЛЕНО: Теперь используется dynamic_steer_speed вместо константы
-	steering = move_toward(steering, steer_target, dynamic_steer_speed * delta)
-	
-	_apply_traction(speed_mps)
-	
-	if speed_mps > 0.1:
-		current_fuel = maxf(current_fuel - fuel_consumption * delta, 0.0)
-	
-	if current_fuel <= 0.0:
-		engine_force = 0.0
-		brake = brake_force * 3.0
-	
-	if has_node("Hud/FuelBar"):
-		$Hud/FuelBar.value = current_fuel
-
-
-	# --- Tire Smoke ---
-	var is_drifting = absf(steering) > 0.15 and speed_kmh > 30
-	var is_braking = Input.is_action_pressed("S") and speed_kmh > 40
-	for ts in _tire_smokes:
-		if is_instance_valid(ts):
-			ts.emitting = is_drifting or is_braking
-
-	_handle_zombie_overlapping_damage(delta)
-
-func refuel(amount: float) -> void:
-	current_fuel = clampf(current_fuel + amount, 0.0, float(max_fuel))
-
-func _apply_traction(speed: float) -> void:
-	var downforce := clampf(speed * 10.0, 0.0, 8000.0)
-	apply_central_force(Vector3.DOWN * downforce)
-
-func hit_stop(duration: float) -> void:
-	Engine.time_scale = 0.1
-	await get_tree().create_timer(duration * 0.1, true, false, true).timeout
-	Engine.time_scale = 1.0
-
-func take_damage(amount: int) -> void:
-	if destroyed: return
-	current_hp = maxi(current_hp - amount, 0)
-	if has_node("Hud/HpBar"):
-		$Hud/HpBar.value = current_hp
-	if current_hp <= 0: 
-		_destroy_car()
-
-func _handle_zombie_overlapping_damage(_delta: float) -> void:
-	pass
-
-func _on_kill_zone_body_entered(body: Node3D) -> void:
-	if destroyed: return
-	var horizontal_vel := Vector2(linear_velocity.x, linear_velocity.z)
-	var speed_mps := horizontal_vel.length()
-	var speed_kmh := speed_mps * 5.4
-	if body.is_in_group("dead_wall"):
-		if speed_mps >= crash_death_speed_mps:
-			take_damage(current_hp) 
-			shake_camera(clampf(speed_mps / 10.0, 1.0, 4.0))
-			CarVFX.spawn_impact(global_position, "dust")
-			return
-			
-	if body.is_in_group("zombie"):
-		CarVFX.spawn_impact(body.global_position + Vector3.UP, "blood")
-		take_damage(10) 
-		if speed_kmh >= 40.0:
-			if body.has_method("die"):
-				body.die(linear_velocity, speed_mps)
-			shake_camera(clampf(speed_mps / 50.0, 0.05, 0.3))
-		elif speed_kmh >= 10.0:
-			if body.has_method("knockdown"):
-				body.knockdown(linear_velocity)
-		return 
-
-	if body != self and not body.is_in_group("player") and body.is_in_group("object_hit"):
-		if speed_mps > wall_damage_min_speed_mps:
-			var damage_to_car := int(speed_mps * collision_damage_multiplier)
-			take_damage(damage_to_car)
-			shake_camera(clampf(float(damage_to_car) * 0.1, 0.2, 1.5))
-			CarVFX.spawn_impact(body.global_position + Vector3.UP * 0.5, "sparks")
-			if body.has_method("take_damage"):
-				body.take_damage(speed_mps * 2.0) 
-				
-	else:
-		# Любое другое столкновение — искры
-		if speed_mps > 3.0:
-			CarVFX.spawn_impact(body.global_position + Vector3.UP * 0.3, "sparks")
-
-func _destroy_car() -> void:
-	if DeadParticles:
-		var Dead = DeadParticles.instantiate() as CPUParticles3D
-		get_tree().current_scene.add_child(Dead)
-		Dead.global_position = global_position
-		
-		Dead.lifetime = 1.0 
-		Dead.anim_speed_min = 2.0
-		Dead.anim_speed_max = 2.5
-		Dead.emitting = true
-		Dead.restart()
-	apply_central_impulse(Vector3(0, 13000.0, 0))
-	if has_node("Hud/ColorRect"):
-		var effect_rect = $Hud/ColorRect as ColorRect
-		effect_rect.show()
-		var mat = effect_rect.material as ShaderMaterial
-		var tween_blood = create_tween()
-		tween_blood.tween_property(mat, "shader_parameter/effect_strength", 1.0, 0.0)
-		var tween_time = create_tween()
-		tween_time.tween_property(Engine, "time_scale", 0.1, 0.2).set_trans(Tween.TRANS_SINE)
-	
-	await get_tree().create_timer(0.4).timeout
-	Engine.time_scale = 1.0
-	get_tree().change_scene_to_file("res://ui/menu.tscn")
-	
-func shake_camera(amount: float) -> void:
-	var camera = get_node_or_null("look/Camera3D")
-	if not camera: return
-	if camera.has_method("add_shake"):
-		camera.add_shake(amount)
+	mass = 1640.0                       ## Масса автомобиля (кг)
+	super()

@@ -2,13 +2,18 @@
 
 [ext_resource type="Texture2D" uid="uid://54ju6qilp8ee" path="res://ui/shop/Angar/burnin_rubber_3_hangar_0.png" id="1_0y33j"]
 [ext_resource type="Script" uid="uid://dgqacjcsyergi" path="res://ui/shop/Angar/anga.gd" id="1_jf624"]
-[ext_resource type="Texture2D" uid="uid://mgxq3moa13jd" path="res://893483.PNG" id="3_pmfdq"]
+[ext_resource type="Shader" path="res://ui/shaders/menu_atmosphere_overlay.gdshader" id="2_atmos"]
+[ext_resource type="Shader" path="res://ui/shaders/menu_accent_bar.gdshader" id="3_acc"]
+[ext_resource type="FontFile" path="res://assets/fonts/RubikDirt-Regular.ttf" id="4_dirt"]
+[ext_resource type="FontFile" path="res://assets/fonts/RussoOne-Regular.ttf" id="5_russo"]
+[ext_resource type="FontFile" path="res://assets/fonts/Jura-Variable.ttf" id="6_jura"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5o6op"]
 resource_name = "HangarMaterial"
 cull_mode = 2
+albedo_color = Color(0.56, 0.58, 0.57, 1)
 albedo_texture = ExtResource("1_0y33j")
-roughness = 0.8308206
+roughness = 0.90
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_36mga"]
 _surfaces = [{
@@ -49,60 +54,58 @@ data = PackedVector3Array(3.9989998, 26.8, 13.3551, 3.9989998, 26.8, 5.9688, -15
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6hrxe"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bo148"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hangar_atmos"]
+shader = ExtResource("2_atmos")
+shader_parameter/fog_tint = Color(0.24, 0.27, 0.28, 1)
+shader_parameter/ember_color = Color(0.96, 0.44, 0.16, 1)
+shader_parameter/scrim_strength = 0.24
+shader_parameter/fog_strength = 0.14
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dxkut"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hangar_acc"]
+shader = ExtResource("3_acc")
+shader_parameter/base_color = Color(0.76, 0.22, 0.09, 1)
+shader_parameter/shimmer_color = Color(1, 0.62, 0.24, 1)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yw1da"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vyjl0"]
-
-[sub_resource type="Environment" id="Environment_pmfdq"]
-background_color = Color(0.39898273, 0.29367173, 0.20432398, 1)
-ssao_enabled = true
-fog_enabled = true
-fog_light_color = Color(0.30350992, 0.23861784, 0.2010488, 1)
-fog_light_energy = 1.43
-adjustment_enabled = true
-adjustment_contrast = 1.125
-
-[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_emvy3"]
-
-[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_emvy3"]
-rayleigh_color = Color(0.25395843, 0.3457173, 0.52315086, 1)
-ground_color = Color(0, 0, 0, 1)
-energy_multiplier = 10.66
-night_sky = ExtResource("3_pmfdq")
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hangar"]
+sky_top_color = Color(0.08, 0.10, 0.12, 1)
+sky_horizon_color = Color(0.18, 0.19, 0.19, 1)
+sky_curve = 0.2
+ground_bottom_color = Color(0.06, 0.06, 0.07, 1)
+ground_horizon_color = Color(0.14, 0.15, 0.15, 1)
 
 [sub_resource type="Sky" id="Sky_1bvp3"]
-sky_material = SubResource("PhysicalSkyMaterial_emvy3")
+sky_material = SubResource("ProceduralSkyMaterial_hangar")
 radiance_size = 2
 
 [sub_resource type="Environment" id="Environment_1twjb"]
 background_mode = 2
-background_color = Color(0, 0, 0.43137255, 1)
 sky = SubResource("Sky_1bvp3")
-sky_rotation = Vector3(0, 0.20245819, 0)
-ambient_light_color = Color(0.43137255, 0.44705883, 0.4745098, 1)
-ambient_light_sky_contribution = 0.42
-ambient_light_energy = 0.7
+ambient_light_source = 3
+ambient_light_color = Color(0.28, 0.32, 0.35, 1)
+ambient_light_sky_contribution = 0.50
+ambient_light_energy = 0.36
 reflected_light_source = 2
-tonemap_exposure = 0.3
-tonemap_agx_white = 16.5
-ssao_radius = 1.5
-ssao_intensity = 0.6
-ssao_power = 32.7849
-sdfgi_y_scale = 2
-glow_intensity = 2.12
-glow_bloom = 0.09
+tonemap_mode = 2
+tonemap_exposure = 1.0
+tonemap_white = 6.0
+glow_enabled = true
+glow_intensity = 0.28
+glow_bloom = 0.02
+glow_blend_mode = 2
+glow_hdr_threshold = 1.35
 fog_enabled = true
-fog_light_energy = 0.28
-fog_sun_scatter = 0.17
-fog_depth_curve = 0.20000064
-fog_depth_begin = 0.0
-fog_depth_end = 220.0
-adjustment_contrast = 1.125
-adjustment_saturation = 0.0
+fog_mode = 1
+fog_light_color = Color(0.24, 0.22, 0.19, 1)
+fog_light_energy = 0.72
+fog_density = 0.82
+fog_sky_affect = 0.85
+fog_depth_curve = 1.15
+fog_depth_begin = 28.0
+fog_depth_end = 175.0
+adjustment_enabled = false
+adjustment_brightness = 1.0
+adjustment_contrast = 1.0
+adjustment_saturation = 1.0
 
 [node name="Shop" type="Node3D" unique_id=1655588568]
 script = ExtResource("1_jf624")
@@ -126,154 +129,290 @@ mesh = SubResource("ArrayMesh_ogdwx")
 shape = SubResource("ConcavePolygonShape3D_gfk5f")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=650486354]
-transform = Transform3D(1, 0, 0, 0, -0.41945213, 0.9077775, 0, -0.9077775, -0.41945213, 4.153198, 10.436678, 0)
-light_color = Color(0.6248492, 0.536741, 0.48532987, 1)
-light_energy = 0.1
-shadow_enabled = true
-shadow_normal_bias = 10.0
-
-[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=417724460]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 3.8148272, 12.44211, 26.562288)
-light_energy = 16.0
-spot_range = 15.452684
-spot_attenuation = 0.66
+transform = Transform3D(0.866025, 0.286788, -0.409576, 0, 0.819152, 0.573576, 0.5, -0.496732, 0.709406, 4.153198, 10.436678, 0)
+light_color = Color(0.92, 0.80, 0.66, 1)
+light_energy = 0.85
+shadow_enabled = false
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1320160728]
 
-[node name="Next" type="Button" parent="CanvasLayer" unique_id=1888127932]
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -34.5
-offset_right = 76.0
-offset_bottom = 34.5
-grow_vertical = 2
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-text = "<"
-
-[node name="Back" type="Button" parent="CanvasLayer" unique_id=89727683]
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
+[node name="AtmosphereOverlay" type="ColorRect" parent="CanvasLayer" unique_id=1810100101]
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -73.0
-offset_top = -34.5
-offset_bottom = 34.5
-grow_horizontal = 0
-grow_vertical = 2
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-text = ">"
-
-[node name="Buy" type="Button" parent="CanvasLayer" unique_id=718643542]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -104.0
-offset_top = -137.0
-offset_right = 109.0
-offset_bottom = -68.0
 grow_horizontal = 2
-grow_vertical = 0
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-text = "Купить"
+grow_vertical = 2
+mouse_filter = 2
+material = SubResource("ShaderMaterial_hangar_atmos")
 
-[node name="Back_menu" type="Button" parent="CanvasLayer" unique_id=670192115]
+[node name="TopLeftHeader" type="VBoxContainer" parent="CanvasLayer" unique_id=1810100102]
+offset_left = 18.0
+offset_top = 14.0
+offset_right = 270.0
+offset_bottom = 118.0
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="SectorTag" type="Label" parent="CanvasLayer/TopLeftHeader" unique_id=1810100103]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.46, 0.22, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 11
+text = "УКРЫТИЕ // ГАРАЖ ВЫЖИВШЕГО"
+
+[node name="GarageTitle" type="Label" parent="CanvasLayer/TopLeftHeader" unique_id=1810100104]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.88, 1)
+theme_override_colors/font_shadow_color = Color(0.02, 0.02, 0.03, 0.85)
+theme_override_colors/font_outline_color = Color(0.05, 0.04, 0.04, 0.95)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("4_dirt")
+theme_override_font_sizes/font_size = 28
+text = "ГАРАЖ"
+
+[node name="HeaderAccent" type="ColorRect" parent="CanvasLayer/TopLeftHeader" unique_id=1810100105]
+custom_minimum_size = Vector2(150, 2)
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+material = SubResource("ShaderMaterial_hangar_acc")
+
+[node name="Back_menu" type="Button" parent="CanvasLayer/TopLeftHeader" unique_id=670192115]
+custom_minimum_size = Vector2(138, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(0.88, 0.9, 0.92, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.9, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 14
+text = "← В МЕНЮ"
+
+[node name="MoneyPanel" type="PanelContainer" parent="CanvasLayer" unique_id=1810100106]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -213.0
-offset_bottom = 69.0
+offset_left = -224.0
+offset_top = 14.0
+offset_right = -18.0
+offset_bottom = 52.0
 grow_horizontal = 0
-theme_override_colors/font_pressed_color = Color(1, 0, 0, 1)
-theme_override_colors/font_hover_color = Color(0.9490196, 0, 0, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_bo148")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dxkut")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_yw1da")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-text = "Назад"
+mouse_filter = 2
 
-[node name="CarName" type="Label" parent="CanvasLayer" unique_id=1547246289]
-visible = false
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -0.5
-offset_right = 126.0
-offset_bottom = 49.0
-grow_horizontal = 2
+[node name="money" type="Label" parent="CanvasLayer/MoneyPanel" unique_id=750735991]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.78, 0.32, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 20
+text = "0 $"
+horizontal_alignment = 2
 
-[node name="Price" type="Label" parent="CanvasLayer" unique_id=1442986292]
+[node name="SpecCard" type="PanelContainer" parent="CanvasLayer" unique_id=1810100107]
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 18.0
+offset_top = -124.0
+offset_right = 252.0
+offset_bottom = 114.0
+grow_vertical = 2
+
+[node name="SpecVBox" type="VBoxContainer" parent="CanvasLayer/SpecCard" unique_id=1810100108]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="SpecAccent" type="ColorRect" parent="CanvasLayer/SpecCard/SpecVBox" unique_id=1810100109]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+mouse_filter = 2
+material = SubResource("ShaderMaterial_hangar_acc")
+
+[node name="SpecMargin" type="MarginContainer" parent="CanvasLayer/SpecCard/SpecVBox" unique_id=1810100110]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="SpecInner" type="VBoxContainer" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin" unique_id=1810100111]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="IndexTag" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100112]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.7, 0.72, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 11
+text = "01 / 04  //  ТЕХНИКА"
+
+[node name="CarName" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1547246289]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.04, 0.05, 0.95)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("4_dirt")
+theme_override_font_sizes/font_size = 23
+text = "Pikap"
+
+[node name="CarRole" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100113]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.48, 0.24, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 11
+text = "РАЗВЕДЧИК // НАДЁЖНЫЙ ПИКАП"
+
+[node name="StatDivider" type="HSeparator" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100114]
+layout_mode = 2
+
+[node name="SpeedRow" type="HBoxContainer" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100115]
+layout_mode = 2
+
+[node name="Lbl" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner/SpeedRow" unique_id=1810100116]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.76, 0.79, 0.82, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 11
+text = "СКОРОСТЬ"
+
+[node name="ValSpeed" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner/SpeedRow" unique_id=1810100117]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.88, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 11
+text = "135 KM/H"
+
+[node name="BarSpeed" type="ProgressBar" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100118]
+custom_minimum_size = Vector2(0, 7)
+layout_mode = 2
+max_value = 260.0
+value = 135.0
+show_percentage = false
+
+[node name="ArmorRow" type="HBoxContainer" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100119]
+layout_mode = 2
+
+[node name="Lbl" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner/ArmorRow" unique_id=1810100120]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.76, 0.79, 0.82, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 11
+text = "БРОНЯ"
+
+[node name="ValArmor" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner/ArmorRow" unique_id=1810100121]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.88, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 11
+text = "600"
+
+[node name="BarArmor" type="ProgressBar" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100122]
+custom_minimum_size = Vector2(0, 7)
+layout_mode = 2
+max_value = 3600.0
+value = 600.0
+show_percentage = false
+
+[node name="FuelRow" type="HBoxContainer" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100123]
+layout_mode = 2
+
+[node name="Lbl" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner/FuelRow" unique_id=1810100124]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.76, 0.79, 0.82, 1)
+theme_override_fonts/font = ExtResource("6_jura")
+theme_override_font_sizes/font_size = 11
+text = "БАК"
+
+[node name="ValFuel" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner/FuelRow" unique_id=1810100125]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.88, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 11
+text = "85 Л"
+
+[node name="BarFuel" type="ProgressBar" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100126]
+custom_minimum_size = Vector2(0, 7)
+layout_mode = 2
+max_value = 210.0
+value = 85.0
+show_percentage = false
+
+[node name="PriceSpacer" type="Control" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1810100127]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+
+[node name="Price" type="Label" parent="CanvasLayer/SpecCard/SpecVBox/SpecMargin/SpecInner" unique_id=1442986292]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.78, 0.32, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 15
+text = "КУПЛЕНО"
+
+[node name="BottomDock" type="HBoxContainer" parent="CanvasLayer" unique_id=1810100128]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -86.0
-offset_top = -69.0
-offset_right = 86.0
+offset_left = -215.0
+offset_top = -58.0
+offset_right = 215.0
+offset_bottom = -14.0
 grow_horizontal = 2
 grow_vertical = 0
-size_flags_vertical = 1
-focus_mode = 2
-mouse_filter = 0
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
+theme_override_constants/separation = 8
+alignment = 1
 
-[node name="money" type="Label" parent="CanvasLayer" unique_id=750735991]
-visible = false
-anchors_preset = -1
-anchor_left = 0.21015625
-anchor_top = 0.6888889
-anchor_right = 0.37109375
-anchor_bottom = 0.7847222
-size_flags_vertical = 1
-focus_mode = 2
-mouse_filter = 0
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxEmpty_6hrxe")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_vyjl0")
-metadata/_edit_use_anchors_ = true
+[node name="Next" type="Button" parent="CanvasLayer/BottomDock" unique_id=1888127932]
+custom_minimum_size = Vector2(46, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.9, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 18
+text = "◀"
+
+[node name="Buy" type="Button" parent="CanvasLayer/BottomDock" unique_id=718643542]
+custom_minimum_size = Vector2(168, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.94, 0.88, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.72, 0.45, 1)
+theme_override_colors/font_hover_color = Color(1, 0.98, 0.94, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 17
+text = "ВЫБРАНО"
+
+[node name="BtnRaid" type="Button" parent="CanvasLayer/BottomDock" unique_id=1810100129]
+custom_minimum_size = Vector2(138, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.86, 0.72, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.72, 0.45, 1)
+theme_override_colors/font_hover_color = Color(1, 0.98, 0.94, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 17
+text = "В РЕЙД"
+
+[node name="Back" type="Button" parent="CanvasLayer/BottomDock" unique_id=89727683]
+custom_minimum_size = Vector2(46, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.9, 1)
+theme_override_fonts/font = ExtResource("5_russo")
+theme_override_font_sizes/font_size = 18
+text = "▶"
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1416847367]
-transform = Transform3D(0.49929258, -0.07016581, 0.8635877, 0.010442306, 0.99713045, 0.074978724, -0.8663705, -0.02841847, 0.49859253, 12.776032, 2.3214757, 30.8734)
-keep_aspect = 0
-environment = SubResource("Environment_pmfdq")
-attributes = SubResource("CameraAttributesPractical_emvy3")
-v_offset = -0.245
+transform = Transform3D(0.569, -0.105, 0.816, 0, 0.992, 0.128, -0.822, -0.073, 0.564, 8.85, 2.02, 32.2)
 current = true
-fov = 82.2
-far = 70.0
+fov = 54.0
+far = 260.0
 
 [node name="Spawn" type="Marker3D" parent="." unique_id=1990064799]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.015, 0.1, 25.943)
@@ -281,7 +420,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.015, 0.1, 25.943)
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2015963402]
 environment = SubResource("Environment_1twjb")
 
-[connection signal="pressed" from="CanvasLayer/Next" to="." method="_on_next_pressed"]
-[connection signal="pressed" from="CanvasLayer/Back" to="." method="_on_back_pressed"]
-[connection signal="pressed" from="CanvasLayer/Buy" to="." method="_on_buy_pressed"]
-[connection signal="pressed" from="CanvasLayer/Back_menu" to="." method="_on_back_menu_pressed"]
+[connection signal="pressed" from="CanvasLayer/BottomDock/Next" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="CanvasLayer/BottomDock/Back" to="." method="_on_next_pressed"]
+[connection signal="pressed" from="CanvasLayer/BottomDock/Buy" to="." method="_on_buy_pressed"]
+[connection signal="pressed" from="CanvasLayer/BottomDock/BtnRaid" to="." method="_on_raid_pressed"]
+[connection signal="pressed" from="CanvasLayer/TopLeftHeader/Back_menu" to="." method="_on_back_menu_pressed"]

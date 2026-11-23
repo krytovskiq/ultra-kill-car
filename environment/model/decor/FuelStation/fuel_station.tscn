@@ -1,0 +1,6 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://environment/model/decor/FuelStation/fuel_station.gd" id="1_fs"]
+
+[node name="FuelStation" type="Node3D"]
+script = ExtResource("1_fs")
