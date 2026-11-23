@@ -62,6 +62,12 @@ var _speed_canvas: CanvasLayer = null
 var _speed_rect: ColorRect = null
 var _speed_mat: ShaderMaterial = null
 
+var _intro_active: bool = false
+var _intro_armed_waiting: bool = false
+var _intro_elapsed: float = 0.0
+var _intro_duration: float = 2.35
+var _intro_side: float = 1.0
+
 func _ready() -> void:
 	var walker := get_parent()
 	while walker != null and walker is Node3D:
@@ -167,6 +173,8 @@ func _physics_process(delta: float) -> void:
 		return
 
 	if follow_this.get("destroyed") == true:
+		_intro_active = false
+		_intro_armed_waiting = false
 		if is_instance_valid(_speed_rect):
 			_speed_rect.visible = false
 		var dead_dt: float = maxf(delta / maxf(Engine.time_scale, 0.05), 0.001)
@@ -178,6 +186,22 @@ func _physics_process(delta: float) -> void:
 		if not global_position.is_equal_approx(last_lookat):
 			look_at(last_lookat, Vector3.UP)
 		fov = lerpf(fov, 64.0, clampf(dead_dt * 2.0, 0.0, 1.0))
+		return
+
+	if _intro_armed_waiting:
+		if is_instance_valid(_speed_rect):
+			_speed_rect.visible = false
+		_apply_intro_pose(0.0)
+		return
+
+	if _intro_active:
+		if is_instance_valid(_speed_rect):
+			_speed_rect.visible = false
+		_intro_elapsed += maxf(delta, 0.001)
+		var t_intro := clampf(_intro_elapsed / maxf(_intro_duration, 0.01), 0.0, 1.0)
+		_apply_intro_pose(t_intro)
+		if t_intro >= 1.0:
+			_intro_active = false
 		return
 
 	var dt := maxf(delta, 0.001)
@@ -320,6 +344,62 @@ func _get_target_pos(speed_ratio: float, accel_mps2: float, chase_dir: Vector3) 
 	var accel_pullback := clampf(accel_mps2 * 0.042, -0.35, 0.65)
 	var cur_distance := lerpf(base_distance, speed_distance, t) + accel_pullback
 	return car_origin - (chase_dir * cur_distance) + (Vector3.UP * cur_height)
+
+func prepare_side_intro(side_sign: float = 1.0) -> void:
+	_intro_side = -1.0 if side_sign < 0.0 else 1.0
+	_intro_armed_waiting = true
+	_intro_active = false
+	_intro_elapsed = 0.0
+	_apply_intro_pose(0.0)
+
+func start_side_intro(duration: float = 2.35, side_sign: float = 1.0) -> void:
+	_intro_duration = maxf(duration, 0.5)
+	_intro_side = -1.0 if side_sign < 0.0 else 1.0
+	_intro_armed_waiting = false
+	_intro_active = true
+	_intro_elapsed = 0.0
+	_apply_intro_pose(0.0)
+
+func _apply_intro_pose(t_norm: float) -> void:
+	if follow_this == null or not is_instance_valid(follow_this):
+		return
+	var t := clampf(t_norm, 0.0, 1.0)
+	var u := t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+
+	var car_origin := follow_this.global_transform.origin
+	var car_fwd := _get_car_forward()
+	var car_right := follow_this.global_transform.basis.x
+	car_right.y = 0.0
+	if car_right.length_squared() > 0.0001:
+		car_right = car_right.normalized()
+	else:
+		car_right = Vector3.RIGHT
+
+	var vel := Vector3.ZERO
+	if "linear_velocity" in follow_this:
+		vel = follow_this.linear_velocity
+	var speed_mps := Vector2(vel.x, vel.z).length()
+	var speed_ratio := clampf((speed_mps * MPS_TO_KMH) / maxf(_max_speed_kmh, 1.0), 0.0, 1.0)
+	_prev_forward_mps = Vector3(vel.x, 0.0, vel.z).dot(car_fwd)
+
+	var chase_pos := _get_target_pos(speed_ratio, 0.0, car_fwd)
+	var chase_dist := maxf(Vector2(chase_pos.x - car_origin.x, chase_pos.z - car_origin.z).length(), base_distance)
+	var chase_h := chase_pos.y - car_origin.y
+	var chase_look := car_origin + Vector3.UP * 1.24 + car_fwd * lerpf(2.0, 5.2, speed_ratio)
+
+	# Облетаем сбоку дороги (56°) через чистый бок (90°) прямо в кормовой ракурс (180°) позади машины
+	var theta := lerpf(deg_to_rad(56.0), PI, u)
+	var orbit_dir := (car_fwd * cos(theta) + car_right * (sin(theta) * _intro_side)).normalized()
+	var cur_dist := lerpf(7.6, chase_dist, u)
+	var cur_h := lerpf(1.48, chase_h, u)
+
+	global_position = car_origin + orbit_dir * cur_dist + Vector3.UP * cur_h
+	var side_look := car_origin + Vector3.UP * 1.02 + car_fwd * 0.75
+	last_lookat = side_look.lerp(chase_look, u)
+	_chase_dir = car_fwd
+	fov = lerpf(52.0, base_fov, u)
+	if is_inside_tree() and not global_position.is_equal_approx(last_lookat):
+		look_at(last_lookat, Vector3.UP)
 
 func add_shake(amount: float) -> void:
 	_shake_intensity = clampf(_shake_intensity + amount, 0.0, 3.0)

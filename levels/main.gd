@@ -104,6 +104,12 @@ var _base_fog_end: float = 148.0
 var spawn_timer: float = 0.0
 var current_spawn_cooldown: float = 1.05
 
+var scene_ready: bool = false
+var scene_load_progress: float = 0.0
+var scene_load_stage: String = "ПОДГОТОВКА ТРАССЫ..."
+var _intro_started: bool = false
+var _intro_zombie_hold_timer: float = 0.0
+
 func _ready() -> void:
 	if world_environment and world_environment.environment and not world_environment.environment.resource_local_to_scene:
 		world_environment.environment = world_environment.environment.duplicate()
@@ -129,33 +135,12 @@ func _ready() -> void:
 
 	if Game.car_data.is_empty():
 		push_error("Main: Game.car_data пуст!")
+		scene_ready = true
 		return
-
-	var car_idx := clampi(Game.selected_car_index, 0, Game.car_data.size() - 1)
-	var car_path: String = Game.car_data[car_idx].path
-	var car_scene: PackedScene = load(car_path)
-	if car_scene:
-		car = car_scene.instantiate() as RigidBody3D
-		add_child(car)
-		var spawn_basis: Basis = Basis.looking_at(_forward, Vector3.UP)
-		car.global_transform = Transform3D(spawn_basis, Vector3(0.0, 0.25, 0.0))
-		car.add_to_group("player")
-		var rolling_start_mps: float = 32.0 / 3.6
-		if car.has_method("set_initial_rolling_start"):
-			car.call("set_initial_rolling_start", rolling_start_mps, _forward)
-		else:
-			car.linear_velocity = _forward * rolling_start_mps
 
 	var WorldChunkScript = load("res://levels/world_chunk.gd")
 	WorldChunkScript.global_distance_counter = 0.0
-
-	var quality_cap: int = SettingsManager.get_max_zombies() if SettingsManager.has_method("get_max_zombies") else max_active_zombies
-	ZombiePool.prewarm_zombies(mini(quality_cap, 150), self)
 	current_spawn_cooldown = base_spawn_cooldown
-
-	if (not use_procedural_generation and chunk_scenes_list.is_empty()) or bridge_scene == null or car == null:
-		push_error("Main: Критические ресурсы не назначены в Инспекторе!")
-		return
 
 	if not SettingsManager.quality_changed.is_connected(_on_quality_changed):
 		SettingsManager.quality_changed.connect(_on_quality_changed)
@@ -168,6 +153,48 @@ func _ready() -> void:
 	_cleanup_preplaced_chunks()
 	_setup_ash_emitter()
 	_setup_rain_emitter()
+	call_deferred("_async_init_world")
+
+func _async_init_world() -> void:
+	scene_load_stage = "ПОДГОТОВКА ТЕХНИКИ..."
+	scene_load_progress = 0.08
+	var car_idx := clampi(Game.selected_car_index, 0, Game.car_data.size() - 1)
+	var car_path: String = Game.car_data[car_idx].path
+	var car_scene: PackedScene = load(car_path)
+	if car_scene:
+		car = car_scene.instantiate() as RigidBody3D
+		add_child(car)
+		var spawn_basis: Basis = Basis.looking_at(_forward, Vector3.UP)
+		car.global_transform = Transform3D(spawn_basis, Vector3(0.0, 0.25, 0.0))
+		car.freeze = true
+		car.add_to_group("player")
+		if car.has_method("prepare_side_intro_pose"):
+			car.call("prepare_side_intro_pose", _forward)
+
+	if not is_inside_tree():
+		return
+	await get_tree().process_frame
+	if not is_inside_tree():
+		return
+
+	if (not use_procedural_generation and chunk_scenes_list.is_empty()) or bridge_scene == null or car == null:
+		push_error("Main: Критические ресурсы не назначены в Инспекторе!")
+		scene_ready = true
+		return
+
+	scene_load_stage = "ПОДГОТОВКА ОРДЫ..."
+	var quality_cap: int = SettingsManager.get_max_zombies() if SettingsManager.has_method("get_max_zombies") else max_active_zombies
+	var target_pool: int = mini(quality_cap, 150)
+	while is_inside_tree():
+		var pool_done: bool = ZombiePool.prewarm_zombies_batch(target_pool, 18, self)
+		scene_load_progress = lerpf(0.14, 0.54, clampf(float(ZombiePool.pool.size()) / float(maxi(target_pool, 1)), 0.0, 1.0))
+		if pool_done:
+			break
+		await get_tree().process_frame
+	if not is_inside_tree():
+		return
+
+	scene_load_stage = "НАСТРОЙКА АТМОСФЕРЫ..."
 	var car_index: int = _get_chunk_index(_distance_along_forward(car.global_position))
 	_current_biome = _get_biome_for_index(car_index)
 	_active_anomaly = _sanitize_anomaly_for_biome(_get_anomaly_for_segment(0), _current_biome)
@@ -180,11 +207,47 @@ func _ready() -> void:
 		_time_of_day = init_tod_val
 		_target_time_of_day = init_tod_val
 	is_fog_red = (_active_anomaly == WeatherAnomaly.BLOOD_NIGHT)
+	SettingsManager.apply_settings(self)
 	_sync_anomaly_effects(false)
 	_update_dynamic_atmosphere(0.0, true)
 
-	_ensure_chunks_for_index(car_index)
+	scene_load_stage = "ГЕНЕРАЦИЯ СЕКТОРА..."
+	var min_index: int = car_index - maxi(chunks_behind, 1)
+	var max_index: int = car_index + maxi(chunks_ahead, 2)
+	var total_chunks: int = maxi(max_index - min_index + 1, 1)
+	for index in range(min_index, max_index + 1):
+		if not _chunk_nodes.has(index):
+			_spawn_chunk(index)
+		scene_load_progress = lerpf(0.56, 0.94, float(index - min_index + 1) / float(total_chunks))
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
 	_last_checked_chunk = car_index
+
+	scene_load_progress = 1.0
+	scene_load_stage = "ПОЕХАЛИ!"
+	scene_ready = true
+
+	var st_node := get_node_or_null("/root/SceneTransition")
+	var via_transition := (st_node != null and st_node.has_method("is_transitioning") and bool(st_node.call("is_transitioning")))
+	if not via_transition:
+		on_transition_reveal()
+
+func on_transition_reveal() -> void:
+	if _intro_started or not is_instance_valid(car):
+		return
+	_intro_started = true
+	car.freeze = false
+	var spawn_basis: Basis = Basis.looking_at(_forward, Vector3.UP)
+	car.global_transform = Transform3D(spawn_basis, Vector3(0.0, 0.25, 0.0))
+	_intro_zombie_hold_timer = 1.85
+	var rolling_start_mps: float = 38.0 / 3.6
+	if car.has_method("start_run_intro"):
+		car.call("start_run_intro", 2.35, rolling_start_mps, _forward)
+	elif car.has_method("set_initial_rolling_start"):
+		car.call("set_initial_rolling_start", rolling_start_mps, _forward)
+	else:
+		car.linear_velocity = _forward * rolling_start_mps
 
 func _exit_tree() -> void:
 	if SettingsManager and SettingsManager.quality_changed.is_connected(_on_quality_changed):
@@ -203,7 +266,7 @@ func get_difficulty(distance_m: float) -> float:
 	return maxf(absf(distance_m) / 11000.0, 0.0)
 
 func _process(delta: float) -> void:
-	if not is_instance_valid(car) or (not use_procedural_generation and chunk_scenes_list.is_empty()):
+	if not scene_ready or not is_instance_valid(car) or (not use_procedural_generation and chunk_scenes_list.is_empty()):
 		return
 
 	if is_instance_valid(_ash_particles):
@@ -222,10 +285,13 @@ func _process(delta: float) -> void:
 
 	var cap_max: int = mini(max_active_zombies, SettingsManager.get_max_zombies() if SettingsManager.has_method("get_max_zombies") else max_active_zombies)
 	var dynamic_max_zombies: int = roundi(lerpf(minf(50.0, float(cap_max)), float(cap_max), diff01))
-	spawn_timer += delta
-	if spawn_timer >= current_spawn_cooldown:
-		spawn_timer = 0.0
-		_spawn_single_zombie_ahead(diff, dynamic_max_zombies)
+	if _intro_zombie_hold_timer > 0.0:
+		_intro_zombie_hold_timer = maxf(_intro_zombie_hold_timer - delta, 0.0)
+	else:
+		spawn_timer += delta
+		if spawn_timer >= current_spawn_cooldown:
+			spawn_timer = 0.0
+			_spawn_single_zombie_ahead(diff, dynamic_max_zombies)
 
 	var weather_seg: int = maxi(floori(float(maxi(current_chunk_index, 0)) / float(_chunks_per_bridge)), 0)
 	var target_biome: int = _get_biome_for_index(current_chunk_index)

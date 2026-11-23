@@ -85,6 +85,7 @@ var _sb_upg_max: StyleBoxFlat
 var _sb_upg_n: StyleBoxFlat
 var _sb_upg_h: StyleBoxFlat
 
+var _bg_preload_idx: int = 0
 var _upg_card: PanelContainer = null
 var _upg_total_lbl: Label = null
 var _upg_kit_banner: Label = null
@@ -445,8 +446,8 @@ func _refresh_upgrade_panel() -> void:
 	var is_max_kit: bool = Game.is_car_max_upgraded(current_idx)
 	var stages: Dictionary = Game.get_maxed_upgrade_stages(current_idx)
 	var unlocked_stages: int = 0
-	for k in stages.keys():
-		if bool(stages[k]):
+	for k: String in ["engine", "armor", "chassis"]:
+		if bool(stages.get(k, false)):
 			unlocked_stages += 1
 	var snd_id: String = str(car_instance.get("engine_sound_id")) if is_instance_valid(car_instance) and car_instance.get("engine_sound_id") != null else ""
 
@@ -466,10 +467,10 @@ func _refresh_upgrade_panel() -> void:
 			_upg_kit_banner.text = "★ ПОЛНАЯ БРОНЯ И БОЕВОЙ ОКРАС УСТАНОВЛЕНЫ (50/50)"
 			_upg_kit_banner.add_theme_color_override("font_color", Color(1.0, 0.78, 0.28, 1.0))
 		elif unlocked_stages > 0:
-			_upg_kit_banner.text = "Установлено элементов обвеса: %d/4 • На %d/%d откроется боевой окрас" % [unlocked_stages, prog.y, prog.y]
+			_upg_kit_banner.text = "Установлено элементов обвеса: %d/3 • На %d/%d откроется боевой окрас" % [unlocked_stages, prog.y, prog.y]
 			_upg_kit_banner.add_theme_color_override("font_color", Color(0.96, 0.76, 0.34, 1.0))
 		else:
-			_upg_kit_banner.text = "Прокачайте любой узел на максимум для этапа обвеса; все %d/%d — боевой окрас" % [prog.y, prog.y]
+			_upg_kit_banner.text = "Максимум Двигателя/Брони/Ходовой ставит обвес; все %d/%d — боевой окрас" % [prog.y, prog.y]
 			_upg_kit_banner.add_theme_color_override("font_color", Color(0.76, 0.80, 0.84, 1.0))
 
 	for stat_key in _upg_rows.keys():
@@ -936,8 +937,22 @@ func _update_camera(_delta: float, immediate: bool = false) -> void:
 		_cam.look_at(target, Vector3.UP)
 
 func preload_all_cars() -> void:
-	for info: Dictionary in Game.car_data:
-		var path: String = info["path"]
+	if Game.car_data.is_empty():
+		return
+	var cur_info: Dictionary = Game.car_data[clampi(current_idx, 0, Game.car_data.size() - 1)]
+	var cur_path: String = str(cur_info.get("path", ""))
+	if not cur_path.is_empty() and not loaded_car_scenes.has(cur_path):
+		var scene := load(cur_path) as PackedScene
+		if scene:
+			loaded_car_scenes[cur_path] = scene
+	_bg_preload_idx = 0
+
+func _step_background_car_preload() -> void:
+	if _bg_preload_idx >= Game.car_data.size():
+		return
+	var path: String = str(Game.car_data[_bg_preload_idx].get("path", ""))
+	_bg_preload_idx += 1
+	if not path.is_empty() and not loaded_car_scenes.has(path):
 		var scene := load(path) as PackedScene
 		if scene:
 			loaded_car_scenes[path] = scene
@@ -1013,7 +1028,10 @@ func spawn_car_preview(path: String) -> void:
 		car_instance = null
 
 	if not loaded_car_scenes.has(path):
-		return
+		var on_demand := load(path) as PackedScene
+		if on_demand == null:
+			return
+		loaded_car_scenes[path] = on_demand
 
 	var car_scene: PackedScene = loaded_car_scenes[path]
 	car_instance = car_scene.instantiate() as Node3D
@@ -1101,6 +1119,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
+	_step_background_car_preload()
 	_cam_time += delta
 	for i in range(_gate_beacons.size()):
 		var b := _gate_beacons[i]

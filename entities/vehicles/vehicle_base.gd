@@ -346,6 +346,14 @@ var _base_steer_speed: float = 2.4
 var _base_brake_force: float = 95.0
 var _chassis_upgrade_lvl: int = 0
 var _is_max_upgraded: bool = false
+var _sc_pulley: Node3D = null
+var _sc_butterflies: Node3D = null
+var _sc_idle_phase: float = 0.0
+var _intro_timer: float = 0.0
+var _intro_duration: float = 2.35
+var _intro_cruise_mps: float = 10.6
+var _intro_fwd: Vector3 = Vector3.BACK
+var _intro_hud_hidden: bool = false
 
 func _capture_base_stats() -> void:
 	if _base_stats_captured:
@@ -424,6 +432,11 @@ func apply_car_upgrades(car_idx: int = -1) -> void:
 
 	var stages: Dictionary = g.call("get_maxed_upgrade_stages", idx) if g.has_method("get_maxed_upgrade_stages") else {}
 	CarArmorKit.apply_staged_kits(self, engine_sound_id, stages)
+	refresh_armor_kit_refs()
+
+func refresh_armor_kit_refs() -> void:
+	_sc_pulley = find_child("SuperchargerPulley", true, false) as Node3D
+	_sc_butterflies = find_child("SuperchargerButterflies", true, false) as Node3D
 
 func _ready() -> void:
 	apply_car_upgrades()
@@ -1389,7 +1402,25 @@ func _physics_process(delta: float) -> void:
 	if _hud_notice_timer > 0.0:
 		_hud_notice_timer = maxf(_hud_notice_timer - delta, 0.0)
 
-	if current_fuel <= 0.0:
+	var intro_autopilot := false
+	if _intro_timer > 0.0:
+		_intro_timer = maxf(_intro_timer - delta, 0.0)
+		intro_autopilot = (_intro_timer > 0.45)
+		if _intro_timer <= 0.55:
+			_set_gameplay_hud_alpha(clampf(1.0 - (_intro_timer / 0.55), 0.0, 1.0))
+		if _intro_timer <= 0.001:
+			_intro_timer = 0.0
+			_intro_hud_hidden = false
+			_set_gameplay_hud_alpha(1.0)
+	elif _intro_hud_hidden:
+		_intro_hud_hidden = false
+		_set_gameplay_hud_alpha(1.0)
+
+	if intro_autopilot:
+		wants_throttle = (forward_mps < _intro_cruise_mps * 1.08)
+		engine_force = float(engine_force_value) * 0.72 if wants_throttle else 0.0
+		brake = 0.0
+	elif current_fuel <= 0.0:
 		# Engine stalls cleanly: no forced braking, car rolls freely on inertia
 		engine_force = 0.0
 		if Input.is_action_pressed("S") and forward_mps > 1.2:
@@ -1436,7 +1467,15 @@ func _physics_process(delta: float) -> void:
 	var spin_rate: float = 7.5 if spin_target > _launch_wheelspin else 3.4
 	_launch_wheelspin = move_toward(_launch_wheelspin, spin_target, spin_rate * delta)
 
-	var steer_input := Input.get_axis("D", "A")
+	var steer_input := 0.0
+	if intro_autopilot:
+		var car_fwd_h := Vector3(forward_3d.x, 0.0, forward_3d.z).normalized()
+		var target_dir := Vector3(_intro_fwd.x, 0.0, _intro_fwd.z).normalized()
+		var desired_dir := (target_dir + Vector3(-global_position.x * 0.08, 0.0, 0.0)).normalized()
+		var yaw_err := car_fwd_h.cross(desired_dir).y
+		steer_input = clampf(yaw_err * 2.2, -0.35, 0.35)
+	else:
+		steer_input = Input.get_axis("D", "A")
 	# Ручной дрифт на Пробел/Shift отключён: машина уходит в занос сама только на гололёде в зимнем биоме (_on_black_ice)
 	_is_handbraking = false
 	var speed_ratio := clampf(float(speed_kmh) / float(maxi(MAX_SPEED_KMH, 1)), 0.0, 1.0)
@@ -1473,6 +1512,7 @@ func _physics_process(delta: float) -> void:
 	_update_damage_vfx(delta)
 	_update_visual_lights(delta, is_braking or Input.is_action_pressed("S"), false)
 	_update_vehicle_audio(delta, speed_ratio, max_slip, wants_throttle, wants_reverse, is_braking, forward_mps)
+	_animate_supercharger(delta, clampf(_sim_rpm, 0.0, 1.0), maxf(_smooth_throttle, 0.0))
 	_update_exhaust_vfx(delta, speed_ratio, wants_throttle, wants_reverse)
 	_update_hud_telemetry()
 	_prev_forward_mps = forward_mps
@@ -2272,9 +2312,19 @@ func _update_visual_lights(delta: float, braking_now: bool, immediate: bool = fa
 			tm.set_shader_parameter("intensity", t_int)
 			tm.set_shader_parameter("lens_color", Color(1.0, lerpf(0.14, 0.24, _smooth_brake_glow), 0.08, 1.0))
 
+func _animate_supercharger(delta: float, rpm_ratio: float, throttle_ratio: float) -> void:
+	if is_instance_valid(_sc_pulley):
+		_sc_pulley.rotate_z(delta * lerpf(8.0, 48.0, clampf(rpm_ratio, 0.0, 1.0)))
+	if is_instance_valid(_sc_butterflies):
+		var target_x: float = deg_to_rad(clampf(throttle_ratio, 0.0, 1.0) * 56.0)
+		_sc_butterflies.rotation.x = lerpf(_sc_butterflies.rotation.x, target_x, clampf(delta * 12.0, 0.0, 1.0))
+
 func update_showcase_lights(delta: float = 0.016) -> void:
 	if _showcase_mode and not destroyed and is_inside_tree():
 		_update_visual_lights(delta, false, false)
+		_sc_idle_phase += delta
+		var flutter := 0.10 + 0.045 * sin(_sc_idle_phase * 2.8)
+		_animate_supercharger(delta, 0.14, flutter)
 
 func _process_vehicle_extras(_delta: float) -> void:
 	pass
@@ -2330,7 +2380,7 @@ func hit_stop(duration: float) -> void:
 	Engine.time_scale = 1.0
 
 func take_damage(amount: int, cause: String = "МАШИНА УНИЧТОЖЕНА") -> void:
-	if destroyed or is_preview or amount <= 0:
+	if destroyed or is_preview or amount <= 0 or _intro_timer > 0.20:
 		return
 	current_hp = maxi(current_hp - amount, 0)
 	if _hud_hp:
@@ -2698,6 +2748,9 @@ func _destroy_car(death_reason: String = "МАШИНА УНИЧТОЖЕНА") ->
 	if destroyed:
 		return
 	destroyed = true
+	_intro_timer = 0.0
+	_intro_hud_hidden = false
+	_set_gameplay_hud_alpha(1.0)
 	engine_force = 0.0
 	brake = brake_force * 3.0
 
@@ -2826,6 +2879,35 @@ func _destroy_car(death_reason: String = "МАШИНА УНИЧТОЖЕНА") ->
 func shake_camera(amount: float) -> void:
 	if is_instance_valid(_camera) and _camera.has_method("add_shake"):
 		_camera.add_shake(amount)
+
+func _set_gameplay_hud_alpha(a: float) -> void:
+	var hud := get_node_or_null("Hud") as CanvasLayer
+	if hud == null:
+		return
+	var clamped_a := clampf(a, 0.0, 1.0)
+	for ch in hud.get_children():
+		if ch.name == "ColorRect" or ch.name == "Pause" or ch.name == "Check" or ch.name == "Fuel":
+			continue
+		if ch is CanvasItem:
+			(ch as CanvasItem).modulate.a = clamped_a
+
+func prepare_side_intro_pose(fwd_dir: Vector3 = Vector3.BACK) -> void:
+	_intro_fwd = fwd_dir.normalized() if fwd_dir.length_squared() > 0.001 else Vector3.BACK
+	_intro_hud_hidden = true
+	_set_gameplay_hud_alpha(0.0)
+	if is_instance_valid(_camera) and _camera.has_method("prepare_side_intro"):
+		_camera.call("prepare_side_intro", 1.0)
+
+func start_run_intro(duration: float = 2.35, cruise_mps: float = 10.6, fwd_dir: Vector3 = Vector3.BACK) -> void:
+	_intro_duration = maxf(duration, 0.5)
+	_intro_timer = _intro_duration
+	_intro_cruise_mps = cruise_mps
+	_intro_fwd = fwd_dir.normalized() if fwd_dir.length_squared() > 0.001 else Vector3.BACK
+	_intro_hud_hidden = true
+	set_initial_rolling_start(cruise_mps, _intro_fwd)
+	_set_gameplay_hud_alpha(0.0)
+	if is_instance_valid(_camera) and _camera.has_method("start_side_intro"):
+		_camera.call("start_side_intro", _intro_duration, 1.0)
 
 func set_initial_rolling_start(speed_mps: float, fwd_dir: Vector3) -> void:
 	var dir := fwd_dir.normalized() if fwd_dir.length_squared() > 0.001 else Vector3.FORWARD

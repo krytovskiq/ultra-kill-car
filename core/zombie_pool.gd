@@ -366,6 +366,17 @@ func prewarm_zombies(count: int, parent_node: Node) -> void:
 		_deactivate_zombie(zombie)
 		pool.append(zombie)
 
+func prewarm_zombies_batch(target_count: int, batch_size: int, parent_node: Node) -> bool:
+	_validate_pool()
+	var needed := maxi(target_count - pool.size(), 0)
+	var step_count := mini(maxi(batch_size, 1), needed)
+	for i in range(step_count):
+		var zombie := zombie_scene.instantiate() as Node3D
+		parent_node.add_child(zombie)
+		_deactivate_zombie(zombie)
+		pool.append(zombie)
+	return pool.size() >= target_count
+
 func _cleanup_distant_zombies() -> void:
 	var main_node := get_tree().current_scene
 	if not main_node or not "car" in main_node or not is_instance_valid(main_node.car):

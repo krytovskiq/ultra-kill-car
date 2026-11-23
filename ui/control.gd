@@ -122,7 +122,7 @@ func _apply_visual_styles() -> void:
 		play_btn.add_theme_stylebox_override("pressed", _sb_nav_pressed)
 		play_btn.add_theme_stylebox_override("focus", _sb_primary_hover)
 
-	for bname in ["Shop", "SettingsButton", "Exit", "BtnClose"]:
+	for bname in ["Shop", "TestPolygon", "SettingsButton", "Exit", "BtnClose"]:
 		var btn := find_child(bname, true, false) as Button
 		if btn:
 			btn.add_theme_stylebox_override("normal", _sb_nav_normal)
@@ -147,7 +147,7 @@ func _apply_visual_styles() -> void:
 
 func _wire_button_audio_and_hover() -> void:
 	var btns: Array[Button] = []
-	for bname in ["Play", "Shop", "SettingsButton", "Exit", "BtnLow", "BtnMedium", "BtnHigh", "BtnUltra", "BtnClose"]:
+	for bname in ["Play", "Shop", "TestPolygon", "SettingsButton", "Exit", "BtnLow", "BtnMedium", "BtnHigh", "BtnUltra", "BtnClose"]:
 		var b := find_child(bname, true, false) as Button
 		if b:
 			btns.append(b)
@@ -161,12 +161,12 @@ func _on_any_btn_hover(btn: Button) -> void:
 	var sm := get_node_or_null("/root/SoundManager")
 	if sm and sm.has_method("play_ui"):
 		sm.call("play_ui", "ui_hover", -10.0, randf_range(0.96, 1.04))
-	if btn.name in ["Play", "Shop", "SettingsButton", "Exit"]:
+	if btn.name in ["Play", "Shop", "TestPolygon", "SettingsButton", "Exit"]:
 		var tw := create_tween()
 		tw.tween_property(btn, "modulate", Color(1.08, 1.04, 1.02, 1.0), 0.12)
 
 func _on_any_btn_exit(btn: Button) -> void:
-	if btn.name in ["Play", "Shop", "SettingsButton", "Exit"]:
+	if btn.name in ["Play", "Shop", "TestPolygon", "SettingsButton", "Exit"]:
 		var tw := create_tween()
 		tw.tween_property(btn, "modulate", Color.WHITE, 0.12)
 
@@ -248,6 +248,13 @@ func _on_texture_button_pressed() -> void:
 	_launching = true
 	_play_click()
 	SceneTransition.transition_to_scene("res://ui/shop/Angar/Shop_Hungar.tscn")
+
+func _on_test_polygon_pressed() -> void:
+	if _launching or SceneTransition.is_transitioning():
+		return
+	_launching = true
+	_play_click()
+	SceneTransition.transition_to_scene("res://levels/test_polygon.tscn")
 
 func _on_play_pressed() -> void:
 	if _launching:

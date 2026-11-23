@@ -192,6 +192,18 @@ theme_override_font_sizes/font_size = 26
 text = "ГАРАЖ"
 alignment = 0
 
+[node name="TestPolygon" type="Button" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100148]
+custom_minimum_size = Vector2(340, 50)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(0.88, 0.9, 0.91, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.56, 0.24, 1)
+theme_override_colors/font_hover_color = Color(1, 0.94, 0.88, 1)
+theme_override_fonts/font = ExtResource("7_russo")
+theme_override_font_sizes/font_size = 26
+text = "ТЕСТ ПОЛИГОН"
+alignment = 0
+
 [node name="SettingsButton" type="Button" parent="Menu/LeftMargin/LeftVBox" unique_id=1805267227]
 custom_minimum_size = Vector2(340, 50)
 layout_mode = 2
@@ -491,6 +503,7 @@ text = "ЗАКРЫТЬ"
 
 [connection signal="pressed" from="Menu/LeftMargin/LeftVBox/Play" to="Menu" method="_on_play_pressed"]
 [connection signal="pressed" from="Menu/LeftMargin/LeftVBox/Shop" to="Menu" method="_on_texture_button_pressed"]
+[connection signal="pressed" from="Menu/LeftMargin/LeftVBox/TestPolygon" to="Menu" method="_on_test_polygon_pressed"]
 [connection signal="pressed" from="Menu/LeftMargin/LeftVBox/SettingsButton" to="Menu" method="_on_settings_pressed"]
 [connection signal="pressed" from="Menu/LeftMargin/LeftVBox/Exit" to="Menu" method="_on_exit_pressed"]
 [connection signal="pressed" from="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/GraphicsRow/BtnLow" to="Menu" method="_on_btn_low_pressed"]

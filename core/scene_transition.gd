@@ -1,26 +1,82 @@
 extends Node
 
-## Плавный пост-апокалиптический переход между сценами (дымка + затемнение + раскрытие без рывков).
+## Плавный пост-апокалиптический переход между сценами с неблокирующей
+## потоковой загрузкой (ResourceLoader.load_threaded_request), анимацией и стадиями мира.
 
 const TRANSITION_SHADER: Shader = preload("res://ui/shaders/scene_transition.gdshader")
+const FONT_HEADER: Font = preload("res://assets/fonts/RussoOne-Regular.ttf")
+const FONT_BODY: Font = preload("res://assets/fonts/Jura-Variable.ttf")
+
+const _TIPS: Array[String] = [
+	"СОВЕТ: Прокачка двигателя каждые 5 уровней открывает более мощный рёв мотора и нагнетатель",
+	"СОВЕТ: Полная прокачка кузова, ходовой и двигателя 50/50 открывает боевой окрас техники",
+	"СОВЕТ: На ПАЗ-3205 крышная турель ведёт огонь по нажатию ПРОБЕЛ",
+	"СОВЕТ: В зимнем биоме трасса покрывается льдом — сбрасывайте газ перед входом в поворот",
+	"СОВЕТ: Сбивайте топливные бочки и зоны орды, чтобы держать комбо и пополнять бак",
+]
 
 var _layer: CanvasLayer = null
 var _overlay: ColorRect = null
 var _mat: ShaderMaterial = null
+
+var _load_ui: Control = null
+var _spinner: TextureRect = null
+var _title_lbl: Label = null
+var _stage_lbl: Label = null
+var _pct_lbl: Label = null
+var _tip_lbl: Label = null
+var _bar: ProgressBar = null
+
 var _is_transitioning: bool = false
 var _shader_time: float = 0.0
-
+var _target_progress: float = 0.0
+var _shown_progress: float = 0.0
+var _tip_idx: int = 0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_ensure_overlay()
 
-
 func _process(delta: float) -> void:
-	if _layer != null and _layer.visible and _mat != null:
-		_shader_time += delta
+	if _layer == null or not _layer.visible:
+		return
+	var dt := clampf(delta, 0.0, 0.05)
+	_shader_time += dt
+	if _mat != null:
 		_mat.set_shader_parameter("time_sec", _shader_time)
+	if is_instance_valid(_load_ui) and _load_ui.visible:
+		if is_instance_valid(_spinner):
+			_spinner.rotation += dt * 3.8
+		_shown_progress = lerpf(_shown_progress, _target_progress, clampf(dt * 11.0, 0.0, 1.0))
+		if absf(_target_progress - _shown_progress) < 0.004:
+			_shown_progress = _target_progress
+		if is_instance_valid(_bar):
+			_bar.value = _shown_progress
+		if is_instance_valid(_pct_lbl):
+			_pct_lbl.text = "%d%%" % clampi(roundi(_shown_progress * 100.0), 0, 100)
 
+func _make_spinner_tex(size_px: int = 96) -> ImageTexture:
+	var img := Image.create(size_px, size_px, false, Image.FORMAT_RGBA8)
+	var half := float(size_px) * 0.5
+	var r_outer := half * 0.86
+	var r_inner := half * 0.60
+	for y in range(size_px):
+		for x in range(size_px):
+			var dx := float(x) + 0.5 - half
+			var dy := float(y) + 0.5 - half
+			var dist := sqrt(dx * dx + dy * dy)
+			if dist < r_inner - 1.5 or dist > r_outer + 1.5:
+				img.set_pixel(x, y, Color(0, 0, 0, 0))
+				continue
+			var ring_a := clampf(minf(dist - (r_inner - 1.5), (r_outer + 1.5) - dist) / 2.2, 0.0, 1.0)
+			var ang := fmod(atan2(dy, dx) + TAU, TAU) / TAU
+			# Leading bright amber arc with jagged industrial fade + 3 accent notches
+			var arc_fade := pow(1.0 - ang, 1.35)
+			var gap := 0.0 if (ang > 0.78 and ang < 0.84) or (ang > 0.90 and ang < 0.95) else 1.0
+			var alpha := ring_a * arc_fade * gap
+			var col := Color(1.0, 0.76, 0.28).lerp(Color(0.88, 0.36, 0.12), clampf(ang * 1.15, 0.0, 1.0))
+			img.set_pixel(x, y, Color(col.r, col.g, col.b, clampf(alpha, 0.0, 1.0)))
+	return ImageTexture.create_from_image(img)
 
 func _ensure_overlay() -> void:
 	if _layer != null and is_instance_valid(_layer):
@@ -45,10 +101,119 @@ func _ensure_overlay() -> void:
 	_overlay.material = _mat
 	_layer.add_child(_overlay)
 
+	_build_loading_ui()
+
+func _build_loading_ui() -> void:
+	_load_ui = Control.new()
+	_load_ui.name = "LoadingOverlayUI"
+	_load_ui.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_load_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_load_ui.visible = false
+	_load_ui.modulate.a = 0.0
+	_layer.add_child(_load_ui)
+
+	var anchor_box := MarginContainer.new()
+	anchor_box.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	anchor_box.offset_top = -178
+	anchor_box.offset_bottom = -28
+	anchor_box.add_theme_constant_override("margin_left", 60)
+	anchor_box.add_theme_constant_override("margin_right", 60)
+	anchor_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_load_ui.add_child(anchor_box)
+
+	var center := CenterContainer.new()
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	anchor_box.add_child(center)
+
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(620, 0)
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb_card := StyleBoxFlat.new()
+	sb_card.bg_color = Color(0.050, 0.056, 0.072, 0.92)
+	sb_card.border_color = Color(0.92, 0.46, 0.16, 0.80)
+	sb_card.set_border_width_all(1)
+	sb_card.border_width_left = 5
+	sb_card.set_corner_radius_all(5)
+	sb_card.content_margin_left = 20
+	sb_card.content_margin_right = 20
+	sb_card.content_margin_top = 14
+	sb_card.content_margin_bottom = 14
+	card.add_theme_stylebox_override("panel", sb_card)
+	center.add_child(card)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	card.add_child(vbox)
+
+	var header_row := HBoxContainer.new()
+	header_row.add_theme_constant_override("separation", 14)
+	header_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_child(header_row)
+
+	_spinner = TextureRect.new()
+	_spinner.texture = _make_spinner_tex(96)
+	_spinner.custom_minimum_size = Vector2(44, 44)
+	_spinner.pivot_offset = Vector2(22, 22)
+	_spinner.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_spinner.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	header_row.add_child(_spinner)
+
+	var titles := VBoxContainer.new()
+	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	titles.add_theme_constant_override("separation", 2)
+	header_row.add_child(titles)
+
+	_title_lbl = Label.new()
+	_title_lbl.text = "ВЫЕЗД В РЕЙД"
+	_title_lbl.add_theme_font_override("font", FONT_HEADER)
+	_title_lbl.add_theme_font_size_override("font_size", 22)
+	_title_lbl.add_theme_color_override("font_color", Color(0.96, 0.94, 0.90, 1.0))
+	titles.add_child(_title_lbl)
+
+	_stage_lbl = Label.new()
+	_stage_lbl.text = "ЗАГРУЗКА..."
+	_stage_lbl.add_theme_font_override("font", FONT_BODY)
+	_stage_lbl.add_theme_font_size_override("font_size", 14)
+	_stage_lbl.add_theme_color_override("font_color", Color(0.76, 0.80, 0.86, 1.0))
+	titles.add_child(_stage_lbl)
+
+	_pct_lbl = Label.new()
+	_pct_lbl.text = "0%"
+	_pct_lbl.custom_minimum_size = Vector2(68, 0)
+	_pct_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_pct_lbl.add_theme_font_override("font", FONT_HEADER)
+	_pct_lbl.add_theme_font_size_override("font_size", 22)
+	_pct_lbl.add_theme_color_override("font_color", Color(0.98, 0.68, 0.24, 1.0))
+	header_row.add_child(_pct_lbl)
+
+	_bar = ProgressBar.new()
+	_bar.custom_minimum_size = Vector2(0, 12)
+	_bar.min_value = 0.0
+	_bar.max_value = 1.0
+	_bar.value = 0.0
+	_bar.show_percentage = false
+	var sb_track := StyleBoxFlat.new()
+	sb_track.bg_color = Color(0.11, 0.12, 0.15, 1.0)
+	sb_track.border_color = Color(0.26, 0.28, 0.34, 0.70)
+	sb_track.set_border_width_all(1)
+	sb_track.set_corner_radius_all(3)
+	var sb_fill := StyleBoxFlat.new()
+	sb_fill.bg_color = Color(0.96, 0.50, 0.14, 1.0)
+	sb_fill.set_corner_radius_all(3)
+	_bar.add_theme_stylebox_override("background", sb_track)
+	_bar.add_theme_stylebox_override("fill", sb_fill)
+	vbox.add_child(_bar)
+
+	_tip_lbl = Label.new()
+	_tip_lbl.text = _TIPS[0]
+	_tip_lbl.add_theme_font_override("font", FONT_BODY)
+	_tip_lbl.add_theme_font_size_override("font_size", 13)
+	_tip_lbl.add_theme_color_override("font_color", Color(0.66, 0.64, 0.60, 0.92))
+	_tip_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(_tip_lbl)
 
 func is_transitioning() -> bool:
 	return _is_transitioning
-
 
 func set_tint_for_scene(scene_path: String) -> void:
 	_ensure_overlay()
@@ -67,39 +232,66 @@ func set_tint_for_scene(scene_path: String) -> void:
 		_mat.set_shader_parameter("fog_color_mid", Color(0.145, 0.138, 0.13, 1.0))
 		_mat.set_shader_parameter("ember_color", Color(0.88, 0.36, 0.14, 1.0))
 
-
 func _set_progress(v: float) -> void:
 	if _mat != null:
 		_mat.set_shader_parameter("progress", clampf(v, 0.0, 1.0))
 
+func _configure_loading_labels(scene_path: String) -> void:
+	_target_progress = 0.04
+	_shown_progress = 0.0
+	if is_instance_valid(_bar):
+		_bar.value = 0.0
+	if is_instance_valid(_pct_lbl):
+		_pct_lbl.text = "0%"
+	if is_instance_valid(_title_lbl):
+		if scene_path.find("Shop_Hungar") >= 0:
+			_title_lbl.text = "АНГАР // МАСТЕРСКАЯ"
+		elif scene_path.find("test_polygon") >= 0:
+			_title_lbl.text = "ТЕСТОВЫЙ ПОЛИГОН // ПОДВЕСКА"
+		elif scene_path.find("main.tscn") >= 0:
+			_title_lbl.text = "ВЫЕЗД В РЕЙД"
+		else:
+			_title_lbl.text = "ГЛАВНОЕ МЕНЮ"
+	if is_instance_valid(_stage_lbl):
+		_stage_lbl.text = "ЗАГРУЗКА СЦЕНЫ..."
+	if is_instance_valid(_tip_lbl):
+		_tip_lbl.text = _TIPS[_tip_idx % _TIPS.size()]
+		_tip_idx += 1
 
-func transition_to_scene(scene_path: String, fade_out_sec: float = 0.36, fade_in_sec: float = 0.48, hold_sec: float = 0.05) -> void:
+func _resolve_selected_car_path() -> String:
+	var g := get_node_or_null("/root/Game")
+	if g == null:
+		return ""
+	var data_v: Variant = g.get("car_data")
+	if not (data_v is Array) or (data_v as Array).is_empty():
+		return ""
+	var data := data_v as Array
+	var idx := clampi(int(g.get("selected_car_index")), 0, data.size() - 1)
+	return str(data[idx].get("path", ""))
+
+func transition_to_scene(scene_path: String, fade_out_sec: float = 0.36, fade_in_sec: float = 0.48, _hold_sec: float = 0.05) -> void:
 	if _is_transitioning or scene_path.is_empty():
 		return
 	_is_transitioning = true
 	_ensure_overlay()
 	set_tint_for_scene(scene_path)
+	_configure_loading_labels(scene_path)
 
 	_layer.visible = true
 	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	_set_progress(0.0)
+	_load_ui.visible = true
+	_load_ui.modulate.a = 0.0
 
-	if fade_out_sec > 0.01:
-		var tw_out := create_tween()
-		tw_out.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-		tw_out.set_ignore_time_scale(true)
-		tw_out.tween_method(Callable(self, "_set_progress"), 0.0, 1.0, fade_out_sec)\
-			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-		await tw_out.finished
-	else:
-		_set_progress(1.0)
-
-	if not is_inside_tree():
-		_is_transitioning = false
-		return
-
-	if hold_sec > 0.0:
-		await get_tree().create_timer(hold_sec, true, false, true).timeout
+	var fade_out_t := maxf(fade_out_sec, 0.18)
+	var tw_out := create_tween().set_parallel(true)
+	tw_out.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw_out.set_ignore_time_scale(true)
+	tw_out.tween_method(Callable(self, "_set_progress"), 0.0, 1.0, fade_out_t)\
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	tw_out.tween_property(_load_ui, "modulate:a", 1.0, minf(fade_out_t, 0.24))\
+		.set_ease(Tween.EASE_OUT)
+	await tw_out.finished
 
 	if not is_inside_tree():
 		_is_transitioning = false
@@ -109,15 +301,110 @@ func transition_to_scene(scene_path: String, fade_out_sec: float = 0.36, fade_in
 	if sm and sm.has_method("stop_transient_sfx"):
 		sm.call("stop_transient_sfx")
 
+	# Запрашиваем фоновую загрузку самой сцены + активной машины (use_sub_threads=false надёжно для GL Compatibility)
+	var is_main_target := (scene_path.find("main.tscn") >= 0)
+	var is_shop_target := (scene_path.find("Shop_Hungar") >= 0)
+	var is_poly_target := (scene_path.find("test_polygon") >= 0)
+	var car_path := _resolve_selected_car_path() if (is_main_target or is_shop_target or is_poly_target) else ""
+	if not car_path.is_empty():
+		ResourceLoader.load_threaded_request(car_path, "PackedScene", false)
+	var req_err := ResourceLoader.load_threaded_request(scene_path, "PackedScene", false)
+
+	var packed: PackedScene = null
+	var progress_arr: Array = []
+	var max_scene_share := 0.52 if is_main_target else 0.92
+	var start_ms := Time.get_ticks_msec()
+
+	if req_err == OK:
+		while is_inside_tree():
+			var status := ResourceLoader.load_threaded_get_status(scene_path, progress_arr)
+			var raw_p: float = float(progress_arr[0]) if not progress_arr.is_empty() else 0.35
+			_target_progress = lerpf(0.06, max_scene_share, clampf(raw_p, 0.0, 1.0))
+			if status == ResourceLoader.THREAD_LOAD_LOADED:
+				packed = ResourceLoader.load_threaded_get(scene_path) as PackedScene
+				break
+			elif status == ResourceLoader.THREAD_LOAD_FAILED or status == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+				break
+			if Time.get_ticks_msec() - start_ms > 12000:
+				break
+			await get_tree().process_frame
+
+	if not car_path.is_empty() and is_inside_tree():
+		var car_wait_ms := Time.get_ticks_msec()
+		while ResourceLoader.load_threaded_get_status(car_path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			if Time.get_ticks_msec() - car_wait_ms > 4000:
+				break
+			await get_tree().process_frame
+
+	if packed == null and is_inside_tree():
+		packed = ResourceLoader.load(scene_path) as PackedScene
+
+	if not is_inside_tree():
+		_is_transitioning = false
+		return
+
+	if is_instance_valid(_stage_lbl):
+		_stage_lbl.text = "ЗАПУСК МИРА..." if is_main_target else "ИНИЦИАЛИЗАЦИЯ СЦЕНЫ..."
+	_target_progress = maxf(_target_progress, max_scene_share)
+	await get_tree().process_frame
+
 	get_tree().paused = false
 	Engine.time_scale = 1.0
-	var err := get_tree().change_scene_to_file(scene_path)
+	var err: int = ERR_CANT_CREATE
+	if packed != null:
+		err = get_tree().change_scene_to_packed(packed)
 	if err != OK:
-		push_warning("SceneTransition: change_scene_to_file failed (%s): %d" % [scene_path, err])
+		err = get_tree().change_scene_to_file(scene_path)
+		if err != OK:
+			push_warning("SceneTransition: change_scene failed (%s): %d" % [scene_path, err])
 
 	await get_tree().process_frame
 	if is_inside_tree():
 		await get_tree().process_frame
+
+	# Если новая сцена инициализирует чанки/пул по кадрам (main.gd: scene_ready), держим анимированный экран загрузки до готовности
+	var cur_scene := get_tree().current_scene if is_inside_tree() else null
+	if is_instance_valid(cur_scene) and ("scene_ready" in cur_scene):
+		var init_start_ms := Time.get_ticks_msec()
+		while is_inside_tree() and is_instance_valid(cur_scene):
+			var ready_v: Variant = cur_scene.get("scene_ready")
+			if ready_v != null and bool(ready_v):
+				break
+			var lp_v: Variant = cur_scene.get("scene_load_progress")
+			var st_v: Variant = cur_scene.get("scene_load_stage")
+			if lp_v != null:
+				_target_progress = maxf(_target_progress, lerpf(0.55, 0.98, clampf(float(lp_v), 0.0, 1.0)))
+			if st_v != null and is_instance_valid(_stage_lbl):
+				var s_txt := str(st_v)
+				if not s_txt.is_empty():
+					_stage_lbl.text = s_txt
+			if Time.get_ticks_msec() - init_start_ms > 12000:
+				break
+			await get_tree().process_frame
+
+	_target_progress = 1.0
+	if is_instance_valid(_stage_lbl):
+		_stage_lbl.text = "ГОТОВО"
+
+	# Даём полосе плавно добежать до 100% + 2 кадра прогрева шейдеров
+	var fin_ms := Time.get_ticks_msec()
+	while is_inside_tree() and (_shown_progress < 0.985 or Time.get_ticks_msec() - fin_ms < 140):
+		if Time.get_ticks_msec() - fin_ms > 500:
+			break
+		await get_tree().process_frame
+
+	if is_inside_tree():
+		var tw_ui_out := create_tween()
+		tw_ui_out.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tw_ui_out.set_ignore_time_scale(true)
+		tw_ui_out.tween_property(_load_ui, "modulate:a", 0.0, 0.16).set_ease(Tween.EASE_OUT)
+		await tw_ui_out.finished
+		if is_instance_valid(_load_ui):
+			_load_ui.visible = false
+
+	cur_scene = get_tree().current_scene if is_inside_tree() else null
+	if is_instance_valid(cur_scene) and cur_scene.has_method("on_transition_reveal"):
+		cur_scene.call("on_transition_reveal")
 
 	if fade_in_sec > 0.01 and is_inside_tree():
 		var tw_in := create_tween()
@@ -128,6 +415,9 @@ func transition_to_scene(scene_path: String, fade_out_sec: float = 0.36, fade_in
 		await tw_in.finished
 
 	_set_progress(0.0)
+	if is_instance_valid(_load_ui):
+		_load_ui.visible = false
+		_load_ui.modulate.a = 0.0
 	if is_instance_valid(_overlay):
 		_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_instance_valid(_layer):
