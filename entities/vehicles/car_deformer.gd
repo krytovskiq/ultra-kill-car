@@ -6,7 +6,8 @@ extends RefCounted
 ## с сохранением защищённой зоны салона, складок металла и PBR-материалов (включая патину).
 
 const MAX_DENT_M: float = 0.38
-const DEFORM_COOLDOWN_MS: int = 90
+const DEFORM_COOLDOWN_MS: int = 480
+const MAX_DEFORMABLE_VERTS_PER_SURF: int = 9500
 const _PRESERVED_SURFACE_FLAGS_MASK: int = (
 	(Mesh.ARRAY_FORMAT_CUSTOM_MASK << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
 	| (Mesh.ARRAY_FORMAT_CUSTOM_MASK << Mesh.ARRAY_FORMAT_CUSTOM1_SHIFT)
@@ -64,7 +65,11 @@ func _ensure_initialized(vehicle: Node3D) -> void:
 				continue
 
 			var raw_verts := arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array
-			if raw_verts.is_empty():
+			if raw_verts.is_empty() or raw_verts.size() > MAX_DEFORMABLE_VERTS_PER_SURF:
+				surf_records.append({"skip": true, "prim": prim, "flags": surf_flags, "arrays": arrays, "mat": mat, "ov_mat": ov_mat})
+				dup_mesh.add_surface_from_arrays(prim, arrays, [], {}, surf_flags)
+				if mat:
+					dup_mesh.surface_set_material(dup_mesh.get_surface_count() - 1, mat)
 				continue
 			valid_any = true
 
@@ -124,6 +129,7 @@ func _ensure_initialized(vehicle: Node3D) -> void:
 
 		_entries.append({
 			"mi": mi,
+			"mesh": dup_mesh,
 			"car_to_mesh": car_to_mesh,
 			"norm_to_mesh": norm_to_mesh,
 			"surfaces": surf_records,
@@ -133,11 +139,13 @@ func _collect_body_meshes(node: Node, out: Array[MeshInstance3D]) -> void:
 	for child in node.get_children():
 		if child is RaycastWheel or child is CPUParticles3D:
 			continue
-		var cname := child.name
-		if cname == "LightsRig" or cname == "FullUpgradeArmorKit" or cname == "EngineDamageFire" or cname == "MuzzleVFX":
+		var cname := String(child.name)
+		if cname == "VisualLightsRig" or cname == "LightsRig" or cname == "FullUpgradeArmorKit" or cname.begins_with("KitStage_") or cname == "EngineDamageFire" or cname == "MuzzleVFX" or cname == "MuzzleFlashRig":
 			continue
 		if child is MeshInstance3D:
-			out.append(child as MeshInstance3D)
+			var mi := child as MeshInstance3D
+			if mi.material_override == null:
+				out.append(mi)
 		_collect_body_meshes(child, out)
 
 func deform_at_world_point(
@@ -271,23 +279,24 @@ func deform_at_world_point(
 					out_arrays[Mesh.ARRAY_NORMAL] = out_n
 
 		if entry_dirty:
-			var rebuilt := ArrayMesh.new()
-			for s_var in surfaces:
-				var rec := s_var as Dictionary
-				var arrays: Array = rec["arrays"]
-				if arrays.is_empty():
-					continue
-				rebuilt.add_surface_from_arrays(int(rec["prim"]), arrays, [], {}, int(rec.get("flags", 0)))
-				var s_idx := rebuilt.get_surface_count() - 1
-				var mat: Material = rec.get("mat") as Material
-				if mat:
-					rebuilt.surface_set_material(s_idx, mat)
-			mi.mesh = rebuilt
-			for s_idx in range(mini(surfaces.size(), rebuilt.get_surface_count())):
-				var rec := surfaces[s_idx] as Dictionary
-				var ov: Material = rec.get("ov_mat") as Material
-				if ov != null:
-					mi.set_surface_override_material(s_idx, ov)
+			var target_mesh := entry.get("mesh") as ArrayMesh
+			if is_instance_valid(target_mesh):
+				target_mesh.clear_surfaces()
+				for s_var in surfaces:
+					var rec := s_var as Dictionary
+					var arrays: Array = rec["arrays"]
+					if arrays.is_empty():
+						continue
+					target_mesh.add_surface_from_arrays(int(rec["prim"]), arrays, [], {}, int(rec.get("flags", 0)))
+					var s_idx := target_mesh.get_surface_count() - 1
+					var mat: Material = rec.get("mat") as Material
+					if mat:
+						target_mesh.surface_set_material(s_idx, mat)
+				for s_idx in range(mini(surfaces.size(), target_mesh.get_surface_count())):
+					var rec := surfaces[s_idx] as Dictionary
+					var ov: Material = rec.get("ov_mat") as Material
+					if ov != null:
+						mi.set_surface_override_material(s_idx, ov)
 
 	if dent_sum > 0.001:
 		_last_deform_ms = now_ms

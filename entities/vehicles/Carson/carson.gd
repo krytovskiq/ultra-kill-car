@@ -2,52 +2,67 @@ extends "res://entities/vehicles/vehicle_base.gd"
 
 func _init() -> void:
 	# ==============================================================================
-	# НАСТРОЙКИ CARSON GRAND SICILIAN — МОЖНО РЕДАКТИРОВАТЬ ПОД СЕБЯ
+	# ОСНОВНЫЕ НАСТРОЙКИ: CARSON GRAND SICILIAN
+	# Самые важные параметры для настройки поведения машины вынесены наверх.
 	# ==============================================================================
 
-	STEER_SPEED = 1.65
-	STEER_LIMIT = 0.36
-	steer_inertia = 5.6
-	high_speed_steer_min_ratio = 0.22
+	# --- 1. Привод, разгон и тормоза ---
+	drive_type = "RWD"                  ## Тип привода: "RWD" (задний), "AWD" (полный), "FWD" (передний)
+	engine_force_value = 6800           ## Мощность / тяга мотора (больше = быстрее разгон)
+	MAX_SPEED_KMH = 186                 ## Максимальная скорость в стоке (км/ч)
+	throttle_response = 3.2             ## Отзывчивость педали газа W (меньше = плавнее набор)
+	launch_wheelspin_intensity = 1.02   ## Пробуксовка колёс при старте с места в пол (0..1.5)
+	brake_force = 98.0                  ## Сила тормозов
+	max_brake_decel_mps2 = 8.2          ## Максимальное замедление при торможении (м/с²)
 
-	throttle_response = 4.6
-	throttle_release_rate = 5.4
-	engine_force_value = 8200
-	MAX_SPEED_KMH = 186
-	brake_force = 98.0
-	max_brake_decel_mps2 = 8.2
+	# --- 2. Подвеска, крен и наклон кузова ---
+	suspension_firmness = 1.00          ## Жёсткость пружин (меньше = мягче на кочках и приземлении)
+	compression_damping_ratio = 0.46    ## Мягкость сжатия при ударе/падении (меньше = глубже проседает)
+	rebound_damping_ratio = 0.65        ## Скорость отбоя вверх (меньше = мягкий упругий качок)
+	anti_roll_stiffness = 8200.0        ## Стабилизатор против крена (меньше = сильнее завал в повороте)
+	body_roll_torque_factor = 0.62      ## Сила бокового наклона (крена) кузова в поворотах
+	body_pitch_torque_factor = 0.68     ## Сила наклона вперёд/назад (приседание на старте и клевок при тормозе)
+	weight_transfer_lat = 0.25          ## Боковой перенос веса на внешние колёса в повороте
+	weight_transfer_long = 0.27         ## Продольный перенос веса (назад при газе, вперёд при тормозе)
+	front_rest_length_scale = 1.08      ## Ход передней подвески / клиренс спереди
+	rear_rest_length_scale = 1.14       ## Ход задней подвески / клиренс сзади
+	front_spring_stiffness = 68000.0    ## Баланс жёсткости передних пружин
+	rear_spring_stiffness = 58000.0     ## Баланс жёсткости задних рессор
+	suspension_travel_speed = 24.0      ## Скорость визуального хода колёс вверх/вниз
+
+	# --- 3. Руль, сцепление и центр тяжести ---
+	STEER_SPEED = 1.68                  ## Скорость поворота руля
+	STEER_LIMIT = 0.36                  ## Максимальный угол выворота колёс (рад)
+	steer_inertia = 5.8                 ## Тяжесть / плавность рулевой рейки
+	tire_friction = 2.38                ## Общее сцепление шин с асфальтом
+	lateral_stiffness = 12.2            ## Боковая цепкость шин против сноса
+	drift_grip_factor = 0.74            ## Сцепление при заносе (меньше = легче уходит в дрифт)
+	yaw_stability_assist = 2.1          ## Стабилизация курса ESC (меньше = свободнее виляет корма)
+	com_height = 0.35                   ## Высота центра масс (ниже = устойчивее к переворотам)
+	com_z_offset = -0.12                ## Смещение центра масс вперёд(-) / назад(+)
+
+	# --- 4. Броня, топливо и таран ---
+	health = 1650                       ## Базовая прочность HP
+	max_fuel = 130                      ## Объём топливного бака (л)
+	fuel_per_100m = 3.3                 ## Расход топлива на 100 метров
+	zombie_damage_taken = 4             ## Урон по машине за сбитого зомби
+	impact_momentum_keep = 0.80         ## Сохранение скорости при таране препятствий (0..1)
+
+	# --- 5. Прочее (КПП, аэродинамика, габариты, свет, звук) ---
+	high_speed_steer_min_ratio = 0.22
+	throttle_release_rate = 5.2
 	aero_drag_coeff = 0.50
 	gear_speed_ratios = [0.18, 0.36, 0.56, 0.78, 1.02]
-	gear_torque_multipliers = [1.74, 1.40, 1.12, 0.88, 0.64]
-
-	suspension_firmness = 1.06
-	compression_damping_ratio = 0.48
-	rebound_damping_ratio = 0.64
-	anti_roll_stiffness = 8800.0
-	front_spring_stiffness = 66000.0
-	rear_spring_stiffness = 64000.0
-	front_rest_length_scale = 1.02
-	rear_rest_length_scale = 1.06
-	front_grip_bias = 0.98
-	rear_grip_bias = 1.04
-	suspension_travel_speed = 19.0
-	weight_transfer_long = 0.24
-	weight_transfer_lat = 0.24
-	com_height = 0.36
-	com_z_offset = -0.14
+	gear_torque_multipliers = [1.56, 1.26, 1.00, 0.80, 0.60]
+	front_grip_bias = 0.99
+	rear_grip_bias = 1.05
 	wheelbase_m = 3.26
 	steering_scrub_drag = 0.14
-	impact_momentum_keep = 0.80
-	body_roll_torque_factor = 0.58
-	body_pitch_torque_factor = 0.56
-	lateral_stiffness = 12.2
-	tire_friction = 2.38
-	drift_grip_factor = 0.74
-	yaw_stability_assist = 2.1
 	hull_half_extents = Vector2(0.98, 2.46)
-
+	idle_fuel_per_sec = 0.23
+	crash_death_speed_mps = 26.0
 	engine_sound_id = "carson"
-	engine_pitch_scale = 1.00
+	engine_pitch_scale = 0.50
 	has_exhaust_backfire = true
 	gear_shift_pitch_base = 0.96
 	shadow_texture = GlbVehicleHelper.make_shadow_tex("carson", 0.50, 0.70)
@@ -61,15 +76,8 @@ func _init() -> void:
 	taillight_proj_z_start = 2.32
 	shadow_blob_size = Vector2(4.40, 8.80)
 	shadow_offset = Vector2(0.0, 0.04)
-
-	health = 1650
 	engine_hood_offset = Vector3(0.0, 0.96, -1.55)
 	car_paint_color = Color(0.26, 0.26, 0.28)
-	zombie_damage_taken = 4
-	crash_death_speed_mps = 26.0
-	max_fuel = 130
-	fuel_per_100m = 3.3
-	idle_fuel_per_sec = 0.23
 	exhaust_offset = Vector3(-0.45, 0.25, 2.48)
 	exhaust_offsets = [Vector3(-0.45, 0.25, 2.48), Vector3(0.45, 0.25, 2.48)]
 	exhaust_style = "muscle"

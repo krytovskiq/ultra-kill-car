@@ -35,6 +35,12 @@ var _rewards_committed: bool = false
 #   pikap.gd / doge_2.gd / mustang.gd / raptor.gd / btr.gd
 # ==============================================================================
 @export_group("Driving")
+## Тип привода: "RWD" = задний привод, "AWD" = полный привод 4x4, "FWD" = передний привод
+@export_enum("RWD", "AWD", "FWD") var drive_type: String = "RWD"
+## Доля крутящего момента на переднюю ось для полного привода AWD (например 0.42 = 42% перед / 58% зад)
+@export var awd_front_torque_split: float = 0.42
+## Интенсивность пробуксовки ведущих колёс на старте при газе в пол в стоке (0.4..1.4)
+@export var launch_wheelspin_intensity: float = 1.0
 ## Скорость поворота руля (чем больше — тем резче отклик руля)
 @export var STEER_SPEED: float = 2.4
 ## Максимальный угол поворота передних колёс в радианах (0.29..0.42)
@@ -506,7 +512,7 @@ func _ready() -> void:
 
 	if not is_preview:
 		for w in _wheels:
-			if not w.is_front:
+			if (drive_type == "FWD" and w.is_front) or (drive_type != "FWD" and not w.is_front):
 				var smoke := CarVFX.create_tire_smoke(w, Vector3(0.0, -w.wheel_radius, 0.0))
 				_tire_smokes.append(smoke)
 		_damage_smoke = CarVFX.create_engine_damage_smoke(self, engine_hood_offset)
@@ -571,6 +577,12 @@ func _collect_wheels() -> void:
 			w.add_exception(self)
 			w.is_front = w.position.z < 0.0
 			w.is_left = w.position.x < 0.0
+			if drive_type == "RWD":
+				w.use_as_traction = not w.is_front
+			elif drive_type == "FWD":
+				w.use_as_traction = w.is_front
+			else:
+				w.use_as_traction = true
 			if w.base_rest_length <= 0.0:
 				w.base_rest_length = w.rest_length
 			w.rest_length = w.base_rest_length * (front_rest_length_scale if w.is_front else rear_rest_length_scale)
@@ -581,7 +593,7 @@ func _collect_wheels() -> void:
 			w.grip_multiplier = front_grip_bias if w.is_front else rear_grip_bias
 			w.visual_lerp_speed = suspension_travel_speed
 			w.configure_ray()
-			w.prev_compression_m = w.rest_length * 0.50
+			w.prev_compression_m = w.rest_length * 0.45
 			_wheels.append(w)
 
 			if w.is_front and w.is_left:
@@ -1460,11 +1472,14 @@ func _physics_process(delta: float) -> void:
 
 	# Пробуксовка ведущих колёс при резком нажатии газа с места и на малой скорости (1-я передача)
 	var spin_target: float = 0.0
-	if wants_throttle and not is_braking and current_fuel > 0.0 and grounded_wheels >= 2 and speed_kmh < 46:
-		var low_spd_t: float = clampf(1.0 - float(speed_kmh) / 46.0, 0.0, 1.0)
-		var throt_punch: float = clampf(maxf(_smooth_throttle, 0.65), 0.0, 1.0)
-		spin_target = clampf(pow(low_spd_t, 0.68) * throt_punch, 0.0, 1.0)
-	var spin_rate: float = 7.5 if spin_target > _launch_wheelspin else 3.4
+	var max_spin_kmh: float = 28.0 if drive_type == "AWD" else 42.0
+	if wants_throttle and not is_braking and current_fuel > 0.0 and grounded_wheels >= 2 and float(speed_kmh) < max_spin_kmh:
+		var low_spd_t: float = clampf(1.0 - float(speed_kmh) / max_spin_kmh, 0.0, 1.0)
+		var throt_punch: float = clampf(maxf(_smooth_throttle, 0.58), 0.0, 1.0)
+		var drive_spin_mult: float = 0.65 if drive_type == "AWD" else 1.0
+		var chs_grip_hook: float = clampf(1.0 - float(_chassis_upgrade_lvl) * 0.025, 0.72, 1.0)
+		spin_target = clampf(pow(low_spd_t, 0.64) * throt_punch * launch_wheelspin_intensity * drive_spin_mult * chs_grip_hook, 0.0, 1.15)
+	var spin_rate: float = 8.2 if spin_target > _launch_wheelspin else 2.8
 	_launch_wheelspin = move_toward(_launch_wheelspin, spin_target, spin_rate * delta)
 
 	var steer_input := 0.0
@@ -1592,8 +1607,9 @@ func _emit_drive_skid_marks(speed_kmh: int, wants_throttle: bool, is_braking: bo
 			continue
 		var lat_t := clampf((absf(w.lateral_slip_mps) - slip_thresh) / 5.0, 0.0, 1.0)
 		var brk_t := clampf(_brake_pressure * 0.92, 0.0, 1.0) if (is_braking and speed_kmh > 22) else 0.0
-		var launch_t := clampf(_launch_wheelspin * 0.92, 0.0, 0.92) if (not w.is_front and _launch_wheelspin > 0.16) else 0.0
-		var ice_spin_t := 0.48 if (_on_black_ice and wants_throttle and speed_kmh < 42 and not w.is_front) else 0.0
+		var axle_spin_scale: float = (awd_front_torque_split * 1.4 if w.is_front else 1.0) if drive_type == "AWD" else 1.0
+		var launch_t := clampf(_launch_wheelspin * 0.92 * axle_spin_scale, 0.0, 0.92) if (w.use_as_traction and _launch_wheelspin > 0.14) else 0.0
+		var ice_spin_t := 0.48 if (_on_black_ice and wants_throttle and speed_kmh < 42 and w.use_as_traction) else 0.0
 		var intensity := maxf(maxf(lat_t, brk_t), maxf(launch_t, ice_spin_t))
 		if intensity > 0.08:
 			var mark_col := Color(0.16, 0.19, 0.24, 0.72) if _on_black_ice else Color(0.035, 0.035, 0.04, 0.88)
@@ -1859,10 +1875,12 @@ func _step_raycast_suspension_and_tires(
 
 	var susp_forces: Array[float] = []
 	susp_forces.resize(wheel_count)
+	var tire_loads: Array[float] = []
+	tire_loads.resize(wheel_count)
 	grounded_wheels = 0
 	var traction_total: int = 0
 
-	# 1. Smoothed progressive Hooke's law suspension with inelastic landing absorption
+	# 1. Smoothed progressive Hooke's law suspension with digressive shocks & hydraulic bump stops
 	_post_landing_damp_timer = maxf(_post_landing_damp_timer - delta, 0.0)
 	var max_landing_comp_ratio: float = 0.0
 	var max_landing_spring_vel: float = 0.0
@@ -1876,7 +1894,14 @@ func _step_raycast_suspension_and_tires(
 		if w.cast_suspension_ray(space_state, self, car_up):
 			max_landing_comp_ratio = maxf(max_landing_comp_ratio, w.compression_ratio)
 
-			var k_eff: float = w.spring_stiffness_override if w.spring_stiffness_override > 0.0 else (per_wheel_weight / maxf(w.rest_length * 0.50, 0.05)) * suspension_firmness
+			# Авто-калибровка пружины под реальный вес колеса (чтобы в покое сжатие было ~45%, как в BeamNG)
+			# с сохранением баланса передней/задней жёсткости и множителя suspension_firmness
+			var k_auto: float = (per_wheel_weight / maxf(w.rest_length * 0.45, 0.04)) * suspension_firmness
+			var axle_bias: float = 1.0
+			if front_spring_stiffness > 0.0 and rear_spring_stiffness > 0.0 and w.spring_stiffness_override > 0.0:
+				var avg_ov: float = (front_spring_stiffness + rear_spring_stiffness) * 0.5
+				axle_bias = clampf(w.spring_stiffness_override / maxf(avg_ov, 1.0), 0.80, 1.28)
+			var k_eff: float = k_auto * axle_bias
 			var c_crit: float = 2.0 * sqrt(k_eff * per_wheel_mass)
 			var damp_comp: float = w.damping_comp_override if w.damping_comp_override > 0.0 else c_crit * compression_damping_ratio
 			var damp_reb: float = w.damping_rebound_override if w.damping_rebound_override > 0.0 else c_crit * rebound_damping_ratio
@@ -1888,35 +1913,42 @@ func _step_raycast_suspension_and_tires(
 			if not was_grounded or signf(raw_spring_vel) != signf(w.smooth_spring_vel):
 				w.smooth_spring_vel = raw_spring_vel
 			else:
-				w.smooth_spring_vel = lerpf(w.smooth_spring_vel, raw_spring_vel, clampf(delta * 28.0, 0.0, 1.0))
+				w.smooth_spring_vel = lerpf(w.smooth_spring_vel, raw_spring_vel, clampf(delta * 30.0, 0.0, 1.0))
 
-			# Позиционно-зависимый гидравлический отбойник:
-			# при глубоком пробое позволяет быстро вернуться в норму, а возле рабочего клиренса жёстко гасит раскачку и прыжок
-			if w.compression_ratio > 0.68:
-				var bs_excess: float = w.compression_ratio - 0.68
+			# Прогрессивный резиновый отбойник (Bump Stop) при глубоком ходе подвески (>64%)
+			if w.compression_ratio > 0.64:
+				var bs_excess: float = w.compression_ratio - 0.64
 				if w.smooth_spring_vel >= 0.0:
-					k_eff *= 1.0 + bs_excess * 0.85
-				damp_comp *= 1.0 + bs_excess * 2.5
+					k_eff *= 1.0 + bs_excess * 1.45 + bs_excess * bs_excess * 2.2
+				damp_comp *= 1.0 + bs_excess * 2.6
 
-			var recovery_t: float = clampf((w.compression_ratio - 0.58) / 0.65, 0.0, 1.0)
+			var recovery_t: float = clampf((w.compression_ratio - 0.56) / 0.65, 0.0, 1.0)
 			if _post_landing_damp_timer > 0.0:
 				if w.compression_ratio > 0.72:
 					damp_reb *= 1.05
 				else:
 					damp_reb = maxf(damp_reb * 1.65, c_crit * 1.12)
 
-			var damp_eff: float = damp_comp if w.smooth_spring_vel >= 0.0 else damp_reb
-			var f_raw: float = w.compression_m * k_eff + w.smooth_spring_vel * damp_eff
-			var reb_cap_mult: float = lerpf(1.08 if _post_landing_damp_timer > 0.0 else 1.24, 1.65, recovery_t)
-			var f_cap: float = per_wheel_weight * (4.2 if w.smooth_spring_vel >= 0.0 else reb_cap_mult)
+			# Дигрессивная характеристика сжатия амортизатора (как в BeamNG):
+			# плавно проглатывает резкие мелкие кочки и гребёнку, не подбрасывая кузов
+			var eff_spring_vel: float = w.smooth_spring_vel
+			if eff_spring_vel > 1.25:
+				eff_spring_vel = 1.25 + (eff_spring_vel - 1.25) * 0.50
+
+			var damp_eff: float = damp_comp if eff_spring_vel >= 0.0 else damp_reb
+			var f_raw: float = w.compression_m * k_eff + eff_spring_vel * damp_eff
+			var reb_cap_mult: float = lerpf(1.10 if _post_landing_damp_timer > 0.0 else 1.32, 1.72, recovery_t)
+			var f_cap: float = per_wheel_weight * (4.4 if eff_spring_vel >= 0.0 else reb_cap_mult)
 			var f_susp: float = clampf(f_raw, 0.0, f_cap)
 			susp_forces[i] = f_susp
+			tire_loads[i] = f_susp
 			w.prev_compression_m = w.compression_m
 			grounded_wheels += 1
 		else:
 			w.prev_compression_m = 0.0
 			w.smooth_spring_vel = lerpf(w.smooth_spring_vel, 0.0, clampf(delta * 12.0, 0.0, 1.0))
 			susp_forces[i] = 0.0
+			tire_loads[i] = 0.0
 
 	# Track airborne flight & trigger hard-landing sparks + sound + camera jolt on touchdown
 	_landing_cooldown = maxf(_landing_cooldown - delta, 0.0)
@@ -1941,27 +1973,32 @@ func _step_raycast_suspension_and_tires(
 		if linear_velocity.y > max_up_vy:
 			linear_velocity.y = move_toward(linear_velocity.y, max_up_vy * 0.85, delta * 36.0)
 
-	# 2. Front & rear Anti-Roll Bars + Dynamic Weight Transfer
+	# 2. Front & rear Anti-Roll Bars + Dynamic Tire Load Transfer
 	_apply_anti_roll_pair(_front_left, _front_right, anti_roll_stiffness, susp_forces, per_wheel_weight)
 	_apply_anti_roll_pair(_rear_left, _rear_right, anti_roll_stiffness * 0.90, susp_forces, per_wheel_weight)
 
 	if grounded_wheels >= 2:
 		var est_long_g: float = clampf(((forward_mps - _prev_forward_mps) * inv_dt) / 9.8, -1.35, 1.35)
 		var est_lat_g: float = clampf((speed_mps * angular_velocity.dot(car_up)) / 9.8, -1.45, 1.45)
-		var long_shift: float = est_long_g * per_wheel_weight * weight_transfer_long
+		var throt_squat_g: float = (_smooth_throttle * 0.42 + _launch_wheelspin * 0.35) if (wants_throttle and forward_mps >= -0.5) else (-_brake_pressure * 0.58 if (is_braking and forward_mps > 1.0) else 0.0)
+		var eff_long_g: float = clampf(est_long_g * 0.65 + throt_squat_g, -1.40, 1.40)
+		var long_shift: float = eff_long_g * per_wheel_weight * weight_transfer_long
 		var lat_shift: float = est_lat_g * per_wheel_weight * weight_transfer_lat
 		for i in range(wheel_count):
 			var w_tr := _wheels[i]
 			if not w_tr.is_grounded:
 				continue
-			# Acceleration shifts load to rear; braking shifts load to front
-			var df_w: float = (-long_shift if w_tr.is_front else long_shift)
-			# Right turn (positive yaw -> negative lat_g) shifts load to left wheels and vice versa
-			df_w += (lat_shift if w_tr.is_left else -lat_shift)
-			var rec_tr: float = clampf((w_tr.compression_ratio - 0.58) / 0.65, 0.0, 1.0)
-			var reb_tr: float = lerpf(1.08 if _post_landing_damp_timer > 0.0 else 1.24, 1.65, rec_tr)
-			var tr_cap: float = per_wheel_weight * (4.2 if w_tr.smooth_spring_vel >= 0.0 else reb_tr)
-			susp_forces[i] = clampf(susp_forces[i] + df_w, per_wheel_weight * 0.15, tr_cap)
+			# 1) Нагрузка на шину для расчёта зацепа: при разгоне догружается задняя ось (+long_shift сзади);
+			# при левом повороте (est_lat_g > 0) центробежная сила догружает внешние ПРАВЫЕ колёса
+			var df_tire: float = (-long_shift if w_tr.is_front else long_shift)
+			df_tire += (-lat_shift if w_tr.is_left else lat_shift)
+			tire_loads[i] = clampf(susp_forces[i] + df_tire, per_wheel_weight * 0.18, per_wheel_weight * 3.6)
+			# 2) Инерционный момент на кузов:
+			# - при разгоне (long_shift > 0) нос приподнимается (+ спереди), корма приседает (- сзади);
+			# - при левом повороте (lat_shift > 0) центробежная сила наклоняет кузов ВПРАВО (левый борт +, правый внешний борт проседает -)
+			var df_chassis: float = (long_shift * 0.52 if w_tr.is_front else -long_shift * 0.52)
+			df_chassis += (lat_shift * 0.55 if w_tr.is_left else -lat_shift * 0.55)
+			susp_forces[i] = clampf(susp_forces[i] + df_chassis, per_wheel_weight * 0.14, per_wheel_weight * 4.2)
 
 	# 3. Aero downforce
 	if grounded_wheels > 0:
@@ -1971,13 +2008,14 @@ func _step_raycast_suspension_and_tires(
 		for i in range(wheel_count):
 			if _wheels[i].is_grounded:
 				susp_forces[i] += downforce_per_w * 0.65
+				tire_loads[i] += downforce_per_w * 0.65
 
 	if is_braking:
 		_brake_pressure = minf(_brake_pressure + delta * 3.4, 1.0)
 	else:
 		_brake_pressure = maxf(_brake_pressure - delta * 8.0, 0.0)
 
-	# 4. Longitudinal drive force coupled to active transmission gear & RPM band
+	# 4. Longitudinal drive force coupled to active transmission gear, RPM band & realistic launch wheelspin
 	var total_drive_force: float = 0.0
 	if wants_throttle and current_fuel > 0.0:
 		var g_idx: int = clampi(_current_gear - 1, 0, maxi(gear_torque_multipliers.size() - 1, 0))
@@ -1986,27 +2024,26 @@ func _step_raycast_suspension_and_tires(
 			gear_mult = float(gear_torque_multipliers[g_idx])
 		else:
 			var max_g: int = maxi(gear_speed_ratios.size(), 1)
-			gear_mult = lerpf(1.50, 0.64, float(g_idx) / maxf(float(max_g - 1), 1.0))
+			gear_mult = lerpf(1.45, 0.62, float(g_idx) / maxf(float(max_g - 1), 1.0))
 		var rpm_t: float = clampf((_sim_rpm - 0.16) / 0.80, 0.0, 1.0)
-		var rpm_curve: float = 0.84 + 0.22 * sin(rpm_t * PI)
+		var rpm_curve: float = 0.78 + 0.24 * sin(rpm_t * PI)
 		if _shift_timer > 0.0:
 			rpm_curve *= 0.28
 		var overdrive_mult: float = 1.18 if _overdrive_timer > 0.0 else 1.0
-		var launch_punch: float = 1.0 + _launch_wheelspin * 0.26
-		var speed_fade: float = clampf((float(MAX_SPEED_KMH) - speed_mps * MPS_TO_KMH) / 14.0, 0.0, 1.0)
-		var spool_factor: float = clampf(maxf(_smooth_throttle, 0.18), 0.18, 1.0)
-		total_drive_force = float(engine_force_value) * 1.72 * gear_mult * rpm_curve * speed_fade * overdrive_mult * spool_factor * launch_punch
+		# При пробуксовке на старте шина скользит по асфальту и передаёт меньше тяги, пока не зацепится
+		var slip_loss: float = lerpf(1.0, 0.78 if drive_type != "AWD" else 0.85, clampf(_launch_wheelspin, 0.0, 1.0))
+		var speed_fade: float = clampf((float(MAX_SPEED_KMH) - speed_mps * MPS_TO_KMH) / 15.0, 0.0, 1.0)
+		var spool_factor: float = clampf(maxf(_smooth_throttle, 0.16), 0.16, 1.0)
+		total_drive_force = float(engine_force_value) * 1.34 * gear_mult * rpm_curve * speed_fade * overdrive_mult * spool_factor * slip_loss
 	elif wants_reverse and current_fuel > 0.0:
 		var rev_kmh := absf(forward_mps) * MPS_TO_KMH
-		if rev_kmh < 42.0:
-			var rev_spool: float = clampf(absf(_smooth_throttle) * 1.25, 0.20, 1.0)
-			total_drive_force = -float(engine_force_value) * 1.15 * rev_spool
+		if rev_kmh < 40.0:
+			var rev_spool: float = clampf(absf(_smooth_throttle) * 1.15, 0.20, 1.0)
+			total_drive_force = -float(engine_force_value) * 0.86 * rev_spool
 
-	var traction_divisor: float = float(maxi(traction_total, 1))
-	var drive_per_wheel: float = total_drive_force / traction_divisor
 	var lat_accel_sum: float = 0.0
 
-	# 5. Apply 3D forces at tire contact patches (rear-anchored stability prevents spinouts)
+	# 5. Apply 3D forces at tire contact patches (strictly below center of mass for true rear squat & front brake dive)
 	for i in range(wheel_count):
 		var w := _wheels[i]
 		if not w.is_grounded:
@@ -2016,11 +2053,16 @@ func _step_raycast_suspension_and_tires(
 			continue
 
 		var f_susp: float = susp_forces[i]
+		var t_load: float = maxf(tire_loads[i], per_wheel_weight * 0.35)
 		var susp_dir: Vector3 = w.ground_normal.lerp(car_up, 0.35).normalized()
 		var susp_offset: Vector3 = w.global_position - global_position
 		apply_force(susp_dir * f_susp, susp_offset)
 
-		var contact_offset: Vector3 = (w.global_position - car_up * (w.wheel_radius * 0.38)) - global_position
+		# Точка приложения продольных и боковых сил шины всегда находится НИЖЕ центра масс (com_height),
+		# благодаря чему разгон физически прижимает заднюю ось (приседание назад), а тормоз наклоняет нос вперёд
+		var local_w_pos: Vector3 = w.position
+		var contact_local := Vector3(local_w_pos.x, com_height - w.wheel_radius * 0.34, local_w_pos.z)
+		var contact_offset: Vector3 = global_transform.basis * contact_local
 		var vel_at_wheel: Vector3 = linear_velocity + angular_velocity.cross(contact_offset)
 
 		var steer_ang: float = steering if w.use_as_steering else 0.0
@@ -2038,19 +2080,23 @@ func _step_raycast_suspension_and_tires(
 		if _on_black_ice:
 			grip_mod *= (front_grip_bias * 0.94 if w.is_front else rear_grip_bias * 0.86)
 		elif w.is_front:
-			grip_mod *= 0.96
+			grip_mod *= 0.97
 		else:
-			grip_mod *= 1.12
+			grip_mod *= 1.10
+		# Эллипс трения (Traction Circle): буксующие ведущие колёса чуть теряют боковой зацеп под полным газом
+		if w.use_as_traction and _launch_wheelspin > 0.08 and wants_throttle:
+			var spin_lat_drop: float = 0.18 if (drive_type == "RWD" and not w.is_front) else 0.10
+			grip_mod *= clampf(1.0 - _launch_wheelspin * spin_lat_drop, 0.76, 1.0)
 		if not w.is_front:
-			var slip_threshold: float = (2.6 + speed_mps * 0.09) if _on_black_ice else (4.8 + speed_mps * 0.15)
+			var slip_threshold: float = (2.6 + speed_mps * 0.09) if _on_black_ice else (4.6 + speed_mps * 0.15)
 			if absf(lat_vel) > slip_threshold:
 				var slide_t: float = clampf((absf(lat_vel) - slip_threshold) / 7.0, 0.0, 1.0)
 				var min_high_speed_grip: float = clampf(drift_grip_factor * 0.78, 0.56, 0.74) if _on_black_ice else maxf(drift_grip_factor, lerpf(0.76, 0.92, clampf(speed_ratio * 1.15, 0.0, 1.0)))
 				grip_mod *= lerpf(1.0, min_high_speed_grip, slide_t)
 
-		var max_tire_lat: float = maxf(f_susp, per_wheel_weight * 0.45) * tire_friction * grip_mod * _surface_grip_mult
+		var max_tire_lat: float = t_load * tire_friction * grip_mod * _surface_grip_mult
 		var stop_lat_force: float = per_wheel_mass * absf(lat_vel) * inv_dt * 0.92
-		var lat_rate_mult: float = (0.38 if not w.is_front else 0.44) if _on_black_ice else (1.14 if not w.is_front else 0.94)
+		var lat_rate_mult: float = (0.38 if not w.is_front else 0.44) if _on_black_ice else (1.14 if not w.is_front else 0.95)
 		var lat_grip_blend: float = lerpf(0.32, 0.85, _surface_grip_mult) if _on_black_ice else lerpf(0.62, 1.0, _surface_grip_mult)
 		var lat_rate: float = lateral_stiffness * lat_rate_mult * lat_grip_blend
 		var raw_lat_force: float = -lat_vel * per_wheel_mass * lat_rate * grip_mod
@@ -2060,11 +2106,20 @@ func _step_raycast_suspension_and_tires(
 
 		var f_long: float = 0.0
 		if w.use_as_traction and absf(total_drive_force) > 1.0:
-			f_long += drive_per_wheel * lerpf(0.82, 1.0, _surface_grip_mult)
+			var wheel_torque_share: float = 0.5
+			if drive_type == "AWD":
+				wheel_torque_share = (awd_front_torque_split * 0.5) if w.is_front else ((1.0 - awd_front_torque_split) * 0.5)
+			elif traction_total > 0:
+				wheel_torque_share = 1.0 / float(traction_total)
+			var raw_wheel_drive: float = total_drive_force * wheel_torque_share * lerpf(0.80, 1.0, _surface_grip_mult)
+			var slip_grip_mult: float = lerpf(1.0, 0.82, clampf(_launch_wheelspin, 0.0, 1.0))
+			var drive_grip_coef: float = 0.82 if drive_type != "AWD" else 0.64
+			var max_tire_drive: float = t_load * tire_friction * drive_grip_coef * _surface_grip_mult * slip_grip_mult
+			f_long += clampf(raw_wheel_drive, -max_tire_drive, max_tire_drive)
 		if is_braking and absf(fwd_vel) > 0.15:
 			var bias: float = 1.30 if w.is_front else 0.70
 			var target_decel: float = max_brake_decel_mps2 * maxf(_brake_pressure, 0.18) * clampf(brake_force / 100.0, 0.65, 1.55) * lerpf(0.54, 1.0, _surface_brake_mult)
-			var max_tire_long: float = maxf(f_susp, per_wheel_weight * 0.45) * tire_friction * 0.90 * _surface_brake_mult
+			var max_tire_long: float = t_load * tire_friction * 0.90 * _surface_brake_mult
 			var brk_mag: float = minf(per_wheel_mass * target_decel * bias, minf(max_tire_long, per_wheel_mass * absf(fwd_vel) * inv_dt * 0.85))
 			f_long += -signf(fwd_vel) * brk_mag
 		elif not wants_throttle and not wants_reverse and absf(fwd_vel) > 0.05:
@@ -2074,7 +2129,11 @@ func _step_raycast_suspension_and_tires(
 		if absf(f_long) > 0.01:
 			apply_force(wheel_fwd * f_long, contact_offset)
 
-		var vis_wheel_spd: float = fwd_vel + (_launch_wheelspin * 24.0 if (w.use_as_traction or not w.is_front) else 0.0)
+		var spin_vis_extra: float = 0.0
+		if w.use_as_traction and _launch_wheelspin > 0.02:
+			var awd_vis_scale: float = (awd_front_torque_split * 1.45 if w.is_front else 1.0) if drive_type == "AWD" else 1.0
+			spin_vis_extra = _launch_wheelspin * 20.0 * awd_vis_scale
+		var vis_wheel_spd: float = fwd_vel + spin_vis_extra
 		w.update_visuals(steering, vis_wheel_spd, delta, false)
 
 	if speed_mps > 1.5:
@@ -2083,16 +2142,24 @@ func _step_raycast_suspension_and_tires(
 
 	# 6. Body roll, pitch squat/dive, launch torque shudder, realistic yaw weight damping & self-righting
 	if grounded_wheels >= 2:
-		var roll_assist: float = (lat_accel_sum / maxf(mass, 1.0)) * mass * body_roll_torque_factor * 0.068
-		apply_torque(car_fwd * (-roll_assist))
+		var roll_assist: float = (lat_accel_sum / maxf(mass, 1.0)) * mass * body_roll_torque_factor * 0.12
+		apply_torque(car_fwd * roll_assist)
 
-		var long_accel: float = clampf((forward_mps - _prev_forward_mps) * inv_dt, -25.0, 25.0)
-		var launch_squat_boost: float = _launch_wheelspin * 6.5 if wants_throttle else 0.0
-		var pitch_assist: float = (long_accel + launch_squat_boost) * mass * body_pitch_torque_factor * 0.018
+		var long_accel: float = clampf((forward_mps - _prev_forward_mps) * inv_dt, -22.0, 22.0)
+		var launch_squat_boost: float = (_launch_wheelspin * 5.6 + _smooth_throttle * 3.8) if (wants_throttle and forward_mps >= -0.5) else 0.0
+		var brake_dive_boost: float = (-_brake_pressure * 7.8) if (is_braking and forward_mps > 1.0) else 0.0
+		var pitch_assist: float = (long_accel * 0.90 + launch_squat_boost + brake_dive_boost) * mass * body_pitch_torque_factor * 0.14
 		apply_torque(car_right * pitch_assist)
 
-		if _launch_wheelspin > 0.18 and wants_throttle:
-			var torque_shudder: float = sin(float(Time.get_ticks_msec()) * 0.036) * _launch_wheelspin * mass * 0.48
+		# Плавное демпфирование угловой скорости крена и тангажа кузова (чтобы подвеска работала упруго, без болтанки)
+		var pitch_rate: float = angular_velocity.dot(car_right)
+		var roll_rate_d: float = angular_velocity.dot(car_fwd)
+		apply_torque(-car_right * pitch_rate * mass * 1.45)
+		apply_torque(-car_fwd * roll_rate_d * mass * 1.65)
+
+		if _launch_wheelspin > 0.14 and wants_throttle:
+			var shudder_mult: float = 0.35 if drive_type == "AWD" else 0.56
+			var torque_shudder: float = sin(float(Time.get_ticks_msec()) * 0.036) * _launch_wheelspin * mass * shudder_mult
 			apply_torque(car_up * torque_shudder)
 
 		# Cornering tire scrub drag gives heavy trucks & APCs palpable weight under hard steering
@@ -2480,7 +2547,8 @@ func _on_kill_zone_body_entered(body: Node3D) -> void:
 		var z_mult_var = body.get("ram_damage_mult")
 		var z_mult: float = float(z_mult_var) if z_mult_var != null else 1.0
 		var z_dmg: int = maxi(roundi(float(zombie_damage_taken) * z_mult), 1)
-		apply_body_deformation(body.global_position + Vector3.UP * 0.72, eff_vel, clampf((speed_mps / 22.0) * z_mult * 0.28, 0.18, 0.55))
+		if z_mult >= 1.5 and speed_mps > 16.0:
+			apply_body_deformation(body.global_position + Vector3.UP * 0.72, eff_vel, clampf((speed_mps / 24.0) * z_mult * 0.25, 0.18, 0.48))
 		if is_lethal:
 			take_damage(z_dmg, "МАШИНА РАЗБИТА ОБ ОРДУ")
 			if body.has_method("die"):

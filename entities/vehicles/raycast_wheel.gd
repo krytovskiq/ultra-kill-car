@@ -137,11 +137,11 @@ func update_visuals(steer_angle: float, forward_mps: float, delta: float, is_pre
 	var target_vis_y: float = 0.0
 	if not is_preview_mode:
 		if is_grounded:
-			target_vis_y = clampf(-(hub_to_ground_m - wheel_radius), -rest_length * 0.68, rest_length * 0.72)
+			target_vis_y = clampf(-(hub_to_ground_m - wheel_radius), -(rest_length + over_extend * 0.78), rest_length * 0.68)
 		else:
-			target_vis_y = -(rest_length + over_extend * 0.65)
+			target_vis_y = -(rest_length + over_extend * 0.68)
 
-	var spd_mult: float = 1.45 if target_vis_y > _visual_y else 1.0
+	var spd_mult: float = 2.15 if target_vis_y > _visual_y else 1.15
 	var y_lerp: float = clampf(delta * visual_lerp_speed * spd_mult, 0.0, 1.0)
 	_visual_y = lerpf(_visual_y, target_vis_y, y_lerp)
 	_steer_pivot.position.y = _visual_y

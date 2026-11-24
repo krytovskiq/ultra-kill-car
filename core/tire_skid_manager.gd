@@ -9,11 +9,13 @@ const MIN_STEP_DIST_SQ: float = 0.14 * 0.14
 const MAX_STEP_DIST_SQ: float = 4.5 * 4.5
 const BURNOUT_STAMP_INTERVAL_MS: int = 90
 const TRAIL_TIMEOUT_MS: int = 320
+const MESH_REBUILD_INTERVAL_MS: int = 45
 
 var _mesh_inst: MeshInstance3D = null
 var _mesh: ArrayMesh = null
 var _mat: StandardMaterial3D = null
 var _tread_tex: ImageTexture = null
+var _last_rebuild_ms: int = 0
 
 var _verts: PackedVector3Array = PackedVector3Array()
 var _normals: PackedVector3Array = PackedVector3Array()
@@ -116,6 +118,10 @@ func _build_tread_texture() -> ImageTexture:
 func _process(_delta: float) -> void:
 	if not _dirty or _mesh == null:
 		return
+	var now_ms: int = Time.get_ticks_msec()
+	if now_ms - _last_rebuild_ms < MESH_REBUILD_INTERVAL_MS:
+		return
+	_last_rebuild_ms = now_ms
 	_dirty = false
 	_rebuild_mesh()
 

@@ -517,10 +517,24 @@ func _apply_current_kit_mode() -> void:
 	if not is_instance_valid(_active_car):
 		return
 	var snd_id: String = str(_active_car.get("engine_sound_id"))
+	var base_spd: int = int(_active_car.get("_base_max_speed"))
+	var base_force: int = int(_active_car.get("_base_engine_force"))
+	var base_throt: float = float(_active_car.get("_base_throttle_response"))
+	var base_grip: float = float(_active_car.get("_base_tire_friction"))
+	var base_steer: float = float(_active_car.get("_base_steer_speed"))
+	var base_brk: float = float(_active_car.get("_base_brake_force"))
 	if _kit_mode == 0:
 		if _active_car.has_method("apply_car_upgrades"):
 			_active_car.call("apply_car_upgrades", _current_car_idx)
 	elif _kit_mode == 1:
+		_active_car.set("_chassis_upgrade_lvl", 10)
+		_active_car.set("_engine_upgrade_tier", 2)
+		_active_car.set("MAX_SPEED_KMH", roundi(float(base_spd) * (1.0 + 10.0 * Game.UPGRADE_SPEED_BONUS_PER_LVL)))
+		_active_car.set("engine_force_value", roundi(float(base_force) * (1.0 + 10.0 * Game.UPGRADE_POWER_BONUS_PER_LVL)))
+		_active_car.set("throttle_response", base_throt * (1.0 + 10.0 * 0.033))
+		_active_car.set("tire_friction", base_grip * (1.0 + 10.0 * Game.UPGRADE_CHASSIS_BONUS_PER_LVL))
+		_active_car.set("STEER_SPEED", base_steer * (1.0 + 10.0 * 0.028))
+		_active_car.set("brake_force", base_brk * (1.0 + 10.0 * 0.032))
 		var full_stages: Dictionary = {
 			"fuel": 3,
 			"engine": 3,
@@ -532,6 +546,14 @@ func _apply_current_kit_mode() -> void:
 		if _active_car.has_method("refresh_armor_kit_refs"):
 			_active_car.call("refresh_armor_kit_refs")
 	else:
+		_active_car.set("_chassis_upgrade_lvl", 0)
+		_active_car.set("_engine_upgrade_tier", 0)
+		_active_car.set("MAX_SPEED_KMH", base_spd)
+		_active_car.set("engine_force_value", base_force)
+		_active_car.set("throttle_response", base_throt)
+		_active_car.set("tire_friction", base_grip)
+		_active_car.set("STEER_SPEED", base_steer)
+		_active_car.set("brake_force", base_brk)
 		var stock_stages: Dictionary = {
 			"fuel": 0,
 			"engine": 0,
@@ -883,11 +905,9 @@ func _update_telemetry_hud() -> void:
 	if not is_instance_valid(_active_car) or not is_instance_valid(_lbl_telemetry):
 		return
 
-	var vel: Vector3 = _active_car.linear_velocity
-	var spd_kmh: int = roundi(vel.length() * 3.6)
-	var basis: Basis = _active_car.global_transform.basis
-	var roll_deg: float = rad_to_deg(asin(clampf(basis.x.y, -1.0, 1.0)))
-	var pitch_deg: float = rad_to_deg(asin(clampf(-basis.z.y, -1.0, 1.0)))
+	var car_basis: Basis = _active_car.global_transform.basis
+	var roll_deg: float = rad_to_deg(asin(clampf(car_basis.x.y, -1.0, 1.0)))
+	var pitch_deg: float = rad_to_deg(asin(clampf(-car_basis.z.y, -1.0, 1.0)))
 
 	var firm_v: Variant = _active_car.get("suspension_firmness")
 	var firm_val: float = float(firm_v) if firm_v != null else 1.25
@@ -930,10 +950,19 @@ func _update_telemetry_hud() -> void:
 		lbl.text = "%d%% %s" % [pct, ("В ВОЗДУХЕ" if not hit else ("ПРОБОЙ!" if pct >= 88 else "НОРМА"))]
 
 	var surf_prof: Dictionary = get_surface_grip_profile(_active_car.global_position)
-	var surf_str: String = "ЛЁД (0.52x)" if bool(surf_prof.get("is_ice", false)) else "АСФАЛЬТ-СЕТКА (1.0x)"
+	var surf_str: String = "ЛЁД (0.52x)" if bool(surf_prof.get("is_ice", false)) else "АСФАЛЬТ (1.0x)"
+	var dt_v: Variant = _active_car.get("drive_type")
+	var dt_code: String = str(dt_v) if dt_v != null else "RWD"
+	var dt_label: String = "ЗАДНИЙ (RWD)"
+	if dt_code == "AWD":
+		dt_label = "ПОЛНЫЙ 4x4 (AWD)"
+	elif dt_code == "FWD":
+		dt_label = "ПЕРЕДНИЙ (FWD)"
+	var ws_v: Variant = _active_car.get("_launch_wheelspin")
+	var ws_pct: int = roundi(clampf(float(ws_v) if ws_v != null else 0.0, 0.0, 1.0) * 100.0)
 
 	_lbl_telemetry.text = (
-		"Скорость: %d км/ч  |  Колёс на земле: %d/4\n" % [spd_kmh, grounded_cnt]
+		"Привод: %s  |  Букс: %d%%  |  Колёса: %d/4\n" % [dt_label, ws_pct, grounded_cnt]
 		+ "Крен (Roll): %+.1f°  |  Тангаж (Pitch): %+.1f°\n" % [roll_deg, pitch_deg]
 		+ "Жёсткость: %.2f  |  Сжатие/Отбой: %.2f/%.2f  |  Стаб: %d\n" % [firm_val, damp_c, damp_r, arb_val]
 		+ "Покрытие: %s" % surf_str

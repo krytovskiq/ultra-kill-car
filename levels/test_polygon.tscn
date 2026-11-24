@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://cdc74r2fqsiag"]
 
-[ext_resource type="Script" path="res://levels/test_polygon.gd" id="1_poly"]
+[ext_resource type="Script" uid="uid://dms51yfka3x8g" path="res://levels/test_polygon.gd" id="1_poly"]
 
-[node name="TestPolygon" type="Node3D"]
+[node name="TestPolygon" type="Node3D" unique_id=1067201847]
 script = ExtResource("1_poly")

@@ -15,54 +15,69 @@ var _barrel_heat_timer: float = 0.0
 
 func _init() -> void:
 	# ==============================================================================
-	# НАСТРОЙКИ ПАЗ-3205 АПОКАЛИПСИС — МОЖНО РЕДАКТИРОВАТЬ ПОД СЕБЯ
+	# ОСНОВНЫЕ НАСТРОЙКИ: ПАЗ-3205 АПОКАЛИПСИС
+	# Самые важные параметры для настройки поведения машины вынесены наверх.
 	# ==============================================================================
 
-	STEER_SPEED = 0.96
-	STEER_LIMIT = 0.30
-	steer_inertia = 3.0
-	high_speed_steer_min_ratio = 0.26
+	# --- 1. Привод, разгон и тормоза ---
+	drive_type = "RWD"                  ## Тип привода: "RWD" (задний мост), "AWD" (полный), "FWD" (передний)
+	engine_force_value = 13400          ## Мощность / тяга мотора (больше = быстрее разгон)
+	MAX_SPEED_KMH = 154                 ## Максимальная скорость в стоке (км/ч)
+	throttle_response = 1.55            ## Отзывчивость педали газа W (меньше = плавнее набор)
+	launch_wheelspin_intensity = 0.75   ## Пробуксовка колёс при старте с места в пол (0..1.5)
+	brake_force = 96.0                  ## Сила тормозов
+	max_brake_decel_mps2 = 5.8          ## Максимальное замедление при торможении (м/с²)
 
-	throttle_response = 1.65
+	# --- 2. Подвеска, крен и наклон кузова ---
+	suspension_firmness = 0.76          ## Жёсткость пружин (меньше = мягче на кочках и приземлении)
+	compression_damping_ratio = 0.40    ## Мягкость сжатия при ударе/падении (меньше = глубже проседает)
+	rebound_damping_ratio = 0.50        ## Скорость отбоя вверх (меньше = мягкий упругий качок)
+	anti_roll_stiffness = 1600.0        ## Стабилизатор против крена (меньше = сильнее завал в повороте)
+	body_roll_torque_factor = 3.60      ## Сила бокового наклона (крена) кузова в поворотах
+	body_pitch_torque_factor = 2.20     ## Сила наклона вперёд/назад (приседание на старте и клевок при тормозе)
+	weight_transfer_lat = 0.85          ## Боковой перенос веса на внешние колёса в повороте
+	weight_transfer_long = 0.64         ## Продольный перенос веса (назад при газе, вперёд при тормозе)
+	front_rest_length_scale = 1.22      ## Ход передней подвески / клиренс спереди
+	rear_rest_length_scale = 1.24       ## Ход задней подвески / клиренс сзади
+	front_spring_stiffness = 175000.0   ## Баланс жёсткости передних рессор
+	rear_spring_stiffness = 185000.0    ## Баланс жёсткости задних рессор
+	suspension_travel_speed = 21.0      ## Скорость визуального хода колёс вверх/вниз
+
+	# --- 3. Руль, сцепление и центр тяжести ---
+	STEER_SPEED = 1.32                  ## Скорость поворота руля
+	STEER_LIMIT = 0.41                  ## Максимальный угол выворота колёс (рад)
+	steer_inertia = 3.1                 ## Тяжесть / плавность рулевой рейки
+	tire_friction = 3.10                ## Общее сцепление шин с асфальтом
+	lateral_stiffness = 11.2            ## Боковая цепкость шин против сноса
+	drift_grip_factor = 0.82            ## Сцепление при заносе (меньше = легче уходит в дрифт)
+	yaw_stability_assist = 2.7          ## Стабилизация курса ESC (меньше = свободнее виляет корма)
+	com_height = 0.48                   ## Высота центра масс (ниже = устойчивее к переворотам)
+	com_z_offset = -0.14                ## Смещение центра масс вперёд(-) / назад(+)
+
+	# --- 4. Броня, топливо и таран ---
+	health = 2850                       ## Базовая прочность HP
+	max_fuel = 190                      ## Объём топливного бака (л)
+	fuel_per_100m = 3.7                 ## Расход топлива на 100 метров
+	zombie_damage_taken = 2             ## Урон по машине за сбитого зомби
+	impact_momentum_keep = 0.94         ## Сохранение скорости при таране препятствий (0..1)
+
+	# --- 5. Прочее (КПП, аэродинамика, габариты, свет, звук) ---
+	high_speed_steer_min_ratio = 0.26
 	throttle_release_rate = 3.2
-	engine_force_value = 15200
-	MAX_SPEED_KMH = 124
-	brake_force = 96.0
-	max_brake_decel_mps2 = 5.8
 	aero_drag_coeff = 1.35
 	downforce_multiplier = 34.0
 	gear_speed_ratios = [0.20, 0.42, 0.68, 0.98]
-	gear_torque_multipliers = [1.52, 1.18, 0.88, 0.66]
-
-	suspension_firmness = 1.18
-	compression_damping_ratio = 0.62
-	rebound_damping_ratio = 0.78
+	gear_torque_multipliers = [1.46, 1.14, 0.86, 0.64]
 	can_deform_body = false
-	anti_roll_stiffness = 34000.0
-	front_spring_stiffness = 175000.0
-	rear_spring_stiffness = 190000.0
-	front_rest_length_scale = 1.16
-	rear_rest_length_scale = 1.18
-	front_grip_bias = 0.94
+	front_grip_bias = 0.96
 	rear_grip_bias = 1.12
-	suspension_travel_speed = 14.5
-	weight_transfer_long = 0.20
-	weight_transfer_lat = 0.22
-	com_height = 0.52
-	com_z_offset = -0.16
 	wheelbase_m = 3.37
-	steering_scrub_drag = 0.22
-	impact_momentum_keep = 0.94
-	body_roll_torque_factor = 0.50
-	body_pitch_torque_factor = 0.48
-	lateral_stiffness = 11.2
-	tire_friction = 2.38
-	drift_grip_factor = 0.82
-	yaw_stability_assist = 2.7
+	steering_scrub_drag = 0.20
 	hull_half_extents = Vector2(1.36, 3.32)
-
+	idle_fuel_per_sec = 0.25
+	crash_death_speed_mps = 35.0
 	engine_sound_id = "paz3205"
-	engine_pitch_scale = 0.95
+	engine_pitch_scale = 0.65
 	has_exhaust_backfire = false
 	gear_shift_pitch_base = 0.78
 	shadow_texture = GlbVehicleHelper.make_shadow_tex("paz3205", 0.56, 0.74)
@@ -76,15 +91,8 @@ func _init() -> void:
 	taillight_proj_z_start = 3.24
 	shadow_blob_size = Vector2(5.80, 10.60)
 	shadow_offset = Vector2(0.0, 0.04)
-
-	health = 2850
 	engine_hood_offset = Vector3(0.0, 1.25, -2.55)
-	car_paint_color = Color(0.76, 0.72, 0.62)
-	zombie_damage_taken = 2
-	crash_death_speed_mps = 35.0
-	max_fuel = 190
-	fuel_per_100m = 3.7
-	idle_fuel_per_sec = 0.25
+	car_paint_color = Color(0.533, 0.533, 0.533, 1.0)
 	exhaust_offset = Vector3(-0.84, 0.44, 3.25)
 	exhaust_offsets = [Vector3(-0.84, 0.44, 3.25)]
 	exhaust_style = "diesel"

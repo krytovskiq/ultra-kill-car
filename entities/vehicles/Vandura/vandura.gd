@@ -5,50 +5,65 @@ const TEX_RUST_NOR: Texture2D = preload("res://environment/model/decor/FuelStati
 
 func _init() -> void:
 	# ==============================================================================
-	# НАСТРОЙКИ GMC VANDURA — МОЖНО РЕДАКТИРОВАТЬ ПОД СЕБЯ
+	# ОСНОВНЫЕ НАСТРОЙКИ: GMC VANDURA
+	# Самые важные параметры для настройки поведения машины вынесены наверх.
 	# ==============================================================================
 
-	STEER_SPEED = 1.42
-	STEER_LIMIT = 0.36
-	steer_inertia = 4.5
-	high_speed_steer_min_ratio = 0.24
+	# --- 1. Привод, разгон и тормоза ---
+	drive_type = "RWD"                  ## Тип привода: "RWD" (задний), "AWD" (полный), "FWD" (передний)
+	engine_force_value = 6900           ## Мощность / тяга мотора (больше = быстрее разгон)
+	MAX_SPEED_KMH = 148                 ## Максимальная скорость в стоке (км/ч)
+	throttle_response = 2.8             ## Отзывчивость педали газа W (меньше = плавнее набор)
+	launch_wheelspin_intensity = 0.90   ## Пробуксовка колёс при старте с места в пол (0..1.5)
+	brake_force = 96.0                  ## Сила тормозов
+	max_brake_decel_mps2 = 7.4          ## Максимальное замедление при торможении (м/с²)
 
-	throttle_response = 3.5
+	# --- 2. Подвеска, крен и наклон кузова ---
+	suspension_firmness = 0.94          ## Жёсткость пружин (меньше = мягче на кочках и приземлении)
+	compression_damping_ratio = 0.46    ## Мягкость сжатия при ударе/падении (меньше = глубже проседает)
+	rebound_damping_ratio = 0.65        ## Скорость отбоя вверх (меньше = мягкий упругий качок)
+	anti_roll_stiffness = 9200.0        ## Стабилизатор против крена (меньше = сильнее завал в повороте)
+	body_roll_torque_factor = 0.68      ## Сила бокового наклона (крена) кузова в поворотах
+	body_pitch_torque_factor = 0.68     ## Сила наклона вперёд/назад (приседание на старте и клевок при тормозе)
+	weight_transfer_lat = 0.26          ## Боковой перенос веса на внешние колёса в повороте
+	weight_transfer_long = 0.28         ## Продольный перенос веса (назад при газе, вперёд при тормозе)
+	front_rest_length_scale = 1.14      ## Ход передней подвески / клиренс спереди
+	rear_rest_length_scale = 1.18       ## Ход задней подвески / клиренс сзади
+	front_spring_stiffness = 76000.0    ## Баланс жёсткости передних пружин
+	rear_spring_stiffness = 68000.0     ## Баланс жёсткости задних рессор
+	suspension_travel_speed = 24.0      ## Скорость визуального хода колёс вверх/вниз
+
+	# --- 3. Руль, сцепление и центр тяжести ---
+	STEER_SPEED = 1.46                  ## Скорость поворота руля
+	STEER_LIMIT = 0.36                  ## Максимальный угол выворота колёс (рад)
+	steer_inertia = 4.8                 ## Тяжесть / плавность рулевой рейки
+	tire_friction = 2.34                ## Общее сцепление шин с асфальтом
+	lateral_stiffness = 11.8            ## Боковая цепкость шин против сноса
+	drift_grip_factor = 0.78            ## Сцепление при заносе (меньше = легче уходит в дрифт)
+	yaw_stability_assist = 2.5          ## Стабилизация курса ESC (меньше = свободнее виляет корма)
+	com_height = 0.42                   ## Высота центра масс (ниже = устойчивее к переворотам)
+	com_z_offset = -0.14                ## Смещение центра масс вперёд(-) / назад(+)
+
+	# --- 4. Броня, топливо и таран ---
+	health = 1450                       ## Базовая прочность HP
+	max_fuel = 155                      ## Объём топливного бака (л)
+	fuel_per_100m = 3.4                 ## Расход топлива на 100 метров
+	zombie_damage_taken = 5             ## Урон по машине за сбитого зомби
+	impact_momentum_keep = 0.82         ## Сохранение скорости при таране препятствий (0..1)
+
+	# --- 5. Прочее (КПП, аэродинамика, габариты, свет, звук) ---
+	high_speed_steer_min_ratio = 0.24
 	throttle_release_rate = 4.6
-	engine_force_value = 7900
-	MAX_SPEED_KMH = 148
-	brake_force = 96.0
-	max_brake_decel_mps2 = 7.4
 	aero_drag_coeff = 0.62
 	gear_speed_ratios = [0.18, 0.36, 0.56, 0.78, 1.02]
-	gear_torque_multipliers = [1.62, 1.32, 1.04, 0.82, 0.62]
-
-	suspension_firmness = 0.96
-	compression_damping_ratio = 0.48
-	rebound_damping_ratio = 0.64
-	anti_roll_stiffness = 9600.0
-	front_spring_stiffness = 74000.0
-	rear_spring_stiffness = 72000.0
-	front_rest_length_scale = 1.08
-	rear_rest_length_scale = 1.12
+	gear_torque_multipliers = [1.50, 1.22, 0.96, 0.76, 0.58]
 	front_grip_bias = 0.96
 	rear_grip_bias = 1.06
-	suspension_travel_speed = 16.5
-	weight_transfer_long = 0.26
-	weight_transfer_lat = 0.26
-	com_height = 0.46
-	com_z_offset = -0.14
 	wheelbase_m = 3.18
 	steering_scrub_drag = 0.16
-	impact_momentum_keep = 0.82
-	body_roll_torque_factor = 0.70
-	body_pitch_torque_factor = 0.62
-	lateral_stiffness = 11.8
-	tire_friction = 2.34
-	drift_grip_factor = 0.78
-	yaw_stability_assist = 2.5
 	hull_half_extents = Vector2(1.12, 2.58)
-
+	idle_fuel_per_sec = 0.23
+	crash_death_speed_mps = 26.0
 	engine_sound_id = "vandura"
 	engine_pitch_scale = 0.98
 	has_exhaust_backfire = false
@@ -64,15 +79,8 @@ func _init() -> void:
 	taillight_proj_z_start = 2.48
 	shadow_blob_size = Vector2(4.90, 9.10)
 	shadow_offset = Vector2(0.0, 0.04)
-
-	health = 1450
 	engine_hood_offset = Vector3(0.0, 1.08, -1.90)
 	car_paint_color = Color(0.15, 0.16, 0.18)
-	zombie_damage_taken = 5
-	crash_death_speed_mps = 26.0
-	max_fuel = 155
-	fuel_per_100m = 3.4
-	idle_fuel_per_sec = 0.23
 	exhaust_offset = Vector3(-0.64, 0.32, 2.54)
 	exhaust_offsets = [Vector3(-0.64, 0.32, 2.54), Vector3(0.64, 0.32, 2.54)]
 	exhaust_style = "gasoline"
