@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://elohit7h51pt"
-path.s3tc="res://.godot/imported/carson_model_10.png-556c357f61ac17fec7a219fa95f7da00.s3tc.ctex"
-path.etc2="res://.godot/imported/carson_model_10.png-556c357f61ac17fec7a219fa95f7da00.etc2.ctex"
+path="res://.godot/imported/carson_model_10.png-556c357f61ac17fec7a219fa95f7da00.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "c2880a37384b0a265b851d79d927b39f"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/Carson/carson_model_10.png"
-dest_files=["res://.godot/imported/carson_model_10.png-556c357f61ac17fec7a219fa95f7da00.s3tc.ctex", "res://.godot/imported/carson_model_10.png-556c357f61ac17fec7a219fa95f7da00.etc2.ctex"]
+dest_files=["res://.godot/imported/carson_model_10.png-556c357f61ac17fec7a219fa95f7da00.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c4y7visl7n8v"
-path.s3tc="res://.godot/imported/paz_3205_model_4.jpg-2eefea4000f28f9d56844b96bc158428.s3tc.ctex"
-path.etc2="res://.godot/imported/paz_3205_model_4.jpg-2eefea4000f28f9d56844b96bc158428.etc2.ctex"
+path="res://.godot/imported/paz_3205_model_4.jpg-2eefea4000f28f9d56844b96bc158428.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "8e09605f2cee075483fe98ec125e391d"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/PAZ_3205/paz_3205_model_4.jpg"
-dest_files=["res://.godot/imported/paz_3205_model_4.jpg-2eefea4000f28f9d56844b96bc158428.s3tc.ctex", "res://.godot/imported/paz_3205_model_4.jpg-2eefea4000f28f9d56844b96bc158428.etc2.ctex"]
+dest_files=["res://.godot/imported/paz_3205_model_4.jpg-2eefea4000f28f9d56844b96bc158428.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -30,8 +28,8 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=3
+roughness/src_normal="res://entities/vehicles/PAZ_3205/paz_3205_model_5.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

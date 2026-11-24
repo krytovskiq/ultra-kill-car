@@ -14,8 +14,8 @@ dest_files=["res://.godot/imported/engine_buhanka_s0_howl.wav-ffba4c3efdd2f04969
 
 force/8_bit=false
 force/mono=false
-force/max_rate=false
-force/max_rate_hz=44100
+force/max_rate=true
+force/max_rate_hz=22050
 edit/trim=false
 edit/normalize=false
 edit/loop_mode=0

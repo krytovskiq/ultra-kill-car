@@ -1602,7 +1602,7 @@ static func get_ph_blue_barrel_mesh() -> ArrayMesh:
 static func get_ph_utility_pole_mesh() -> ArrayMesh:
 	var pole := _extract_merged_gltf_mesh(
 		"ph_utility_pole",
-		"res://environment/model/polyhaven/modular_electricity_poles/modular_electricity_poles_1k.gltf",
+		"res://environment/model/polyhaven/modular_electricity_poles/modular_electricity_poles_opt.scn",
 		1.15,
 		"preset_01_",
 		PackedStringArray(["_bolt_", "_nail_", "_fastener_"]),
@@ -1617,7 +1617,7 @@ static func get_ph_chainlink_fence_mesh() -> ArrayMesh:
 		return _meshes["ph_chainlink_fence"] as ArrayMesh
 	var panel := _extract_merged_gltf_mesh(
 		"ph_chainlink_panel_unit",
-		"res://environment/model/polyhaven/modular_chainlink_fence/modular_chainlink_fence_1k.gltf",
+		"res://environment/model/polyhaven/modular_chainlink_fence/modular_chainlink_fence_opt.scn",
 		1.0,
 		"modular_chainlink_fence_double",
 		PackedStringArray(),
@@ -1660,7 +1660,7 @@ static func get_ph_chainlink_fence_mesh() -> ArrayMesh:
 static func get_ph_fire_hydrant_mesh() -> ArrayMesh:
 	return _extract_merged_gltf_mesh(
 		"ph_fire_hydrant",
-		"res://environment/model/polyhaven/fire_hydrant/fire_hydrant_1k.gltf",
+		"res://environment/model/polyhaven/fire_hydrant/fire_hydrant_opt.scn",
 		1.25
 	)
 
@@ -1703,7 +1703,7 @@ static func get_ph_trash_can_mesh() -> ArrayMesh:
 static func get_ph_dead_log_mesh() -> ArrayMesh:
 	return _extract_merged_gltf_mesh(
 		"ph_dead_log",
-		"res://environment/model/polyhaven/dead_tree_trunk/dead_tree_trunk_1k.gltf",
+		"res://environment/model/polyhaven/dead_tree_trunk/dead_tree_trunk_opt.scn",
 		1.45
 	)
 
@@ -1711,7 +1711,7 @@ static func get_ph_dead_log_mesh() -> ArrayMesh:
 static func get_ph_boulder_desert_mesh() -> ArrayMesh:
 	return _extract_merged_gltf_mesh(
 		"ph_boulder_desert",
-		"res://environment/model/polyhaven/namaqualand_boulder_02/namaqualand_boulder_02_1k.gltf",
+		"res://environment/model/polyhaven/namaqualand_boulder_02/namaqualand_boulder_02_opt.scn",
 		1.6
 	)
 
@@ -1720,7 +1720,7 @@ static func get_ph_moss_rock_mesh(idx: int = 0) -> ArrayMesh:
 	var r_i: int = clampi(idx, 0, 5)
 	var rock := _extract_merged_gltf_mesh(
 		"ph_moss_rock_%d" % r_i,
-		"res://environment/model/polyhaven/rock_moss_set_01/rock_moss_set_01_1k.gltf",
+		"res://environment/model/polyhaven/rock_moss_set_01/rock_moss_set_01_opt.scn",
 		1.8,
 		"rock_moss_set_01_rock0%d" % (r_i + 1)
 	)

@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cp43nqoaykxlf"
-path.s3tc="res://.godot/imported/gmc_k2500_model_6.png-e47497a6407f4e1330e9d55eeff527ec.s3tc.ctex"
-path.etc2="res://.godot/imported/gmc_k2500_model_6.png-e47497a6407f4e1330e9d55eeff527ec.etc2.ctex"
+path="res://.godot/imported/gmc_k2500_model_6.png-e47497a6407f4e1330e9d55eeff527ec.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "f0ce1cd91ec73794fb5d440af6e26f9d"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/GMC_K2500/gmc_k2500_model_6.png"
-dest_files=["res://.godot/imported/gmc_k2500_model_6.png-e47497a6407f4e1330e9d55eeff527ec.s3tc.ctex", "res://.godot/imported/gmc_k2500_model_6.png-e47497a6407f4e1330e9d55eeff527ec.etc2.ctex"]
+dest_files=["res://.godot/imported/gmc_k2500_model_6.png-e47497a6407f4e1330e9d55eeff527ec.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://4uwytatmq0sk"
-path.s3tc="res://.godot/imported/cop_FuzZombie_body_diffuse.webp-7cb12a2d1012625e3e640d0627549e7e.s3tc.ctex"
-path.etc2="res://.godot/imported/cop_FuzZombie_body_diffuse.webp-7cb12a2d1012625e3e640d0627549e7e.etc2.ctex"
+path="res://.godot/imported/cop_FuzZombie_body_diffuse.webp-7cb12a2d1012625e3e640d0627549e7e.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "7e88df8c228fdd64fd018bcba52376f3"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/zombies/models/cop_FuzZombie_body_diffuse.webp"
-dest_files=["res://.godot/imported/cop_FuzZombie_body_diffuse.webp-7cb12a2d1012625e3e640d0627549e7e.s3tc.ctex", "res://.godot/imported/cop_FuzZombie_body_diffuse.webp-7cb12a2d1012625e3e640d0627549e7e.etc2.ctex"]
+dest_files=["res://.godot/imported/cop_FuzZombie_body_diffuse.webp-7cb12a2d1012625e3e640d0627549e7e.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.78
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -30,8 +28,8 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=-5
+roughness/src_normal="res://entities/zombies/models/cop_FuzZombie_normal.webp"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2
@@ -41,5 +39,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
+process/size_limit=512
 detect_3d/compress_to=0

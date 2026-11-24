@@ -14,8 +14,8 @@ dest_files=["res://.godot/imported/engine_carson_s0_mid.wav-d13e590ebbbc130481e0
 
 force/8_bit=false
 force/mono=false
-force/max_rate=false
-force/max_rate_hz=44100
+force/max_rate=true
+force/max_rate_hz=22050
 edit/trim=false
 edit/normalize=false
 edit/loop_mode=0

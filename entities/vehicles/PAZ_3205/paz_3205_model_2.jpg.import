@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://brw024s2fk50i"
-path.s3tc="res://.godot/imported/paz_3205_model_2.jpg-19593c86e5a3fa496265aafc097e97f0.s3tc.ctex"
-path.etc2="res://.godot/imported/paz_3205_model_2.jpg-19593c86e5a3fa496265aafc097e97f0.etc2.ctex"
+path="res://.godot/imported/paz_3205_model_2.jpg-19593c86e5a3fa496265aafc097e97f0.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "6a633b6e51755a30180483256ce86642"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/PAZ_3205/paz_3205_model_2.jpg"
-dest_files=["res://.godot/imported/paz_3205_model_2.jpg-19593c86e5a3fa496265aafc097e97f0.s3tc.ctex", "res://.godot/imported/paz_3205_model_2.jpg-19593c86e5a3fa496265aafc097e97f0.etc2.ctex"]
+dest_files=["res://.godot/imported/paz_3205_model_2.jpg-19593c86e5a3fa496265aafc097e97f0.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

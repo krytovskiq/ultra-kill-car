@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bavd5mifup8lv"
-path.s3tc="res://.godot/imported/pine_trees_pack__ps1_low_poly_0.png-bfd59af482d260f788dd5f20ddd33a57.s3tc.ctex"
-path.etc2="res://.godot/imported/pine_trees_pack__ps1_low_poly_0.png-bfd59af482d260f788dd5f20ddd33a57.etc2.ctex"
+path="res://.godot/imported/pine_trees_pack__ps1_low_poly_0.png-bfd59af482d260f788dd5f20ddd33a57.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "9d917504eaded8f0f1ab7b6288c09c96"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://environment/model/tree/texture/pine_trees_pack__ps1_low_poly_0.png"
-dest_files=["res://.godot/imported/pine_trees_pack__ps1_low_poly_0.png-bfd59af482d260f788dd5f20ddd33a57.s3tc.ctex", "res://.godot/imported/pine_trees_pack__ps1_low_poly_0.png-bfd59af482d260f788dd5f20ddd33a57.etc2.ctex"]
+dest_files=["res://.godot/imported/pine_trees_pack__ps1_low_poly_0.png-bfd59af482d260f788dd5f20ddd33a57.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.76
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -41,5 +39,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
+process/size_limit=512
 detect_3d/compress_to=0

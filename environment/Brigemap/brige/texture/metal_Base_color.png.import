@@ -3,23 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://oyx7gfw6pe8w"
-path.s3tc="res://.godot/imported/metal_Base_color.png-179d7e8bb0a8296056a9d7da443320da.s3tc.ctex"
-path.etc2="res://.godot/imported/metal_Base_color.png-179d7e8bb0a8296056a9d7da443320da.etc2.ctex"
+path="res://.godot/imported/metal_Base_color.png-179d7e8bb0a8296056a9d7da443320da.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://environment/Brigemap/brige/texture/metal_Base_color.png"
-dest_files=["res://.godot/imported/metal_Base_color.png-179d7e8bb0a8296056a9d7da443320da.s3tc.ctex", "res://.godot/imported/metal_Base_color.png-179d7e8bb0a8296056a9d7da443320da.etc2.ctex"]
+dest_files=["res://.godot/imported/metal_Base_color.png-179d7e8bb0a8296056a9d7da443320da.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.78
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

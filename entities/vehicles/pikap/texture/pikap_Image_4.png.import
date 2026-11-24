@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dmmy2b6d0riqn"
-path.s3tc="res://.godot/imported/pikap_Image_4.png-c079cda57bd1b4dacc62a7c43559db21.s3tc.ctex"
-path.etc2="res://.godot/imported/pikap_Image_4.png-c079cda57bd1b4dacc62a7c43559db21.etc2.ctex"
+path="res://.godot/imported/pikap_Image_4.png-c079cda57bd1b4dacc62a7c43559db21.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "b7e6fd9ca75caafc76d35b65f9ebefcc"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/pikap/texture/pikap_Image_4.png"
-dest_files=["res://.godot/imported/pikap_Image_4.png-c079cda57bd1b4dacc62a7c43559db21.s3tc.ctex", "res://.godot/imported/pikap_Image_4.png-c079cda57bd1b4dacc62a7c43559db21.etc2.ctex"]
+dest_files=["res://.godot/imported/pikap_Image_4.png-c079cda57bd1b4dacc62a7c43559db21.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

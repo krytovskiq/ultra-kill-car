@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dv3nnbfqkkbgp"
-path.s3tc="res://.godot/imported/vandura_model_4.png-69cfd2f26ff3b9480b87164fb4d67201.s3tc.ctex"
-path.etc2="res://.godot/imported/vandura_model_4.png-69cfd2f26ff3b9480b87164fb4d67201.etc2.ctex"
+path="res://.godot/imported/vandura_model_4.png-69cfd2f26ff3b9480b87164fb4d67201.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "310b20fd12a27eedb7f456db0242bb8c"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/Vandura/vandura_model_4.png"
-dest_files=["res://.godot/imported/vandura_model_4.png-69cfd2f26ff3b9480b87164fb4d67201.s3tc.ctex", "res://.godot/imported/vandura_model_4.png-69cfd2f26ff3b9480b87164fb4d67201.etc2.ctex"]
+dest_files=["res://.godot/imported/vandura_model_4.png-69cfd2f26ff3b9480b87164fb4d67201.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

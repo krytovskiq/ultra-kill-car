@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c8qmoirsffot8"
-path.s3tc="res://.godot/imported/wrecked_cars_2_4.png-5226f7c8e0daaa6bbeea84f10084c59f.s3tc.ctex"
-path.etc2="res://.godot/imported/wrecked_cars_2_4.png-5226f7c8e0daaa6bbeea84f10084c59f.etc2.ctex"
+path="res://.godot/imported/wrecked_cars_2_4.png-5226f7c8e0daaa6bbeea84f10084c59f.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "bc5602a4d13d7da4c69672397af17405"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://environment/model/decor/wrekers_car/texture/wrecked_cars_2_4.png"
-dest_files=["res://.godot/imported/wrecked_cars_2_4.png-5226f7c8e0daaa6bbeea84f10084c59f.s3tc.ctex", "res://.godot/imported/wrecked_cars_2_4.png-5226f7c8e0daaa6bbeea84f10084c59f.etc2.ctex"]
+dest_files=["res://.godot/imported/wrecked_cars_2_4.png-5226f7c8e0daaa6bbeea84f10084c59f.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.76
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -41,5 +39,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
+process/size_limit=512
 detect_3d/compress_to=0

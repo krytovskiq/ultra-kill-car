@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://mv1t0y2y8ig6"
-path.s3tc="res://.godot/imported/delorean_model_6.png-98878166b9aad80cd5e174c1827c83bf.s3tc.ctex"
-path.etc2="res://.godot/imported/delorean_model_6.png-98878166b9aad80cd5e174c1827c83bf.etc2.ctex"
+path="res://.godot/imported/delorean_model_6.png-98878166b9aad80cd5e174c1827c83bf.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "329a0d519bab3945297bc8744d00c9ce"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/DeLorean/delorean_model_6.png"
-dest_files=["res://.godot/imported/delorean_model_6.png-98878166b9aad80cd5e174c1827c83bf.s3tc.ctex", "res://.godot/imported/delorean_model_6.png-98878166b9aad80cd5e174c1827c83bf.etc2.ctex"]
+dest_files=["res://.godot/imported/delorean_model_6.png-98878166b9aad80cd5e174c1827c83bf.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

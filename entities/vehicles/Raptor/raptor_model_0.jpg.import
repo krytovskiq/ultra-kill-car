@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://be6y4mblm17xu"
-path.s3tc="res://.godot/imported/raptor_model_0.jpg-4f241e26a5df566c848b9957b63dcfda.s3tc.ctex"
-path.etc2="res://.godot/imported/raptor_model_0.jpg-4f241e26a5df566c848b9957b63dcfda.etc2.ctex"
+path="res://.godot/imported/raptor_model_0.jpg-4f241e26a5df566c848b9957b63dcfda.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "636cb48894b6cb5b6197bd74db0641e3"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/Raptor/raptor_model_0.jpg"
-dest_files=["res://.godot/imported/raptor_model_0.jpg-4f241e26a5df566c848b9957b63dcfda.s3tc.ctex", "res://.godot/imported/raptor_model_0.jpg-4f241e26a5df566c848b9957b63dcfda.etc2.ctex"]
+dest_files=["res://.godot/imported/raptor_model_0.jpg-4f241e26a5df566c848b9957b63dcfda.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -30,8 +28,8 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=-5
+roughness/src_normal="res://entities/vehicles/Raptor/raptor_model_1.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

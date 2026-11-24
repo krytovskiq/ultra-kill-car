@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bmybol7lovuc0"
-path.s3tc="res://.godot/imported/raptor_model_2.jpg-4bf5234f983762221b18ec999c9dd521.s3tc.ctex"
-path.etc2="res://.godot/imported/raptor_model_2.jpg-4bf5234f983762221b18ec999c9dd521.etc2.ctex"
+path="res://.godot/imported/raptor_model_2.jpg-4bf5234f983762221b18ec999c9dd521.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "ecb5ede055b36dd80d74cb1772d85793"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/Raptor/raptor_model_2.jpg"
-dest_files=["res://.godot/imported/raptor_model_2.jpg-4bf5234f983762221b18ec999c9dd521.s3tc.ctex", "res://.godot/imported/raptor_model_2.jpg-4bf5234f983762221b18ec999c9dd521.etc2.ctex"]
+dest_files=["res://.godot/imported/raptor_model_2.jpg-4bf5234f983762221b18ec999c9dd521.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://4pt1cg82afkn"
-path.s3tc="res://.godot/imported/barracuda_model_4.png-152d0791e7e9f4a5833e5f948c124fe9.s3tc.ctex"
-path.etc2="res://.godot/imported/barracuda_model_4.png-152d0791e7e9f4a5833e5f948c124fe9.etc2.ctex"
+path="res://.godot/imported/barracuda_model_4.png-152d0791e7e9f4a5833e5f948c124fe9.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "03c3384b11d2c8dab34c4ec618b78233"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/Barracuda/barracuda_model_4.png"
-dest_files=["res://.godot/imported/barracuda_model_4.png-152d0791e7e9f4a5833e5f948c124fe9.s3tc.ctex", "res://.godot/imported/barracuda_model_4.png-152d0791e7e9f4a5833e5f948c124fe9.etc2.ctex"]
+dest_files=["res://.godot/imported/barracuda_model_4.png-152d0791e7e9f4a5833e5f948c124fe9.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

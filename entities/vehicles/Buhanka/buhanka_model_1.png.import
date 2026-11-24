@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b2avuj8y2wv1k"
-path.s3tc="res://.godot/imported/buhanka_model_1.png-5c2e7a175ea217b7c98a8f4cbe9ae6e4.s3tc.ctex"
-path.etc2="res://.godot/imported/buhanka_model_1.png-5c2e7a175ea217b7c98a8f4cbe9ae6e4.etc2.ctex"
+path="res://.godot/imported/buhanka_model_1.png-5c2e7a175ea217b7c98a8f4cbe9ae6e4.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "8a7b5d07af6dbf60a73d9772a2998925"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/Buhanka/buhanka_model_1.png"
-dest_files=["res://.godot/imported/buhanka_model_1.png-5c2e7a175ea217b7c98a8f4cbe9ae6e4.s3tc.ctex", "res://.godot/imported/buhanka_model_1.png-5c2e7a175ea217b7c98a8f4cbe9ae6e4.etc2.ctex"]
+dest_files=["res://.godot/imported/buhanka_model_1.png-5c2e7a175ea217b7c98a8f4cbe9ae6e4.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

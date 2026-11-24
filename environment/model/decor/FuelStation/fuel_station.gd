@@ -8,15 +8,15 @@ const TANKER_WRECK_SCENE: PackedScene = preload("res://environment/model/decor/w
 const GLTF_GENERATOR: PackedScene = preload("res://environment/model/decor/FuelStation/models/portable_generator/portable_generator_1k.gltf")
 const GLTF_PROPANE: PackedScene = preload("res://environment/model/decor/FuelStation/models/propane_tank/propane_tank_1k.gltf")
 const GLTF_IBC: PackedScene = preload("res://environment/model/decor/FuelStation/models/industrial_pastic_container/industrial_pastic_container_1k.gltf")
-const GLTF_BARRIER: PackedScene = preload("res://environment/model/decor/FuelStation/models/concrete_road_barrier/concrete_road_barrier_1k.gltf")
+const GLTF_BARRIER: PackedScene = preload("res://environment/model/decor/FuelStation/models/concrete_road_barrier/concrete_road_barrier_opt.scn")
 const GLTF_CRATE: PackedScene = preload("res://environment/model/decor/FuelStation/models/old_military_crate/old_military_crate_1k.gltf")
 const GLTF_JERRYCAN: PackedScene = preload("res://environment/model/decor/FuelStation/models/metal_jerrycan/metal_jerrycan_1k.gltf")
 
 const FONT_RUSSO: FontFile = preload("res://assets/fonts/RussoOne-Regular.ttf")
 
-const TEX_CONCRETE_FLOOR_DIFF: Texture2D = preload("res://environment/model/decor/FuelStation/textures/concrete_floor_worn_001/concrete_floor_worn_001_diff_1k.jpg")
-const TEX_CONCRETE_FLOOR_NOR: Texture2D = preload("res://environment/model/decor/FuelStation/textures/concrete_floor_worn_001/concrete_floor_worn_001_nor_gl_1k.jpg")
-const TEX_CONCRETE_FLOOR_RGH: Texture2D = preload("res://environment/model/decor/FuelStation/textures/concrete_floor_worn_001/concrete_floor_worn_001_rough_1k.jpg")
+const TEX_CONCRETE_FLOOR_DIFF: Texture2D = preload("res://environment/textures/procedural/concrete_floor_worn_001/diff.jpg")
+const TEX_CONCRETE_FLOOR_NOR: Texture2D = preload("res://environment/textures/procedural/concrete_floor_worn_001/nor_gl.jpg")
+const TEX_CONCRETE_FLOOR_RGH: Texture2D = preload("res://environment/textures/procedural/concrete_floor_worn_001/rough.jpg")
 
 const TEX_CONCRETE_WALL_DIFF: Texture2D = preload("res://environment/model/decor/FuelStation/textures/concrete_wall_006/concrete_wall_006_diff_1k.jpg")
 const TEX_CONCRETE_WALL_NOR: Texture2D = preload("res://environment/model/decor/FuelStation/textures/concrete_wall_006/concrete_wall_006_nor_gl_1k.jpg")

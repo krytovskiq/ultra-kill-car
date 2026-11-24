@@ -1,14 +1,13 @@
 [gd_scene format=4 uid="uid://sffaj4bscxpa"]
 
 [ext_resource type="Script" uid="uid://qlfobs7v7t5o" path="res://levels/world_chunk.gd" id="1_1mryt"]
-[ext_resource type="Texture2D" uid="uid://88l7bwfl3acr" path="res://environment/model/terrain/gravelly_sand_diff_1k.jpg" id="3_1cr0a"]
-[ext_resource type="Texture2D" uid="uid://drivfr7jp7qib" path="res://environment/model/terrain/forest_ground_04_nor_gl_1k.jpg" id="4_5sdx4"]
+[ext_resource type="Texture2D" uid="uid://0utsvsvflfgi" path="res://environment/textures/procedural/gravelly_sand/diff.jpg" id="3_1cr0a"]
+[ext_resource type="Texture2D" uid="uid://dekhkkfm48ppe" path="res://environment/textures/procedural/forest_ground_04/nor_gl.jpg" id="4_5sdx4"]
 [ext_resource type="PackedScene" uid="uid://c36bgc6dyy2js" path="res://environment/model/decor/wrekers_car/tanker_001a_reference_smd_1.tscn" id="4_8g4c3"]
 [ext_resource type="PackedScene" uid="uid://bbowbayg5jg2f" path="res://environment/model/decor/wrekers_car/truck_001a_reference_smd_0.tscn" id="4_yegdb"]
 [ext_resource type="PackedScene" uid="uid://00rfbyyau7bx" path="res://environment/model/decor/wrekers_car/truck_002a_cab_reference_smd_2.tscn" id="5_8g4c3"]
 [ext_resource type="PackedScene" uid="uid://dxny8y0lipjox" path="res://environment/model/decor/wrekers_car/van_001a_reference_smd_3.tscn" id="6_6cu7m"]
 [ext_resource type="PackedScene" uid="uid://ww4cxhxsyvpo" path="res://environment/model/decor/wrekers_car/wagon_001a_reference_smd_4.tscn" id="8_ua3rv"]
-[ext_resource type="Texture2D" uid="uid://d2bcbor7yky4" path="res://environment/model/terrain/gravelly_sand_disp_1k.png" id="10_j2hus"]
 [ext_resource type="Texture2D" uid="uid://bavd5mifup8lv" path="res://environment/model/tree/texture/pine_trees_pack__ps1_low_poly_0.png" id="12_j2hus"]
 [ext_resource type="Script" uid="uid://qb8f8b41vbeq" path="res://environment/multi_mesh_instance_3d.gd" id="13_ua3rv"]
 
@@ -17,8 +16,6 @@ albedo_texture = ExtResource("3_1cr0a")
 normal_enabled = true
 normal_scale = 16.0
 normal_texture = ExtResource("4_5sdx4")
-heightmap_scale = 2.0
-heightmap_texture = ExtResource("10_j2hus")
 uv1_scale = Vector3(0.1, 0.1, 0.1)
 uv1_triplanar = true
 

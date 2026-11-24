@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dqtovm123b1u1"
-path.s3tc="res://.godot/imported/BTR_BTR_Image_0.jpg-926143d9ed50899a818b812c1984d31b.s3tc.ctex"
-path.etc2="res://.godot/imported/BTR_BTR_Image_0.jpg-926143d9ed50899a818b812c1984d31b.etc2.ctex"
+path="res://.godot/imported/BTR_BTR_Image_0.jpg-926143d9ed50899a818b812c1984d31b.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "37056eeb68f3954ec778f47d85d0e231"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/BTR/texture/BTR_BTR_Image_0.jpg"
-dest_files=["res://.godot/imported/BTR_BTR_Image_0.jpg-926143d9ed50899a818b812c1984d31b.s3tc.ctex", "res://.godot/imported/BTR_BTR_Image_0.jpg-926143d9ed50899a818b812c1984d31b.etc2.ctex"]
+dest_files=["res://.godot/imported/BTR_BTR_Image_0.jpg-926143d9ed50899a818b812c1984d31b.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -30,8 +28,8 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=-5
+roughness/src_normal="res://entities/vehicles/BTR/texture/BTR_BTR_Image_2.jpg"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

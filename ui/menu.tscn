@@ -2,13 +2,13 @@
 
 [ext_resource type="PackedScene" uid="uid://hut6rtb4m5uh" path="res://levels/Generator.tscn" id="1_ecwwl"]
 [ext_resource type="Script" uid="uid://bl38sws02lfg6" path="res://ui/control.gd" id="1_lti8b"]
-[ext_resource type="Shader" path="res://environment/shaders/atmospheric_sky.gdshader" id="2_skysh"]
-[ext_resource type="Script" path="res://ui/menu_diorama.gd" id="3_dior"]
-[ext_resource type="Shader" path="res://ui/shaders/menu_atmosphere_overlay.gdshader" id="4_atmos"]
-[ext_resource type="Shader" path="res://ui/shaders/menu_accent_bar.gdshader" id="5_acc"]
-[ext_resource type="FontFile" path="res://assets/fonts/RubikDirt-Regular.ttf" id="6_dirt"]
-[ext_resource type="FontFile" path="res://assets/fonts/RussoOne-Regular.ttf" id="7_russo"]
-[ext_resource type="FontFile" path="res://assets/fonts/Jura-Variable.ttf" id="8_jura"]
+[ext_resource type="Shader" uid="uid://w3eps8yrwg6p" path="res://environment/shaders/atmospheric_sky.gdshader" id="2_skysh"]
+[ext_resource type="Script" uid="uid://dpcmgj68vxxwn" path="res://ui/menu_diorama.gd" id="3_dior"]
+[ext_resource type="Shader" uid="uid://d31tt836a2jui" path="res://ui/shaders/menu_atmosphere_overlay.gdshader" id="4_atmos"]
+[ext_resource type="Shader" uid="uid://cn4taphxls405" path="res://ui/shaders/menu_accent_bar.gdshader" id="5_acc"]
+[ext_resource type="FontFile" uid="uid://c0cyx8hcek81i" path="res://assets/fonts/RubikDirt-Regular.ttf" id="6_dirt"]
+[ext_resource type="FontFile" uid="uid://cst3sthuacqme" path="res://assets/fonts/RussoOne-Regular.ttf" id="7_russo"]
+[ext_resource type="FontFile" uid="uid://338uowheajlr" path="res://assets/fonts/Jura-Variable.ttf" id="8_jura"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_menu_sky"]
 shader = ExtResource("2_skysh")
@@ -20,6 +20,11 @@ shader_parameter/cloud_lit_color = Color(0.48, 0.49, 0.48, 1)
 shader_parameter/cloud_shadow_color = Color(0.19, 0.22, 0.25, 1)
 shader_parameter/sun_glow_color = Color(0.82, 0.48, 0.28, 1)
 shader_parameter/sun_direction = Vector3(-0.42, 0.32, 0.85)
+shader_parameter/moon_direction = Vector3(-0.18, 0.34, 0.92)
+shader_parameter/night_factor = 0.0
+shader_parameter/blood_moon_factor = 0.0
+shader_parameter/acid_factor = 0.0
+shader_parameter/star_intensity = 0.0
 shader_parameter/cloud_coverage = 0.72
 shader_parameter/cloud_speed = 0.02
 shader_parameter/haze_strength = 0.85
@@ -37,7 +42,6 @@ ambient_light_sky_contribution = 0.55
 ambient_light_energy = 0.44
 reflected_light_source = 2
 tonemap_mode = 2
-tonemap_exposure = 1.0
 tonemap_white = 6.0
 glow_enabled = true
 glow_intensity = 0.28
@@ -54,10 +58,6 @@ fog_sky_affect = 0.85
 fog_depth_curve = 1.25
 fog_depth_begin = 11.0
 fog_depth_end = 98.0
-adjustment_enabled = false
-adjustment_brightness = 1.0
-adjustment_contrast = 1.0
-adjustment_saturation = 1.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_atmos"]
 shader = ExtResource("4_atmos")
@@ -82,7 +82,6 @@ transform = Transform3D(0.882948, 0.262525, -0.38921, 0, 0.829038, 0.559193, 0.4
 light_color = Color(0.78, 0.8, 0.82, 1)
 light_energy = 0.68
 light_bake_mode = 1
-shadow_enabled = false
 shadow_bias = 0.06
 shadow_normal_bias = 1.5
 directional_shadow_mode = 1
@@ -107,6 +106,7 @@ grow_vertical = 2
 script = ExtResource("1_lti8b")
 
 [node name="AtmosphereOverlay" type="ColorRect" parent="Menu" unique_id=1700100101]
+material = SubResource("ShaderMaterial_atmos")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -114,7 +114,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-material = SubResource("ShaderMaterial_atmos")
 
 [node name="LeftMargin" type="MarginContainer" parent="Menu" unique_id=1700100102]
 layout_mode = 1
@@ -158,11 +157,11 @@ theme_override_font_sizes/font_size = 18
 text = "ПРОРВИСЬ СКВОЗЬ ТУМАН И ОРДУ"
 
 [node name="AccentBar" type="ColorRect" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100107]
+material = SubResource("ShaderMaterial_accent")
 custom_minimum_size = Vector2(360, 4)
 layout_mode = 2
 size_flags_horizontal = 0
 mouse_filter = 2
-material = SubResource("ShaderMaterial_accent")
 
 [node name="NavSpacer" type="Control" parent="Menu/LeftMargin/LeftVBox" unique_id=1700100108]
 custom_minimum_size = Vector2(0, 18)
@@ -293,9 +292,9 @@ layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="TopAccent" type="ColorRect" parent="Menu/SettingsPanel/SettingsCard/CardVBox" unique_id=1700100122]
+material = SubResource("ShaderMaterial_accent")
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
-material = SubResource("ShaderMaterial_accent")
 
 [node name="CardMargin" type="MarginContainer" parent="Menu/SettingsPanel/SettingsCard/CardVBox" unique_id=1700100123]
 layout_mode = 2
@@ -391,7 +390,6 @@ text = "Общая громкость"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-max_value = 100.0
 value = 85.0
 
 [node name="ValMaster" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowMaster" unique_id=1700100133]
@@ -419,7 +417,6 @@ text = "Двигатели и шины"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-max_value = 100.0
 value = 85.0
 
 [node name="ValVehicles" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowVehicles" unique_id=1700100137]
@@ -447,7 +444,6 @@ text = "Эффекты и зомби"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-max_value = 100.0
 value = 90.0
 
 [node name="ValSfx" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowSfx" unique_id=1700100141]
@@ -475,7 +471,6 @@ text = "Атмосфера"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-max_value = 100.0
 value = 80.0
 
 [node name="ValAmbience" type="Label" parent="Menu/SettingsPanel/SettingsCard/CardVBox/CardMargin/VBox/RowAmbience" unique_id=1700100145]

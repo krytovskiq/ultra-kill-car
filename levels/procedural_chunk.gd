@@ -4,7 +4,7 @@ enum Biome { WASTELAND, RUINED_CITY, DARK_FOREST, WINTER_ICE, TOXIC_MARSH, SCORC
 
 const ProceduralMaterials = preload("res://levels/procedural_materials.gd")
 
-const GLTF_BARRIER: PackedScene = preload("res://environment/model/decor/FuelStation/models/concrete_road_barrier/concrete_road_barrier_1k.gltf")
+const GLTF_BARRIER: PackedScene = preload("res://environment/model/decor/FuelStation/models/concrete_road_barrier/concrete_road_barrier_opt.scn")
 const GLTF_CRATE: PackedScene = preload("res://environment/model/decor/FuelStation/models/old_military_crate/old_military_crate_1k.gltf")
 
 static var _shared_box_shapes: Dictionary = {}

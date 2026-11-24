@@ -14,8 +14,8 @@ dest_files=["res://.godot/imported/engine_paz3205_s2_idle.wav-4e6755db08b47eac1b
 
 force/8_bit=false
 force/mono=false
-force/max_rate=false
-force/max_rate_hz=44100
+force/max_rate=true
+force/max_rate_hz=22050
 edit/trim=false
 edit/normalize=false
 edit/loop_mode=0

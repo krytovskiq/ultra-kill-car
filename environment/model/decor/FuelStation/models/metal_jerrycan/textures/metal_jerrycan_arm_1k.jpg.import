@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cc8djh1y6cm7m"
+uid="uid://dnsf3yiikmg5x"
 path.s3tc="res://.godot/imported/metal_jerrycan_arm_1k.jpg-6664e2ce825d261e75b4c94e7e6059bb.s3tc.ctex"
 path.etc2="res://.godot/imported/metal_jerrycan_arm_1k.jpg-6664e2ce825d261e75b4c94e7e6059bb.etc2.ctex"
 metadata={
@@ -27,8 +27,8 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=3
+roughness/src_normal="res://environment/model/decor/FuelStation/models/metal_jerrycan/textures/metal_jerrycan_nor_gl_1k.jpg"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

@@ -14,8 +14,8 @@ dest_files=["res://.godot/imported/turbo_bov.wav-84d941bf8bb80dbbf00f9e6223adace
 
 force/8_bit=false
 force/mono=false
-force/max_rate=false
-force/max_rate_hz=44100
+force/max_rate=true
+force/max_rate_hz=22050
 edit/trim=false
 edit/normalize=false
 edit/loop_mode=0

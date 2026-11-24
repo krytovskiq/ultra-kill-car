@@ -3,11 +3,9 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c7wgqesh1po1k"
-path.s3tc="res://.godot/imported/Dodge_carson_fastback_5.jpg-be5a28f8fe9a8e639452b6d11a0c48f8.s3tc.ctex"
-path.etc2="res://.godot/imported/Dodge_carson_fastback_5.jpg-be5a28f8fe9a8e639452b6d11a0c48f8.etc2.ctex"
+path="res://.godot/imported/Dodge_carson_fastback_5.jpg-be5a28f8fe9a8e639452b6d11a0c48f8.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "ad8fdf7be9985eec46b68d5284b9b9ea"
@@ -16,13 +14,13 @@ generator_parameters={
 [deps]
 
 source_file="res://entities/vehicles/Doge_Optimizado/texture/Dodge_carson_fastback_5.jpg"
-dest_files=["res://.godot/imported/Dodge_carson_fastback_5.jpg-be5a28f8fe9a8e639452b6d11a0c48f8.s3tc.ctex", "res://.godot/imported/Dodge_carson_fastback_5.jpg-be5a28f8fe9a8e639452b6d11a0c48f8.etc2.ctex"]
+dest_files=["res://.godot/imported/Dodge_carson_fastback_5.jpg-be5a28f8fe9a8e639452b6d11a0c48f8.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.82
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

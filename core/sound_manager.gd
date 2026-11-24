@@ -95,17 +95,6 @@ func _load_audio(key: String) -> AudioStream:
 
 func _preload_all() -> void:
 	var loop_files: Array[String] = [
-		"engine_pikap", "engine_pikap_idle", "engine_pikap_howl",
-		"engine_doge2", "engine_doge2_idle", "engine_doge2_howl",
-		"engine_mustang", "engine_mustang_idle", "engine_mustang_howl",
-		"engine_barracuda", "engine_barracuda_idle", "engine_barracuda_howl",
-		"engine_buhanka", "engine_buhanka_idle", "engine_buhanka_howl",
-		"engine_vandura", "engine_vandura_idle", "engine_vandura_howl",
-		"engine_carson", "engine_carson_idle", "engine_carson_howl",
-		"engine_delorean", "engine_delorean_idle", "engine_delorean_howl",
-		"engine_k2500", "engine_k2500_idle", "engine_k2500_howl",
-		"engine_paz3205", "engine_paz3205_idle", "engine_paz3205_howl",
-		"engine_raptor", "engine_raptor_idle", "engine_raptor_howl",
 		"engine_btr", "engine_btr_idle", "engine_btr_howl",
 		"engine_supercharger",
 		"fire_crackle_loop", "weather_rain_loop", "weather_tornado_loop",
@@ -113,7 +102,8 @@ func _preload_all() -> void:
 		"music_wasteland", "music_city", "music_forest",
 		"music_winter", "music_toxic", "music_scorched"
 	]
-	for car_id: String in ["pikap", "doge2", "mustang", "barracuda", "buhanka", "vandura", "carson", "delorean", "k2500", "paz3205", "raptor"]:
+	var engine_cars: Array[String] = ["pikap", "doge2", "barracuda", "buhanka", "vandura", "carson", "delorean", "k2500", "paz3205", "raptor"]
+	for car_id: String in engine_cars:
 		for st_i: int in range(3):
 			for layer_k: String in ["idle", "mid", "howl"]:
 				loop_files.append("engine_%s_s%d_%s" % [car_id, st_i, layer_k])
@@ -121,8 +111,10 @@ func _preload_all() -> void:
 		var st := _load_audio(k)
 		if st is AudioStreamWAV:
 			var dup := (st as AudioStreamWAV).duplicate() as AudioStreamWAV
-			var bps_frame: int = 2 * (2 if dup.stereo else 1)
-			var total_frames: int = floori(float(dup.data.size()) / float(maxi(bps_frame, 1)))
+			var total_frames: int = roundi(dup.get_length() * float(dup.mix_rate))
+			if total_frames <= 0:
+				var bps_frame: int = 2 * (2 if dup.stereo else 1)
+				total_frames = floori(float(dup.data.size()) / float(maxi(bps_frame, 1)))
 			if total_frames > 32:
 				dup.loop_mode = AudioStreamWAV.LOOP_FORWARD
 				dup.loop_begin = 0
@@ -134,6 +126,15 @@ func _preload_all() -> void:
 			_streams[k] = dup_ogg
 		elif st != null:
 			_streams[k] = st
+
+	# Алиасы базовых дорожек двигателей без дублирования файлов на диске и в памяти
+	for car_id: String in engine_cars:
+		if _streams.has("engine_%s_s0_mid" % car_id):
+			_streams["engine_%s" % car_id] = _streams["engine_%s_s0_mid" % car_id]
+		if _streams.has("engine_%s_s0_idle" % car_id):
+			_streams["engine_%s_idle" % car_id] = _streams["engine_%s_s0_idle" % car_id]
+		if _streams.has("engine_%s_s0_howl" % car_id):
+			_streams["engine_%s_howl" % car_id] = _streams["engine_%s_s0_howl" % car_id]
 
 	# Алиасы атмосферной музыки биомов
 	for b_name: String in ["wasteland", "city", "forest", "winter", "toxic", "scorched"]:

@@ -3,23 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dt7px8r10wnk1"
-path.s3tc="res://.godot/imported/diff.jpg-b644dfb17dec063d5d1f3d3b407805ef.s3tc.ctex"
-path.etc2="res://.godot/imported/diff.jpg-b644dfb17dec063d5d1f3d3b407805ef.etc2.ctex"
+path="res://.godot/imported/diff.jpg-b644dfb17dec063d5d1f3d3b407805ef.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://environment/textures/procedural/worn_asphalt/diff.jpg"
-dest_files=["res://.godot/imported/diff.jpg-b644dfb17dec063d5d1f3d3b407805ef.s3tc.ctex", "res://.godot/imported/diff.jpg-b644dfb17dec063d5d1f3d3b407805ef.etc2.ctex"]
+dest_files=["res://.godot/imported/diff.jpg-b644dfb17dec063d5d1f3d3b407805ef.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.78
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

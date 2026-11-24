@@ -3,23 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cj6hj1r7ql26u"
-path.s3tc="res://.godot/imported/industrial_pastic_container_diff_1k.jpg-45c4b8ca5224b3495a6b087cc341f4da.s3tc.ctex"
-path.etc2="res://.godot/imported/industrial_pastic_container_diff_1k.jpg-45c4b8ca5224b3495a6b087cc341f4da.etc2.ctex"
+path="res://.godot/imported/industrial_pastic_container_diff_1k.jpg-45c4b8ca5224b3495a6b087cc341f4da.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://environment/model/decor/FuelStation/models/industrial_pastic_container/textures/industrial_pastic_container_diff_1k.jpg"
-dest_files=["res://.godot/imported/industrial_pastic_container_diff_1k.jpg-45c4b8ca5224b3495a6b087cc341f4da.s3tc.ctex", "res://.godot/imported/industrial_pastic_container_diff_1k.jpg-45c4b8ca5224b3495a6b087cc341f4da.etc2.ctex"]
+dest_files=["res://.godot/imported/industrial_pastic_container_diff_1k.jpg-45c4b8ca5224b3495a6b087cc341f4da.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.76
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
@@ -38,5 +36,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
+process/size_limit=512
 detect_3d/compress_to=0
