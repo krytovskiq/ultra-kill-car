@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_add, unshaded, depth_draw_never, cull_disabled;
+render_mode blend_add, unshaded, depth_draw_never, cull_back;
 
 uniform sampler2D cookie_tex : source_color, filter_linear_mipmap, repeat_disable;
 uniform vec4 light_tint : source_color = vec4(1.0, 0.94, 0.82, 1.0);
@@ -15,12 +15,14 @@ void fragment() {
 	vec2 proj_uv = vec2(clamp(shifted_u, 0.0, 1.0), long_v);
 
 	vec4 cookie = texture(cookie_tex, proj_uv);
-	float u_fade = smoothstep(0.0, 0.10, shifted_u) * smoothstep(1.0, 0.90, shifted_u);
+	// Smoothly fade quad edges horizontally so the light cone has soft, natural boundaries
+	float u_fade = smoothstep(0.0, 0.16, shifted_u) * smoothstep(1.0, 0.84, shifted_u);
 	// Smoothly taper physical quad UV bounds so neither near nor far edges ever clip sharply
-	float quad_fade = smoothstep(0.0, 0.04, base_v) * smoothstep(1.0, 0.42, base_v);
+	float quad_fade = smoothstep(0.0, 0.07, base_v) * smoothstep(1.0, 0.46, base_v);
 	float long_falloff = pow(clamp(1.0 - base_v, 0.0, 1.0), 1.35);
 	float mask = cookie.a * u_fade * quad_fade * (0.45 + 0.55 * long_falloff);
 
-	ALBEDO = cookie.rgb * light_tint.rgb * (intensity * 1.12);
-	ALPHA = clamp(mask * intensity, 0.0, 1.0);
+	float final_alpha = clamp(mask * intensity, 0.0, 1.0);
+	ALBEDO = cookie.rgb * light_tint.rgb * (intensity * 1.12) * u_fade * quad_fade;
+	ALPHA = final_alpha;
 }

@@ -168,6 +168,8 @@ var _rewards_committed: bool = false
 @export var collision_damage_multiplier: float = 0.45
 ## Включить 3D-деформацию кузова при ударах об объекты (отключено у БТР)
 @export var can_deform_body: bool = true
+## Включить дым из-под колёс при пробуксовке и заносе (отключено у тяжёлой военной техники типа БТР)
+@export var enable_tire_smoke: bool = true
 ## Множитель урона по прочности от сбивания дорожных объектов (столбы, знаки, барьеры)
 @export var prop_damage_multiplier: float = 3.2
 ## Множитель урона по прочности от тарана обломков машин и грузовиков
@@ -219,10 +221,15 @@ var _rear_right: RaycastWheel = null
 
 var _tire_smokes: Array[CPUParticles3D] = []
 var _tire_smoke_wheels: Array[RaycastWheel] = []
+var _tire_smoke_heat: Array[float] = []
 var _fitted_lower_pts: PackedVector3Array = PackedVector3Array()
 var _fitted_upper_pts: PackedVector3Array = PackedVector3Array()
 var _exhaust: CPUParticles3D = null
 var _exhausts: Array[CPUParticles3D] = []
+var _exhausts_initialized: bool = false
+var _has_tall_exhaust_stacks: bool = false
+var _uses_black_exhaust_smoke: bool = false
+var _exhaust_coal_level: float = 0.0
 var _showcase_mode: bool = false
 
 var _lights_rig: Node3D = null
@@ -454,6 +461,8 @@ func apply_car_upgrades(car_idx: int = -1) -> void:
 func refresh_armor_kit_refs() -> void:
 	_sc_pulley = find_child("SuperchargerPulley", true, false) as Node3D
 	_sc_butterflies = find_child("SuperchargerButterflies", true, false) as Node3D
+	if _exhausts_initialized:
+		_rebuild_exhaust_emitters()
 
 func _scale_collision_shape_node(cs: CollisionShape3D, vs: float) -> void:
 	if cs == null:
@@ -609,14 +618,7 @@ func _ready() -> void:
 	if use_visual_lights:
 		_setup_visual_lights()
 
-	var pipe_offsets: Array[Vector3] = exhaust_offsets if not exhaust_offsets.is_empty() else [exhaust_offset]
-	for p_off in pipe_offsets:
-		var ex := CarVFX.create_exhaust(self, p_off, exhaust_style)
-		ex.visible = not is_preview
-		ex.emitting = not is_preview
-		_exhausts.append(ex)
-	if not _exhausts.is_empty():
-		_exhaust = _exhausts[0]
+	_rebuild_exhaust_emitters()
 
 	if not is_preview:
 		_attach_tire_smokes()
@@ -625,27 +627,62 @@ func _ready() -> void:
 		_setup_vehicle_audio()
 		_setup_prop_trigger_area()
 
+func _is_heavy_diesel_exhaust() -> bool:
+	return exhaust_style == "diesel" or engine_sound_id in ["vandura", "buhanka", "paz3205", "k2500", "raptor", "btr"]
+
+func _collect_exhaust_stack_tips(node: Node, out: Array[Marker3D]) -> void:
+	if node == null or not is_instance_valid(node):
+		return
+	if node is Marker3D and node.has_meta("is_exhaust_stack_tip"):
+		out.append(node as Marker3D)
+	for ch in node.get_children():
+		_collect_exhaust_stack_tips(ch, out)
+
+func _rebuild_exhaust_emitters() -> void:
+	for ex_old in _exhausts:
+		if is_instance_valid(ex_old):
+			ex_old.queue_free()
+	_exhausts.clear()
+	_exhaust = null
+
+	var stack_tips: Array[Marker3D] = []
+	var kit := get_node_or_null("FullUpgradeArmorKit") as Node3D
+	if is_instance_valid(kit):
+		_collect_exhaust_stack_tips(kit, stack_tips)
+
+	_has_tall_exhaust_stacks = not stack_tips.is_empty()
+	_uses_black_exhaust_smoke = _has_tall_exhaust_stacks or _is_heavy_diesel_exhaust()
+	var ex_active: bool = (not is_preview or _showcase_mode or _burnout_active) and not destroyed
+
+	if _has_tall_exhaust_stacks:
+		for tip: Marker3D in stack_tips:
+			var local_pos: Vector3 = _node_local_to_car(tip).origin
+			var emit_dir: Vector3 = tip.get_meta("emit_dir", Vector3(0.0, 0.68, 0.73)) as Vector3
+			var ex := CarVFX.create_exhaust(self, local_pos, "stack_diesel", emit_dir)
+			ex.visible = ex_active
+			ex.emitting = ex_active
+			_exhausts.append(ex)
+	else:
+		var eff_style: String = "diesel" if _uses_black_exhaust_smoke else exhaust_style
+		var pipe_offsets: Array[Vector3] = exhaust_offsets if not exhaust_offsets.is_empty() else [exhaust_offset]
+		for p_off in pipe_offsets:
+			var ex := CarVFX.create_exhaust(self, p_off, eff_style)
+			ex.visible = ex_active
+			ex.emitting = ex_active
+			_exhausts.append(ex)
+
+	if not _exhausts.is_empty():
+		_exhaust = _exhausts[0]
+	_exhausts_initialized = true
+
 
 func _attach_tire_smokes() -> void:
-	if not _tire_smokes.is_empty():
+	if not enable_tire_smoke or not _tire_smokes.is_empty():
 		return
 	var candidates: Array[RaycastWheel] = []
 	for w: RaycastWheel in _wheels:
-		if not is_instance_valid(w):
-			continue
-		if drive_type == "FWD":
-			if w.is_front and w.use_as_traction:
-				candidates.append(w)
-		elif drive_type == "RWD":
-			if not w.is_front and w.use_as_traction:
-				candidates.append(w)
-		else:
-			if w.use_as_traction:
-				candidates.append(w)
-	if candidates.is_empty():
-		for w: RaycastWheel in _wheels:
-			if is_instance_valid(w) and not w.is_front:
-				candidates.append(w)
+		if is_instance_valid(w):
+			candidates.append(w)
 	var chosen: Array[RaycastWheel] = []
 	if candidates.size() <= 4:
 		chosen = candidates
@@ -657,9 +694,10 @@ func _attach_tire_smokes() -> void:
 		chosen.append(sorted_by_z[sorted_by_z.size() - 2])
 		chosen.append(sorted_by_z[sorted_by_z.size() - 1])
 	for w: RaycastWheel in chosen:
-		var smoke := CarVFX.create_tire_smoke(w, Vector3(0.0, -w.wheel_radius + 0.10, 0.0))
+		var smoke := CarVFX.create_tire_smoke(w, Vector3(0.0, -w.wheel_radius + 0.04, 0.0))
 		_tire_smokes.append(smoke)
 		_tire_smoke_wheels.append(w)
+		_tire_smoke_heat.append(0.0)
 
 func _node_local_to_car(node: Node3D) -> Transform3D:
 	var xf := Transform3D.IDENTITY
@@ -1721,13 +1759,18 @@ func start_burnout_vfx(play_audio: bool = true) -> void:
 		return
 	_burnout_active = true
 	_attach_tire_smokes()
-	for ts in _tire_smokes:
+	for i_b: int in range(_tire_smokes.size()):
+		var ts := _tire_smokes[i_b]
+		var w_b: RaycastWheel = _tire_smoke_wheels[i_b] if i_b < _tire_smoke_wheels.size() else null
 		if is_instance_valid(ts):
-			ts.visible = true
-			ts.emitting = true
-			ts.speed_scale = 1.65
-			ts.scale_amount_min = 1.25
-			ts.scale_amount_max = 2.85
+			var do_b: bool = (w_b == null) or w_b.use_as_traction or (drive_type == "AWD")
+			ts.visible = do_b
+			ts.emitting = do_b
+			if do_b:
+				ts.color = Color(1.0, 1.0, 1.0, 0.85)
+				ts.speed_scale = 1.55
+				ts.scale_amount_min = 0.72
+				ts.scale_amount_max = 1.55
 	for ex in _exhausts:
 		if is_instance_valid(ex):
 			ex.visible = true
@@ -1782,9 +1825,12 @@ func stop_burnout_vfx() -> void:
 	for w in _wheels:
 		if is_instance_valid(w):
 			CarVFX.break_tire_skid(int(w.get_instance_id()))
-	for ts in _tire_smokes:
+	for i_s: int in range(_tire_smokes.size()):
+		var ts := _tire_smokes[i_s]
 		if is_instance_valid(ts):
 			ts.emitting = false
+		if i_s < _tire_smoke_heat.size():
+			_tire_smoke_heat[i_s] = 0.0
 	if is_instance_valid(_engine_audio):
 		_engine_audio.stop()
 	if is_instance_valid(_engine_idle_audio):
@@ -1986,27 +2032,37 @@ func _physics_process(delta: float) -> void:
 		if w.is_grounded:
 			max_slip = maxf(max_slip, absf(w.lateral_slip_mps))
 	var in_rev_jturn_smoke: bool = (forward_mps < -2.6 and absf(steering) > 0.16 and grounded_wheels >= 2)
-	var allow_rubber_smoke: bool = (not _on_black_ice) and (_surface_grip_mult > 0.25)
-	var spin_smoke_lvl: float = clampf(_launch_wheelspin * 1.15, 0.0, 1.35)
-	var jturn_smoke_lvl: float = clampf((absf(forward_mps) - 2.0) / 8.0, 0.40, 1.0) if in_rev_jturn_smoke else 0.0
-	var brake_smoke_lvl: float = clampf((float(speed_kmh) - 32.0) / 55.0, 0.35, 1.05) if (is_braking and speed_kmh > 32) else 0.0
+	var allow_rubber_smoke: bool = enable_tire_smoke and (not _on_black_ice) and (_surface_grip_mult > 0.25)
+	var brake_active: bool = is_braking and speed_kmh > 14 and _brake_pressure > 0.22
+	var brake_smoke_lvl: float = clampf((float(speed_kmh) - 12.0) / 42.0, 0.40, 1.0) * clampf(_brake_pressure * 1.15, 0.0, 1.0) if brake_active else 0.0
+	if _tire_smoke_heat.size() != _tire_smokes.size():
+		_tire_smoke_heat.resize(_tire_smokes.size())
 	for i: int in range(_tire_smokes.size()):
 		var ts: CPUParticles3D = _tire_smokes[i]
 		if not is_instance_valid(ts):
 			continue
 		var w: RaycastWheel = _tire_smoke_wheels[i] if i < _tire_smoke_wheels.size() else null
 		var w_grounded: bool = (grounded_wheels > 0) if w == null else (is_instance_valid(w) and w.is_grounded)
+		if w != null and is_instance_valid(w) and w.is_grounded:
+			ts.position = Vector3(0.0, -w.hub_to_ground_m + 0.04, 0.0)
 		var w_slip: float = absf(w.lateral_slip_mps) if (w != null and is_instance_valid(w) and w.is_grounded) else max_slip
 		var w_traction: bool = (w == null) or (is_instance_valid(w) and w.use_as_traction)
-		var spin_active: bool = w_traction and _launch_wheelspin > 0.10
-		var slip_smoke_lvl: float = clampf((w_slip - 3.2) / 5.5, 0.35, 1.25) if (w_slip > 3.2 and speed_kmh > 20) else 0.0
-		var w_emit: bool = allow_rubber_smoke and w_grounded and (spin_active or in_rev_jturn_smoke or (w_slip > 3.2 and speed_kmh > 20) or (is_braking and speed_kmh > 32))
+		var spin_lvl: float = clampf(_launch_wheelspin * 0.95, 0.0, 1.0) if (w_traction and _launch_wheelspin > 0.12) else 0.0
+		var jturn_lvl: float = clampf((absf(forward_mps) - 2.0) / 8.0, 0.35, 0.95) if in_rev_jturn_smoke else 0.0
+		var slip_lvl: float = clampf((w_slip - 3.0) / 5.5, 0.30, 1.0) if (w_slip > 3.0 and speed_kmh > 18) else 0.0
+		var brk_lvl: float = brake_smoke_lvl * (1.05 if (w != null and w.is_front) else 0.85) if brake_active else 0.0
+		var target_lvl: float = clampf(maxf(maxf(spin_lvl, jturn_lvl), maxf(slip_lvl, brk_lvl)), 0.0, 1.0) if (allow_rubber_smoke and w_grounded) else 0.0
+		var rise_rate: float = 1.45 if (brake_active and brk_lvl >= spin_lvl) else 0.95
+		var heat: float = move_toward(_tire_smoke_heat[i], target_lvl, (rise_rate if target_lvl > _tire_smoke_heat[i] else 2.4) * delta)
+		_tire_smoke_heat[i] = heat
+		var w_emit: bool = allow_rubber_smoke and w_grounded and heat > 0.04
 		ts.emitting = w_emit
 		if w_emit:
-			var intensity: float = clampf(maxf(maxf(spin_smoke_lvl if spin_active else 0.0, jturn_smoke_lvl), maxf(slip_smoke_lvl, brake_smoke_lvl)), 0.35, 1.35)
-			ts.speed_scale = lerpf(1.05, 1.85, clampf(intensity, 0.0, 1.0))
-			ts.scale_amount_min = lerpf(1.05, 1.55, clampf(intensity, 0.0, 1.0))
-			ts.scale_amount_max = lerpf(2.25, 3.30, clampf(intensity, 0.0, 1.0))
+			var shaped: float = pow(clampf(heat, 0.0, 1.0), 1.15)
+			ts.color = Color(1.0, 1.0, 1.0, lerpf(0.20, 0.92, shaped))
+			ts.speed_scale = lerpf(0.42, 1.50, shaped)
+			ts.scale_amount_min = lerpf(0.32, 0.78, shaped)
+			ts.scale_amount_max = lerpf(0.64, 1.62, shaped)
 	_emit_drive_skid_marks(speed_kmh, wants_throttle, is_braking)
 
 	_update_damage_vfx(delta)
@@ -2096,7 +2152,7 @@ func _emit_drive_skid_marks(speed_kmh: int, _wants_throttle: bool, is_braking: b
 			CarVFX.break_tire_skid(wid)
 			continue
 		var lat_t := clampf((absf(w.lateral_slip_mps) - slip_thresh) / 5.0, 0.0, 1.0)
-		var brk_t := clampf(_brake_pressure * 0.92, 0.0, 1.0) if (is_braking and speed_kmh > 22) else 0.0
+		var brk_t := clampf(_brake_pressure * 1.05, 0.0, 1.0) if (is_braking and speed_kmh > 14 and _brake_pressure > 0.22) else 0.0
 		var axle_spin_scale: float = (awd_front_torque_split * 1.4 if w.is_front else 1.0) if drive_type == "AWD" else 1.0
 		var launch_t := clampf(_launch_wheelspin * 0.92 * axle_spin_scale, 0.0, 0.92) if (w.use_as_traction and _launch_wheelspin > 0.14) else 0.0
 		var intensity := maxf(maxf(lat_t, brk_t), launch_t)
@@ -2116,20 +2172,48 @@ func _update_damage_vfx(_delta: float) -> void:
 
 func _update_exhaust_vfx(delta: float, speed_ratio: float, wants_throttle: bool, wants_reverse: bool) -> void:
 	var active := not destroyed and current_fuel > 0.0
-	var drive_load := clampf(_sim_rpm * 0.65 + (0.45 if (wants_throttle or wants_reverse) else 0.0) + speed_ratio * 0.25, 0.15, 1.35)
-	var target_scale := lerpf(0.62, 1.80, clampf(drive_load, 0.0, 1.0))
-	if _shift_timer > 0.02 or _air_revving:
-		target_scale += 0.45
-	var v_min := lerpf(1.4, 3.6, clampf(drive_load, 0.0, 1.0))
-	var v_max := lerpf(2.8, 6.6, clampf(drive_load, 0.0, 1.0))
-	for ex in _exhausts:
-		if not is_instance_valid(ex):
-			continue
-		ex.emitting = active
-		if active:
-			ex.speed_scale = lerpf(ex.speed_scale, target_scale, clampf(delta * 8.0, 0.0, 1.0))
-			ex.initial_velocity_min = v_min
-			ex.initial_velocity_max = v_max
+	var wants_drive: bool = wants_throttle or wants_reverse
+	if _uses_black_exhaust_smoke:
+		var launch_surge: float = clampf(1.0 - (speed_ratio / 0.42), 0.0, 1.0)
+		var shift_puff: float = 0.28 if (_shift_timer > 0.02 or _air_revving) else 0.0
+		var coal_target: float = clampf(0.24 + launch_surge * 0.76 + shift_puff, 0.0, 1.0) if wants_drive else 0.0
+		var rate: float = 5.5 if coal_target > _exhaust_coal_level else 2.2
+		_exhaust_coal_level = lerpf(_exhaust_coal_level, coal_target, clampf(delta * rate, 0.0, 1.0))
+
+		var col_idle := Color(0.56, 0.56, 0.59, 0.44)
+		var col_black := Color(0.055, 0.055, 0.065, 0.96)
+		var eff_col := col_idle.lerp(col_black, _exhaust_coal_level)
+		var min_sz := lerpf(0.32, 0.68, _exhaust_coal_level) if _has_tall_exhaust_stacks else lerpf(0.28, 0.58, _exhaust_coal_level)
+		var max_sz := lerpf(0.62, 1.38, _exhaust_coal_level) if _has_tall_exhaust_stacks else lerpf(0.56, 1.18, _exhaust_coal_level)
+		var spd_sc := lerpf(0.68, 2.35, _exhaust_coal_level)
+		var v_min := lerpf(1.8, 4.8, _exhaust_coal_level)
+		var v_max := lerpf(3.2, 7.6, _exhaust_coal_level)
+		for ex in _exhausts:
+			if not is_instance_valid(ex):
+				continue
+			ex.emitting = active
+			if active:
+				ex.color = eff_col
+				ex.speed_scale = spd_sc
+				ex.scale_amount_min = min_sz
+				ex.scale_amount_max = max_sz
+				ex.initial_velocity_min = v_min
+				ex.initial_velocity_max = v_max
+	else:
+		var drive_load := clampf(_sim_rpm * 0.65 + (0.45 if wants_drive else 0.0) + speed_ratio * 0.25, 0.15, 1.35)
+		var target_scale := lerpf(0.62, 1.80, clampf(drive_load, 0.0, 1.0))
+		if _shift_timer > 0.02 or _air_revving:
+			target_scale += 0.45
+		var v_min := lerpf(1.4, 3.6, clampf(drive_load, 0.0, 1.0))
+		var v_max := lerpf(2.8, 6.6, clampf(drive_load, 0.0, 1.0))
+		for ex in _exhausts:
+			if not is_instance_valid(ex):
+				continue
+			ex.emitting = active
+			if active:
+				ex.speed_scale = lerpf(ex.speed_scale, target_scale, clampf(delta * 8.0, 0.0, 1.0))
+				ex.initial_velocity_min = v_min
+				ex.initial_velocity_max = v_max
 
 func _step_transmission(
 	delta: float,
@@ -2350,8 +2434,8 @@ func _update_vehicle_audio(
 				skid_raw = maxf(skid_raw, clampf(_launch_wheelspin * 0.92, 0.0, 0.92))
 			if max_slip > 3.8 and speed_ratio > 0.14:
 				skid_raw = maxf(skid_raw, clampf((max_slip - 3.8) / 6.5, 0.0, 0.92))
-			elif is_braking and speed_ratio > 0.18:
-				skid_raw = maxf(skid_raw, clampf(speed_ratio * 0.80, 0.0, 0.80))
+			elif is_braking and absf(forward_mps) * MPS_TO_KMH > 14.0 and _brake_pressure > 0.22 and enable_tire_smoke:
+				skid_raw = maxf(skid_raw, clampf(_brake_pressure * clampf(absf(forward_mps) * MPS_TO_KMH / 48.0, 0.34, 0.92), 0.0, 0.90))
 
 	if is_instance_valid(_skid_audio):
 		_smooth_skid_vol = lerpf(_smooth_skid_vol, 0.0 if is_ice_sliding else skid_raw, clampf(delta * 12.0, 0.0, 1.0))
@@ -2705,6 +2789,9 @@ func _step_raycast_suspension_and_tires(
 			var spin_dir_s: float = -1.0 if (wants_reverse and not wants_throttle) else 1.0
 			var spin_mag_s: float = 24.0 if wants_reverse else 20.0
 			vis_wheel_spd = fwd_vel + _launch_wheelspin * spin_mag_s * awd_vis_scale * spin_dir_s
+		elif is_braking and _brake_pressure > 0.25 and absf(fwd_vel) > 3.5 and not _on_black_ice and enable_tire_smoke:
+			var lock_t: float = clampf((_brake_pressure - 0.25) / 0.40, 0.0, 1.0)
+			vis_wheel_spd = fwd_vel * lerpf(1.0, 0.05, lock_t)
 		w.update_visuals(steering, vis_wheel_spd, delta, false)
 
 	if speed_mps > 1.5:
@@ -2873,8 +2960,51 @@ func _update_visual_lights(delta: float, braking_now: bool, immediate: bool = fa
 				rear_hit += w.ground_point
 				rear_hits += 1
 
-	var target_ground_y: float = (ground_sum_y / float(g_count)) if g_count > 0 else (global_position.y - 0.06)
-	var target_normal: Vector3 = normal_sum.normalized() if g_count > 0 and normal_sum.length_squared() > 0.001 else Vector3.UP
+	var target_ground_y: float = global_position.y
+	var target_normal: Vector3 = Vector3.UP
+	var ground_factor: float = 1.0
+	var shadow_fade: float = 0.82
+
+	if _showcase_mode or is_preview:
+		target_ground_y = global_position.y
+		target_normal = Vector3.UP
+		ground_factor = 1.0
+		shadow_fade = 0.82
+	elif g_count > 0:
+		target_ground_y = ground_sum_y / float(g_count)
+		target_normal = normal_sum.normalized() if normal_sum.length_squared() > 0.001 else Vector3.UP
+		ground_factor = 1.0
+		shadow_fade = 0.82
+	else:
+		# Vehicle is airborne (jumping, off a ramp, or flying). Raycast straight down to find real ground.
+		var hit_ground: bool = false
+		if is_inside_tree():
+			var space_state := get_world_3d().direct_space_state
+			if space_state != null:
+				var ray_param := PhysicsRayQueryParameters3D.new()
+				ray_param.from = global_position
+				ray_param.to = global_position - Vector3(0.0, 18.0, 0.0)
+				ray_param.collision_mask = 513
+				ray_param.collide_with_areas = false
+				ray_param.collide_with_bodies = true
+				ray_param.exclude = [get_rid()]
+				var hit: Dictionary = space_state.intersect_ray(ray_param)
+				if not hit.is_empty():
+					var hit_pos: Vector3 = hit["position"]
+					var hit_norm: Vector3 = hit["normal"]
+					var car_alt: float = global_position.y - hit_pos.y
+					if global_transform.basis.y.dot(Vector3.UP) > 0.25 and car_alt > 0.0:
+						target_ground_y = hit_pos.y
+						target_normal = hit_norm.normalized() if hit_norm.length_squared() > 0.001 else Vector3.UP
+						var alt_factor: float = clampf(1.0 - (car_alt - 0.65) / 1.85, 0.0, 1.0)
+						ground_factor = alt_factor
+						shadow_fade = 0.82 * alt_factor
+						hit_ground = true
+		if not hit_ground:
+			ground_factor = 0.0
+			shadow_fade = 0.0
+			target_ground_y = _smooth_ground_y
+			target_normal = Vector3.UP
 
 	# Align light plane longitudinal pitch with actual front-vs-rear wheel road slope (climbs bridges!)
 	var car_fwd := -global_transform.basis.z
@@ -2892,7 +3022,7 @@ func _update_visual_lights(delta: float, braking_now: bool, immediate: bool = fa
 			if up_ortho.length_squared() > 0.001:
 				target_normal = up_ortho.normalized()
 
-	var lerp_t: float = 1.0 if immediate else clampf(delta * 16.0, 0.0, 1.0)
+	var lerp_t: float = 1.0 if (immediate or g_count == 0) else clampf(delta * 16.0, 0.0, 1.0)
 	_smooth_ground_y = lerpf(_smooth_ground_y, target_ground_y, lerp_t)
 	_smooth_ground_normal = _smooth_ground_normal.lerp(target_normal, lerp_t).normalized()
 
@@ -2908,10 +3038,12 @@ func _update_visual_lights(delta: float, braking_now: bool, immediate: bool = fa
 
 	var base_origin := Vector3(global_position.x, _smooth_ground_y, global_position.z)
 
-	if is_instance_valid(_shadow_mesh) and _shadow_mat:
-		_shadow_mesh.global_transform = Transform3D(road_basis, base_origin + road_basis * Vector3(shadow_offset.x, 0.028, shadow_offset.y))
-		var shadow_fade: float = 0.82 if (g_count > 0 or is_preview) else 0.22
-		_shadow_mat.set_shader_parameter("shadow_strength", shadow_fade)
+	var proj_mesh_visible: bool = ground_factor > 0.005
+	if is_instance_valid(_shadow_mesh):
+		_shadow_mesh.visible = proj_mesh_visible
+		if proj_mesh_visible and _shadow_mat:
+			_shadow_mesh.global_transform = Transform3D(road_basis, base_origin + road_basis * Vector3(shadow_offset.x, 0.028, shadow_offset.y))
+			_shadow_mat.set_shader_parameter("shadow_strength", shadow_fade)
 
 	var target_steer_shift: float = clampf(steering / maxf(STEER_LIMIT, 0.01), -1.0, 1.0)
 	_smooth_steer_shift = lerpf(_smooth_steer_shift, target_steer_shift, clampf(delta * 12.0, 0.0, 1.0))
@@ -2924,23 +3056,28 @@ func _update_visual_lights(delta: float, braking_now: bool, immediate: bool = fa
 	if main_sc and main_sc.has_method("get_headlight_boost"):
 		hl_boost = float(main_sc.call("get_headlight_boost"))
 
-	var ground_factor: float = 1.0 if (g_count > 0 or _showcase_mode) else 0.45
-	if is_instance_valid(_head_proj_mesh) and _head_proj_mat:
-		var head_local := Vector3(0.0, 0.044, headlight_proj_z_start - headlight_proj_size.y * 0.5 + 1.0)
-		_head_proj_mesh.global_transform = Transform3D(road_basis, base_origin + road_basis * head_local)
-		_head_proj_mat.set_shader_parameter("steer_shift", _smooth_steer_shift)
-		_head_proj_mat.set_shader_parameter("pitch_stretch", _smooth_pitch_shift)
-		_head_proj_mat.set_shader_parameter("intensity", 1.05 * ground_factor * hl_boost)
+	var light_proj_visible: bool = proj_mesh_visible and not destroyed
+	if is_instance_valid(_head_proj_mesh):
+		_head_proj_mesh.visible = light_proj_visible
+		if light_proj_visible and _head_proj_mat:
+			var head_local := Vector3(0.0, 0.044, headlight_proj_z_start - headlight_proj_size.y * 0.5 + 1.0)
+			_head_proj_mesh.global_transform = Transform3D(road_basis, base_origin + road_basis * head_local)
+			_head_proj_mat.set_shader_parameter("steer_shift", _smooth_steer_shift)
+			_head_proj_mat.set_shader_parameter("pitch_stretch", _smooth_pitch_shift)
+			_head_proj_mat.set_shader_parameter("intensity", 1.05 * ground_factor * hl_boost)
 
 	_smooth_brake_glow = lerpf(_smooth_brake_glow, 1.0 if braking_now else 0.0, clampf(delta * 14.0, 0.0, 1.0))
-	if is_instance_valid(_tail_proj_mesh) and _tail_proj_mat:
-		var tail_local := Vector3(0.0, 0.040, taillight_proj_z_start + taillight_proj_size.y * 0.5 - 0.28)
-		_tail_proj_mesh.global_transform = Transform3D(road_basis, base_origin + road_basis * tail_local)
-		_tail_proj_mat.set_shader_parameter("intensity", lerpf(0.44, 1.38, _smooth_brake_glow) * ground_factor)
+	if is_instance_valid(_tail_proj_mesh):
+		_tail_proj_mesh.visible = light_proj_visible
+		if light_proj_visible and _tail_proj_mat:
+			var tail_local := Vector3(0.0, 0.040, taillight_proj_z_start + taillight_proj_size.y * 0.5 - 0.28)
+			_tail_proj_mesh.global_transform = Transform3D(road_basis, base_origin + road_basis * tail_local)
+			_tail_proj_mat.set_shader_parameter("intensity", lerpf(0.44, 1.38, _smooth_brake_glow) * ground_factor)
 
 	for bm in _head_beam_mats:
 		if bm:
-			bm.set_shader_parameter("beam_intensity", lerpf(0.22, 0.28, absf(_smooth_steer_shift)) * lerpf(1.0, 1.45, clampf(hl_boost - 1.0, 0.0, 1.0)))
+			var b_int: float = 0.0 if destroyed else lerpf(0.22, 0.28, absf(_smooth_steer_shift)) * lerpf(1.0, 1.45, clampf(hl_boost - 1.0, 0.0, 1.0))
+			bm.set_shader_parameter("beam_intensity", b_int)
 
 	if (not is_preview or _showcase_mode) and not destroyed:
 		var hl_l_local: Vector3 = headlight_positions[0] if headlight_positions.size() >= 1 else Vector3(-0.7, 0.75, -2.3)
@@ -2948,7 +3085,7 @@ func _update_visual_lights(delta: float, braking_now: bool, immediate: bool = fa
 		var hl_l_world: Vector3 = global_transform * hl_l_local
 		var hl_r_world: Vector3 = global_transform * hl_r_local
 		var hl_dir_world: Vector3 = (car_fwd + global_transform.basis.x * (_smooth_steer_shift * 0.14) + Vector3(0.0, -0.055, 0.0)).normalized()
-		var hl_base_int: float = (1.65 if _showcase_mode else 1.25 * hl_boost) * ground_factor
+		var hl_base_int: float = 1.65 if _showcase_mode else 1.25 * hl_boost
 		var hl_rng: float = (74.0 if _showcase_mode else 68.0) * lerpf(1.0, 1.18, clampf(hl_boost - 1.0, 0.0, 1.0))
 		ZombiePool.update_headlight_uniforms(hl_l_world, hl_r_world, hl_dir_world, hl_base_int, Color(1.0, 0.94, 0.78, 1.0), hl_rng)
 		ProceduralMaterials.update_headlight_uniforms(hl_l_world, hl_r_world, hl_dir_world, hl_base_int, Color(1.0, 0.94, 0.78, 1.0), hl_rng)
@@ -3535,9 +3672,12 @@ func _enter_water(surface_y: float) -> void:
 		_ice_slide_audio.stop()
 	if is_instance_valid(_fire_audio):
 		_fire_audio.stop()
-	for ts in _tire_smokes:
+	for i_s: int in range(_tire_smokes.size()):
+		var ts := _tire_smokes[i_s]
 		if is_instance_valid(ts):
 			ts.emitting = false
+		if i_s < _tire_smoke_heat.size():
+			_tire_smoke_heat[i_s] = 0.0
 	for ex in _exhausts:
 		if is_instance_valid(ex):
 			ex.emitting = false
@@ -3638,9 +3778,12 @@ func _destroy_car(death_reason: String = "МАШИНА УНИЧТОЖЕНА") ->
 			sm.call("play_sfx", "btr_explosion_1", 1.0, randf_range(0.88, 1.02))
 		sm.call("set_speed_wind", 0.0, false)
 
-	for ts in _tire_smokes:
+	for i_s: int in range(_tire_smokes.size()):
+		var ts := _tire_smokes[i_s]
 		if is_instance_valid(ts):
 			ts.emitting = false
+		if i_s < _tire_smoke_heat.size():
+			_tire_smoke_heat[i_s] = 0.0
 	for ex in _exhausts:
 		if is_instance_valid(ex):
 			ex.emitting = false

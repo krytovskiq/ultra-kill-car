@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, depth_draw_never, cull_disabled;
+render_mode unshaded, depth_draw_never, cull_back;
 
 uniform sampler2D shadow_tex : source_color, filter_linear_mipmap, repeat_disable;
 uniform float shadow_strength : hint_range(0.0, 1.0) = 0.80;

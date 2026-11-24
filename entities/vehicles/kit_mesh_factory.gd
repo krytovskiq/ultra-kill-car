@@ -130,6 +130,11 @@ static func get_mat(key: String) -> StandardMaterial3D:
 			m.albedo_color = Color(0.035, 0.035, 0.045)
 			m.metallic = 0.10
 			m.roughness = 0.92
+		"intake_void":
+			m.albedo_color = Color(0.012, 0.012, 0.016)
+			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			m.metallic = 0.0
+			m.roughness = 1.0
 		"rubber_belt":
 			m.albedo_color = Color(0.10, 0.10, 0.11)
 			m.metallic = 0.04
@@ -335,6 +340,40 @@ static func _stadium_ring(half_w: float, half_h: float, y_center: float, segs_pe
 		pts.append(Vector2(-dx + cos(ang) * r, y_center + sin(ang) * half_h))
 	return pts
 
+static func _make_hollow_tube_mesh(r_outer: float, r_inner: float, length: float, segs: int = 20) -> ArrayMesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var hz := length * 0.5
+	for i in range(segs):
+		var a0 := float(i) * TAU / float(segs)
+		var a1 := float(i + 1) * TAU / float(segs)
+		var c0 := cos(a0)
+		var s0 := sin(a0)
+		var c1 := cos(a1)
+		var s1 := sin(a1)
+		var fo0 := Vector3(c0 * r_outer, s0 * r_outer, -hz)
+		var fo1 := Vector3(c1 * r_outer, s1 * r_outer, -hz)
+		var bo0 := Vector3(c0 * r_outer, s0 * r_outer,  hz)
+		var bo1 := Vector3(c1 * r_outer, s1 * r_outer,  hz)
+		var fi0 := Vector3(c0 * r_inner, s0 * r_inner, -hz)
+		var fi1 := Vector3(c1 * r_inner, s1 * r_inner, -hz)
+		var bi0 := Vector3(c0 * r_inner, s0 * r_inner,  hz)
+		var bi1 := Vector3(c1 * r_inner, s1 * r_inner,  hz)
+		# Outer wall
+		st.add_vertex(fo0); st.add_vertex(bo0); st.add_vertex(bo1)
+		st.add_vertex(fo0); st.add_vertex(bo1); st.add_vertex(fo1)
+		# Inner bore wall
+		st.add_vertex(fi0); st.add_vertex(bi1); st.add_vertex(bi0)
+		st.add_vertex(fi0); st.add_vertex(fi1); st.add_vertex(bi1)
+		# Front rim (-Z)
+		st.add_vertex(fo0); st.add_vertex(fo1); st.add_vertex(fi1)
+		st.add_vertex(fo0); st.add_vertex(fi1); st.add_vertex(fi0)
+		# Back rim (+Z)
+		st.add_vertex(bo0); st.add_vertex(bi1); st.add_vertex(bo1)
+		st.add_vertex(bo0); st.add_vertex(bi0); st.add_vertex(bi1)
+	st.generate_normals()
+	return st.commit()
+
 # ==============================================================================
 # 1. НАГНЕТАТЕЛЬ V8 ROOTS SUPERCHARGER BLOWER (АНИМИРОВАННЫЙ ШКИВ И ЗАСЛОНКИ)
 # ==============================================================================
@@ -345,6 +384,7 @@ static func add_supercharger_blower(parent: Node3D, pos: Vector3, scale_v: float
 	var billet := get_mat("billet_alu")
 	var red_anod := get_mat("anodized_red")
 	var dark := get_mat("dark_cavity")
+	var void_mat := get_mat("intake_void")
 	var belt_mat := get_mat("rubber_belt")
 	var steel := get_mat("forged_steel")
 
@@ -355,7 +395,16 @@ static func add_supercharger_blower(parent: Node3D, pos: Vector3, scale_v: float
 	rig.scale = Vector3.ONE * scale_v
 	parent.add_child(rig)
 
-	# 1. Впускной коллектор / постамент, глубоко уходящий в капот (y = -0.14 .. +0.05) — без зазоров даже на наклонных капотах
+	# Окантовка выреза в капоте на уровне крышки (верхняя часть нагнетателя утоплена в моторный отсек, снаружи только головка)
+	_add_box(rig, Vector3(0.0, 0.004, -0.02), Vector3(0.42, 0.016, 0.50), Vector3.ZERO, steel, "HoodCutoutTrim")
+	_add_box(rig, Vector3(0.0, 0.009, -0.02), Vector3(0.37, 0.010, 0.45), Vector3.ZERO, void_mat, "HoodCutoutVoid")
+
+	var body := Node3D.new()
+	body.name = "BlowerBodyOffset"
+	body.position = Vector3(0.0, -0.175, 0.0)
+	rig.add_child(body)
+
+	# 1. Впускной коллектор / постамент, глубоко уходящий в капот
 	var base_st: Array[Dictionary] = [
 		{"z": -0.25, "pts": _stadium_ring(0.225, 0.095, -0.045)},
 		{"z":  0.25, "pts": _stadium_ring(0.225, 0.095, -0.045)},
@@ -364,13 +413,13 @@ static func add_supercharger_blower(parent: Node3D, pos: Vector3, scale_v: float
 	mi_manifold.mesh = _make_loft_mesh(base_st, true, true)
 	mi_manifold.material_override = cast_alu
 	mi_manifold.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	rig.add_child(mi_manifold)
+	body.add_child(mi_manifold)
 
 	# Фланец посадки с болтами крепления
-	_add_box(rig, Vector3(0.0, 0.050, 0.0), Vector3(0.42, 0.022, 0.48), Vector3.ZERO, billet, "BlowerFlange")
+	_add_box(body, Vector3(0.0, 0.050, 0.0), Vector3(0.42, 0.022, 0.48), Vector3.ZERO, billet, "BlowerFlange")
 	for bx: float in [-0.185, 0.185]:
 		for bz: float in [-0.20, -0.07, 0.07, 0.20]:
-			_add_cyl(rig, Vector3(bx, 0.064, bz), 0.011, 0.011, 0.014, Vector3.ZERO, chrome, 6, "FlangeBolt")
+			_add_cyl(body, Vector3(bx, 0.064, bz), 0.011, 0.011, 0.014, Vector3.ZERO, chrome, 6, "FlangeBolt")
 
 	# 2. Скульптурный оребрённый корпус 8-71 Roots Blower (лофтинг с закруглёнными стенками)
 	var blower_st: Array[Dictionary] = [
@@ -382,28 +431,28 @@ static func add_supercharger_blower(parent: Node3D, pos: Vector3, scale_v: float
 	mi_housing.mesh = _make_loft_mesh(blower_st, true, true)
 	mi_housing.material_override = cast_alu
 	mi_housing.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	rig.add_child(mi_housing)
+	body.add_child(mi_housing)
 
-	# Машинная фрезеровка: 7 горизонтальных рёбер охлаждения слева и справа
+	# Машинная фрезеровка: горизонтальные рёбра охлаждения слева и справа
 	for side: float in [-1.0, 1.0]:
 		for fi in range(6):
 			var fy := 0.088 + float(fi) * 0.022
-			_add_box(rig, Vector3(side * 0.182, fy, 0.0), Vector3(0.020, 0.008, 0.40), Vector3.ZERO, billet, "BlowerFin")
+			_add_box(body, Vector3(side * 0.182, fy, 0.0), Vector3(0.020, 0.008, 0.40), Vector3.ZERO, billet, "BlowerFin")
 
 	# Передняя и задняя фрезерованные крышки подшипников нагнетателя
-	_add_box(rig, Vector3(0.0, 0.145, -0.232), Vector3(0.35, 0.165, 0.024), Vector3.ZERO, billet, "BlowerFrontPlate")
-	_add_box(rig, Vector3(0.0, 0.145,  0.232), Vector3(0.35, 0.165, 0.024), Vector3.ZERO, billet, "BlowerRearPlate")
-	_add_cyl(rig, Vector3(0.0, 0.145,  0.252), 0.036, 0.042, 0.030, Vector3(90.0, 0.0, 0.0), chrome, 12, "BlowOffValve")
+	_add_box(body, Vector3(0.0, 0.145, -0.232), Vector3(0.35, 0.165, 0.024), Vector3.ZERO, billet, "BlowerFrontPlate")
+	_add_box(body, Vector3(0.0, 0.145,  0.232), Vector3(0.35, 0.165, 0.024), Vector3.ZERO, billet, "BlowerRearPlate")
+	_add_cyl(body, Vector3(0.0, 0.145,  0.252), 0.036, 0.042, 0.030, Vector3(90.0, 0.0, 0.0), chrome, 12, "BlowOffValve")
 
 	# 3. Выносной приводной нос (Snout), нижний шкив коленвала, зубчатый ремень и вращающийся шкив
-	_add_cyl(rig, Vector3(0.0, 0.145, -0.320), 0.048, 0.062, 0.175, Vector3(90.0, 0.0, 0.0), billet, 16, "BlowerSnout")
-	_add_cyl(rig, Vector3(0.0, 0.145, -0.395), 0.056, 0.056, 0.022, Vector3(90.0, 0.0, 0.0), chrome, 16, "SnoutCollar")
+	_add_cyl(body, Vector3(0.0, 0.145, -0.320), 0.048, 0.062, 0.175, Vector3(90.0, 0.0, 0.0), billet, 16, "BlowerSnout")
+	_add_cyl(body, Vector3(0.0, 0.145, -0.395), 0.056, 0.056, 0.022, Vector3(90.0, 0.0, 0.0), chrome, 16, "SnoutCollar")
 
 	# Верхний вращающийся шкив (VehicleBase вращает узел "SuperchargerPulley" по оси Z)
 	var upper_pulley := Node3D.new()
 	upper_pulley.name = "SuperchargerPulley"
 	upper_pulley.position = Vector3(0.0, 0.145, -0.435)
-	rig.add_child(upper_pulley)
+	body.add_child(upper_pulley)
 	_add_cyl(upper_pulley, Vector3.ZERO, 0.082, 0.082, 0.042, Vector3(90.0, 0.0, 0.0), billet, 20, "PulleyWheel")
 	_add_cyl(upper_pulley, Vector3(0.0, 0.0, -0.016), 0.056, 0.056, 0.014, Vector3(90.0, 0.0, 0.0), steel, 16, "PulleyDish")
 	_add_cyl(upper_pulley, Vector3(0.0, 0.0, -0.024), 0.020, 0.020, 0.018, Vector3(90.0, 0.0, 0.0), chrome, 6, "PulleyHubNut")
@@ -411,16 +460,16 @@ static func add_supercharger_blower(parent: Node3D, pos: Vector3, scale_v: float
 		var ang := float(bi) * TAU / 6.0
 		_add_cyl(upper_pulley, Vector3(cos(ang) * 0.040, sin(ang) * 0.040, -0.022), 0.007, 0.007, 0.012, Vector3(90.0, 0.0, 0.0), red_anod, 6, "PulleyBolt")
 
-	# Нижний шкив на капоте + натяжной ролик + зубчатый приводной ремень Гилмера
-	_add_cyl(rig, Vector3(0.0, -0.045, -0.435), 0.072, 0.072, 0.042, Vector3(90.0, 0.0, 0.0), steel, 18, "LowerCrankPulley")
-	_add_cyl(rig, Vector3(0.088, 0.055, -0.435), 0.026, 0.026, 0.042, Vector3(90.0, 0.0, 0.0), chrome, 14, "TensionerPulley")
+	# Нижний шкив на коленвале + натяжной ролик + зубчатый приводной ремень Гилмера
+	_add_cyl(body, Vector3(0.0, -0.045, -0.435), 0.072, 0.072, 0.042, Vector3(90.0, 0.0, 0.0), steel, 18, "LowerCrankPulley")
+	_add_cyl(body, Vector3(0.088, 0.055, -0.435), 0.026, 0.026, 0.042, Vector3(90.0, 0.0, 0.0), chrome, 14, "TensionerPulley")
 	# Две плотные ветви зубчатого ремня от верхнего к нижнему шкиву
-	_add_box(rig, Vector3(-0.074, 0.050, -0.435), Vector3(0.014, 0.215, 0.044), Vector3(0.0, 0.0, 3.0), belt_mat, "BeltLeft")
-	_add_box(rig, Vector3(0.074, 0.050, -0.435), Vector3(0.014, 0.215, 0.044), Vector3(0.0, 0.0, -3.0), belt_mat, "BeltRight")
-	_add_cyl(rig, Vector3(0.0, 0.145, -0.435), 0.087, 0.087, 0.044, Vector3(90.0, 0.0, 0.0), belt_mat, 18, "BeltWrapTop")
+	_add_box(body, Vector3(-0.074, 0.050, -0.435), Vector3(0.014, 0.215, 0.044), Vector3(0.0, 0.0, 3.0), belt_mat, "BeltLeft")
+	_add_box(body, Vector3(0.074, 0.050, -0.435), Vector3(0.014, 0.215, 0.044), Vector3(0.0, 0.0, -3.0), belt_mat, "BeltRight")
+	_add_cyl(body, Vector3(0.0, 0.145, -0.435), 0.087, 0.087, 0.044, Vector3(90.0, 0.0, 0.0), belt_mat, 18, "BeltWrapTop")
 
 	# 4. Хромированный аэродинамический ковш 3-Barrel "Bug Catcher" (плавный многоступенчатый лофт)
-	_add_box(rig, Vector3(0.0, 0.240, 0.0), Vector3(0.28, 0.024, 0.34), Vector3.ZERO, chrome, "ScoopNeckPlate")
+	_add_box(body, Vector3(0.0, 0.240, 0.0), Vector3(0.28, 0.024, 0.34), Vector3.ZERO, chrome, "ScoopNeckPlate")
 	var scoop_stations: Array[Dictionary] = [
 		{"z": -0.295, "pts": _stadium_ring(0.215, 0.084, 0.340)},
 		{"z": -0.255, "pts": _stadium_ring(0.205, 0.078, 0.338)},
@@ -434,32 +483,52 @@ static func add_supercharger_blower(parent: Node3D, pos: Vector3, scale_v: float
 	mi_scoop.mesh = _make_loft_mesh(scoop_stations, true, false)
 	mi_scoop.material_override = chrome
 	mi_scoop.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	rig.add_child(mi_scoop)
+	body.add_child(mi_scoop)
 
-	# Развальцованный хромированный обод переднего раструба + тёмная впускная камера внутри
-	_add_box(rig, Vector3(0.0, 0.340, -0.258), Vector3(0.37, 0.128, 0.025), Vector3.ZERO, dark, "ScoopCavity")
+	# Глубокая впускная камера + 3 полых 3D-канала с тёмными колодцами (настоящие дырки без заглушки)
+	_add_box(body, Vector3(0.0, 0.340, -0.212), Vector3(0.36, 0.128, 0.016), Vector3.ZERO, void_mat, "ScoopDeepBackplate")
+	for wx: float in [-0.175, -0.056, 0.056, 0.175]:
+		_add_box(body, Vector3(wx, 0.340, -0.266), Vector3(0.022, 0.124, 0.036), Vector3.ZERO, dark, "ScoopDividerWeb")
+	_add_box(body, Vector3(0.0, 0.398, -0.266), Vector3(0.36, 0.020, 0.036), Vector3.ZERO, dark, "ScoopInnerTrimTop")
+	_add_box(body, Vector3(0.0, 0.282, -0.266), Vector3(0.36, 0.020, 0.036), Vector3.ZERO, dark, "ScoopInnerTrimBot")
+
+	var hollow_ring_mesh := _make_hollow_tube_mesh(0.052, 0.041, 0.034, 20)
+	var hollow_bore_mesh := _make_hollow_tube_mesh(0.0412, 0.0395, 0.072, 18)
 	for bx: float in [-0.112, 0.0, 0.112]:
-		_add_cyl(rig, Vector3(bx, 0.340, -0.286), 0.048, 0.050, 0.024, Vector3(90.0, 0.0, 0.0), chrome, 16, "InjectorBarrelRing")
-		_add_cyl(rig, Vector3(bx, 0.340, -0.274), 0.042, 0.042, 0.018, Vector3(90.0, 0.0, 0.0), dark, 16, "InjectorBarrelBore")
+		var mi_ring := MeshInstance3D.new()
+		mi_ring.name = "InjectorBarrelRing"
+		mi_ring.mesh = hollow_ring_mesh
+		mi_ring.material_override = chrome
+		mi_ring.position = Vector3(bx, 0.340, -0.282)
+		mi_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		body.add_child(mi_ring)
+
+		var mi_bore := MeshInstance3D.new()
+		mi_bore.name = "InjectorBarrelBore"
+		mi_bore.mesh = hollow_bore_mesh
+		mi_bore.material_override = void_mat
+		mi_bore.position = Vector3(bx, 0.340, -0.254)
+		mi_bore.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		body.add_child(mi_bore)
 
 	# Верхний и нижний хромированные козырьки раструба
-	_add_box(rig, Vector3(0.0, 0.422, -0.285), Vector3(0.41, 0.016, 0.040), Vector3(-6.0, 0.0, 0.0), chrome, "ScoopLipTop")
-	_add_box(rig, Vector3(0.0, 0.258, -0.285), Vector3(0.41, 0.016, 0.040), Vector3(6.0, 0.0, 0.0), chrome, "ScoopLipBot")
+	_add_box(body, Vector3(0.0, 0.422, -0.285), Vector3(0.41, 0.016, 0.040), Vector3(-6.0, 0.0, 0.0), chrome, "ScoopLipTop")
+	_add_box(body, Vector3(0.0, 0.258, -0.285), Vector3(0.41, 0.016, 0.040), Vector3(6.0, 0.0, 0.0), chrome, "ScoopLipBot")
 
 	# 5. Подвижная ось с тремя ярко-красными дроссельными заслонками ("SuperchargerButterflies")
 	var bfly_shaft := Node3D.new()
 	bfly_shaft.name = "SuperchargerButterflies"
-	bfly_shaft.position = Vector3(0.0, 0.340, -0.292)
+	bfly_shaft.position = Vector3(0.0, 0.340, -0.284)
 	bfly_shaft.rotation.x = deg_to_rad(14.0)
-	rig.add_child(bfly_shaft)
+	body.add_child(bfly_shaft)
 	_add_cyl(bfly_shaft, Vector3.ZERO, 0.008, 0.008, 0.38, Vector3(0.0, 0.0, 90.0), chrome, 10, "ThrottleShaft")
 	for bx: float in [-0.112, 0.0, 0.112]:
-		_add_cyl(bfly_shaft, Vector3(bx, 0.0, -0.004), 0.041, 0.041, 0.009, Vector3(90.0, 0.0, 0.0), red_anod, 16, "ThrottlePlate")
+		_add_cyl(bfly_shaft, Vector3(bx, 0.0, 0.0), 0.0385, 0.0385, 0.006, Vector3(90.0, 0.0, 0.0), red_anod, 16, "ThrottlePlate")
 
 	# Топливная рампа с 3 форсуночными трубками на боку нагнетателя
-	_add_box(rig, Vector3(-0.18, 0.255, -0.05), Vector3(0.028, 0.026, 0.24), Vector3.ZERO, red_anod, "FuelDistBlock")
+	_add_box(body, Vector3(-0.18, 0.255, -0.05), Vector3(0.028, 0.026, 0.24), Vector3.ZERO, red_anod, "FuelDistBlock")
 	for fz: float in [-0.13, -0.04, 0.05]:
-		_add_tube(rig, Vector3(-0.18, 0.268, fz), Vector3(-0.14, 0.305, fz - 0.02), 0.007, chrome, true, 8)
+		_add_tube(body, Vector3(-0.18, 0.268, fz), Vector3(-0.14, 0.305, fz - 0.02), 0.007, chrome, true, 8)
 
 # ==============================================================================
 # 2. ТВИН-ТУРБО МОТОРНЫЙ БЛОК ДЛЯ ЗАДНЕМОТОРНОЙ КОРМЫ (DELOREAN V6 TURBO)
@@ -521,7 +590,7 @@ static func add_diesel_turbo_unit(parent: Node3D, pos: Vector3, scale_v: float =
 	rig.scale = Vector3.ONE * scale_v
 	parent.add_child(rig)
 
-	_add_box(rig, Vector3(0.0, -0.02, 0.0), Vector3(0.84, 0.08, 0.72), Vector3.ZERO, steel, "CoolerMountTray")
+	_add_box(rig, Vector3(0.0, -0.025, 0.0), Vector3(0.84, 0.105, 0.72), Vector3.ZERO, steel, "CoolerMountTray")
 	_add_box(rig, Vector3(0.0, 0.09, -0.05), Vector3(0.76, 0.14, 0.56), Vector3.ZERO, cast_alu, "IntercoolerShroud")
 	_add_box(rig, Vector3(0.0, 0.09, -0.335), Vector3(0.68, 0.11, 0.02), Vector3.ZERO, grille, "CoolerFrontGrille")
 	for side: float in [-1.0, 1.0]:
@@ -662,7 +731,7 @@ static func add_sculpted_airfoil_wing(parent: Node3D, base_pos: Vector3, width: 
 	# Опорные стойки с основаниями, прижатыми к крышке багажника/кузова (y = 0)
 	var half_s := strut_spacing * 0.5
 	for side: float in [-1.0, 1.0]:
-		_add_box(wing, Vector3(side * half_s, 0.010, 0.0), Vector3(0.08, 0.022, chord * 0.72), Vector3.ZERO, steel, "WingFootPad")
+		_add_box(wing, Vector3(side * half_s, 0.000, 0.0), Vector3(0.08, 0.038, chord * 0.72), Vector3.ZERO, steel, "WingFootPad")
 		_add_box(wing, Vector3(side * half_s, strut_h * 0.5, 0.02), Vector3(0.038, strut_h, chord * 0.58), Vector3(8.0, 0.0, 0.0), steel, "WingStrut")
 
 	# Аэродинамический профиль крыла (лофт вдоль X: широкое переднее крыло + закрылок Герни)
@@ -713,15 +782,31 @@ static func add_exhaust_stack(parent: Node3D, base_pos: Vector3, top_pos: Vector
 	var steel := get_mat("forged_steel")
 	var dark := get_mat("dark_cavity")
 
+	var in_dir := -signf(base_pos.x) if absf(base_pos.x) > 0.05 else 0.0
+	# Нижнее 90-градусное колено, уходящее под днище/в раму, чтобы труба не висела в воздухе
+	_add_tube(parent, base_pos + Vector3(0.0, 0.03, 0.0), base_pos + Vector3(in_dir * 0.28, -0.06, 0.0), radius * 0.94, ex_mat, true, 10)
 	_add_tube(parent, base_pos, top_pos, radius, ex_mat, false, 12)
 	# Перфорированный теплоэкран в средней части трубы
 	var mid := base_pos.lerp(top_pos, 0.45)
 	var shield_h := maxf((top_pos - base_pos).length() * 0.52, 0.25)
 	_add_cyl(parent, mid, radius * 1.32, radius * 1.32, shield_h, Vector3.ZERO, steel, 12, "HeatShield")
-	# Косой срез выхлопного сопла сверху + тёмное жерло
+	# 2 силовых хомута крепления к кузову
+	for t_c: float in [0.22, 0.65]:
+		var p_clamp := base_pos.lerp(top_pos, t_c)
+		_add_cyl(parent, p_clamp, radius * 1.38, radius * 1.38, 0.045, Vector3.ZERO, steel, 12, "StackClamp")
+		if absf(in_dir) > 0.1:
+			_add_tube(parent, p_clamp, p_clamp + Vector3(in_dir * 0.22, 0.0, -0.03), 0.020, steel, true, 8)
+	# Косой срез выхлопного сопла сверху + тёмное жерло + маркер выхода выхлопных газов
 	var tip_dir := Vector3(0.0, 0.08, 0.11).normalized()
 	_add_tube(parent, top_pos - Vector3(0.0, 0.02, 0.0), top_pos + tip_dir * 0.16, radius * 1.06, ex_mat, false, 12)
 	_add_cyl(parent, top_pos + tip_dir * 0.155, radius * 0.85, radius * 0.85, 0.02, Vector3(54.0, 0.0, 0.0), dark, 10, "ExhaustBore")
+
+	var tip_marker := Marker3D.new()
+	tip_marker.name = "ExhaustStackTip"
+	tip_marker.position = top_pos + tip_dir * 0.165
+	tip_marker.set_meta("is_exhaust_stack_tip", true)
+	tip_marker.set_meta("emit_dir", Vector3(0.0, 0.68, 0.73).normalized())
+	parent.add_child(tip_marker)
 
 static func add_rock_slider(parent: Node3D, x_pos: float, y_pos: float, z_front: float, z_rear: float, side_sign: float) -> void:
 	var steel := get_mat("forged_steel")
@@ -732,6 +817,8 @@ static func add_rock_slider(parent: Node3D, x_pos: float, y_pos: float, z_front:
 	for frac: float in [0.18, 0.50, 0.82]:
 		var bz := lerpf(z_front, z_rear, frac)
 		_add_tube(parent, Vector3(inner_x, y_pos, bz), Vector3(outer_x, y_pos + 0.015, bz), 0.028, steel)
+		# Внутренний кронштейн к раме/дну кузова
+		_add_tube(parent, Vector3(inner_x, y_pos, bz), Vector3(inner_x - side_sign * 0.34, y_pos + 0.07, bz), 0.026, steel)
 
 static func add_tactical_lightbar(parent: Node3D, pos: Vector3, width: float, pod_count: int = 4) -> void:
 	var steel := get_mat("forged_steel")
@@ -745,7 +832,7 @@ static func add_tactical_lightbar(parent: Node3D, pos: Vector3, width: float, po
 
 	# Установочные лапы на крышу + оребрённый корпус LED-балки + верхняя защитная дуга
 	for sx: float in [-width * 0.44, width * 0.44]:
-		_add_box(bar, Vector3(sx, 0.026, 0.0), Vector3(0.05, 0.058, 0.10), Vector3.ZERO, steel, "LightbarFoot")
+		_add_box(bar, Vector3(sx, 0.010, 0.0), Vector3(0.05, 0.092, 0.10), Vector3.ZERO, steel, "LightbarFoot")
 	_add_box(bar, Vector3(0.0, 0.068, 0.0), Vector3(width * 0.90, 0.084, 0.115), Vector3.ZERO, steel, "LightbarHousing")
 	_add_tube(bar, Vector3(-width * 0.48, 0.125, -0.02), Vector3(width * 0.48, 0.125, -0.02), 0.018, steel)
 	_add_tube(bar, Vector3(-width * 0.48, 0.050, -0.02), Vector3(-width * 0.48, 0.125, -0.02), 0.018, steel)

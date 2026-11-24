@@ -148,202 +148,208 @@ static func _build_pikap_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_ch
 	if st_armor:
 		KMF.add_sculpted_v_ram(kit, -2.37, 0.30, 0.76, 0.94, 0.34, 0.0)
 		KMF.add_radiator_guard(kit, Vector3(0.0, 1.00, -2.36), Vector2(0.96, 0.36))
-		for sx: float in [-1.015, 1.015]:
+		for sx: float in [-0.935, 0.935]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.74, -0.18), 0.34, 1.06, signf(sx))
 
 	if st_engine:
-		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.34, -1.56), 1.02, -4.0)
-		for sx: float in [-0.88, 0.88]:
-			KMF.add_exhaust_stack(kit, Vector3(sx, 1.08, 0.44), Vector3(sx, 2.02, 0.48), 0.045)
+		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.33, -1.56), 0.98, -4.0)
+		for sx: float in [-0.77, 0.77]:
+			KMF.add_exhaust_stack(kit, Vector3(sx, 0.62, 0.46), Vector3(sx, 1.98, 0.48), 0.044)
 
 	if st_chassis:
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.60, -0.78), 1.24, 0.42, -48.0, 4, 24.0)
-		for sx: float in [-0.78, 0.78]:
-			KMF._add_tube(kit, Vector3(sx, 1.08, 0.50), Vector3(sx * 0.90, 1.94, 0.52), 0.040, steel)
-			KMF._add_tube(kit, Vector3(sx * 0.90, 1.94, 0.52), Vector3(sx, 1.08, 2.02), 0.036, steel)
-			KMF._add_tube(kit, Vector3(sx, 1.08, 0.50), Vector3(sx, 1.08, 2.08), 0.034, steel)
-		KMF._add_tube(kit, Vector3(-0.70, 1.94, 0.52), Vector3(0.70, 1.94, 0.52), 0.040, steel)
-		for sx: float in [-1.02, 1.02]:
-			KMF.add_rock_slider(kit, sx, 0.34, -0.88, 0.92, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.84, -0.28), 1.18, 4)
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.49, -0.78), 1.24, 0.42, -48.0, 4, 24.0)
+		for sx: float in [-0.72, 0.72]:
+			KMF._add_tube(kit, Vector3(sx, 1.06, 0.48), Vector3(sx * 0.90, 1.88, 0.50), 0.040, steel)
+			KMF._add_tube(kit, Vector3(sx * 0.90, 1.88, 0.50), Vector3(sx, 1.06, 2.02), 0.036, steel)
+			KMF._add_tube(kit, Vector3(sx, 1.06, 0.48), Vector3(sx, 1.06, 2.06), 0.034, steel)
+		KMF._add_tube(kit, Vector3(-0.65, 1.88, 0.50), Vector3(0.65, 1.88, 0.50), 0.040, steel)
+		for sx: float in [-0.88, 0.88]:
+			KMF.add_rock_slider(kit, sx, 0.36, -0.86, 0.88, signf(sx))
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.805, -0.28), 1.06, 4)
 
 static func _build_doge2_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	if st_armor:
 		KMF.add_sculpted_v_ram(kit, -2.63, 0.22, 0.60, 1.00, 0.34, 0.0)
 		KMF.add_radiator_guard(kit, Vector3(0.0, 0.70, -2.63), Vector2(1.14, 0.26))
-		for sx: float in [-1.075, 1.075]:
+		for sx: float in [-0.96, 0.96]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.62, 0.0), 0.30, 1.68, signf(sx))
 
 	if st_engine:
-		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.005, -1.62), 1.10, -2.0)
-		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 1.105, 2.40), 1.84, 0.28, -10.0, 0.16, 1.02)
+		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.01, -1.62), 1.04, -2.0)
+		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 1.075, 2.40), 1.84, 0.28, -10.0, 0.16, 1.02)
 
 	if st_chassis:
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.21, -0.56), 1.42, 0.56, -32.0, 4, 22.0)
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.22, 1.18), 1.38, 0.86, 16.0, 6, -16.0)
-		for sx: float in [-1.08, 1.08]:
-			KMF.add_rock_slider(kit, sx, 0.28, -1.10, 1.10, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.425, 0.02), 1.26, 4)
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.145, -0.56), 1.42, 0.56, -32.0, 4, 22.0)
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.24, 1.18), 1.38, 0.86, 16.0, 6, -16.0)
+		for sx: float in [-0.95, 0.95]:
+			KMF.add_rock_slider(kit, sx, 0.28, -1.08, 1.08, signf(sx))
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.355, 0.02), 1.12, 4)
 
 static func _build_barracuda_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	if st_armor:
-		KMF.add_sculpted_v_ram(kit, -2.37, 0.26, 0.58, 0.90, 0.30, 0.0)
-		KMF.add_radiator_guard(kit, Vector3(0.0, 0.66, -2.33), Vector2(1.08, 0.22))
-		for sx: float in [-1.045, 1.045]:
+		KMF.add_sculpted_v_ram(kit, -2.28, 0.26, 0.58, 0.90, 0.30, 0.0)
+		KMF.add_radiator_guard(kit, Vector3(0.0, 0.66, -2.24), Vector2(1.08, 0.22))
+		for sx: float in [-0.925, 0.925]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.62, 0.0), 0.28, 1.46, signf(sx))
 
 	if st_engine:
-		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.00, -1.36), 1.08, -1.5)
-		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 0.96, 2.18), 1.76, 0.28, -10.0, 0.21, 0.96)
+		KMF.add_supercharger_blower(kit, Vector3(0.0, 0.98, -1.36), 1.02, -1.5)
+		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 0.93, 2.18), 1.76, 0.28, -10.0, 0.21, 0.96)
 
 	if st_chassis:
 		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.14, -0.42), 1.22, 0.52, -31.0, 4, 22.0)
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.15, 1.16), 1.16, 0.74, 18.0, 5, -18.0)
-		for sx: float in [-1.04, 1.04]:
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.18, 1.16), 1.16, 0.74, 18.0, 5, -18.0)
+		for sx: float in [-0.86, 0.86]:
 			KMF.add_rock_slider(kit, sx, 0.30, -0.88, 0.88, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.33, 0.10), 1.14, 4)
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.29, 0.10), 1.02, 4)
 
 static func _build_buhanka_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	var steel := KMF.get_mat("forged_steel")
 	if st_armor:
 		KMF.add_sculpted_v_ram(kit, -2.12, 0.28, 0.74, 0.98, 0.32, 0.0)
 		KMF.add_radiator_guard(kit, Vector3(0.0, 0.95, -2.13), Vector2(1.16, 0.38))
-		for sx: float in [-1.00, 1.00]:
+		for sx: float in [-0.975, 0.975]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.78, 0.02), 0.42, 1.24, signf(sx))
 
 	if st_engine:
-		KMF.add_diesel_turbo_unit(kit, Vector3(0.0, 2.09, -0.15), 1.0)
-		for sx: float in [-0.96, 0.96]:
-			KMF.add_exhaust_stack(kit, Vector3(sx, 0.90, 2.04), Vector3(sx, 2.26, 2.04), 0.044)
+		KMF.add_diesel_turbo_unit(kit, Vector3(0.0, 2.06, -0.15), 1.0)
+		for sx: float in [-0.90, 0.90]:
+			KMF.add_exhaust_stack(kit, Vector3(sx, 0.56, 1.96), Vector3(sx, 2.26, 1.96), 0.044)
 
 	if st_chassis:
 		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.48, -1.98), 1.44, 0.50, -70.0, 4, 24.0)
 		for sx: float in [-0.70, 0.70]:
-			KMF._add_tube(kit, Vector3(sx, 2.12, -1.50), Vector3(sx, 2.12, 1.72), 0.032, steel)
-		KMF._add_tube(kit, Vector3(-0.70, 2.12, 1.72), Vector3(0.70, 2.12, 1.72), 0.032, steel)
-		for sx: float in [-1.00, 1.00]:
-			KMF.add_rock_slider(kit, sx, 0.36, -0.68, 0.72, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 2.11, -1.25), 1.36, 4)
+			KMF._add_tube(kit, Vector3(sx, 2.09, -1.50), Vector3(sx, 2.09, 1.72), 0.032, steel)
+			for rz: float in [-1.45, 0.10, 1.68]:
+				KMF._add_tube(kit, Vector3(sx, 1.94, rz), Vector3(sx, 2.09, rz), 0.026, steel)
+		KMF._add_tube(kit, Vector3(-0.70, 2.09, -1.50), Vector3(0.70, 2.09, -1.50), 0.032, steel)
+		KMF._add_tube(kit, Vector3(-0.70, 2.09, 1.72), Vector3(0.70, 2.09, 1.72), 0.032, steel)
+		for sx: float in [-0.96, 0.96]:
+			KMF.add_rock_slider(kit, sx, 0.46, -0.68, 0.72, signf(sx))
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 2.05, -1.25), 1.22, 4)
 
 static func _build_vandura_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	if st_armor:
 		KMF.add_sculpted_v_ram(kit, -2.57, 0.30, 0.72, 1.00, 0.32, 0.0)
 		KMF.add_radiator_guard(kit, Vector3(0.0, 0.90, -2.56), Vector2(1.16, 0.32))
-		for sx: float in [-1.02, 1.02]:
+		for sx: float in [-1.005, 1.005]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.84, -0.20), 0.44, 1.96, signf(sx))
 
 	if st_engine:
-		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.34, -2.18), 0.80, -14.0)
-		for sx: float in [-1.02, 1.02]:
-			KMF.add_exhaust_stack(kit, Vector3(sx, 0.92, 2.42), Vector3(sx, 2.30, 2.42), 0.046)
-		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 2.12, 2.05), 1.72, 0.28, -9.0, 0.16, 1.08)
+		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.285, -2.18), 0.78, -14.0)
+		for sx: float in [-0.94, 0.94]:
+			KMF.add_exhaust_stack(kit, Vector3(sx, 0.52, 2.28), Vector3(sx, 2.28, 2.28), 0.046)
+		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 2.11, 2.02), 1.62, 0.26, -9.0, 0.14, 1.04)
 
 	if st_chassis:
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.74, -1.68), 1.42, 0.54, -42.0, 4, 24.0)
-		for sx: float in [-1.02, 1.02]:
-			KMF.add_rock_slider(kit, sx, 0.36, -1.26, 0.90, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 2.12, -0.72), 1.38, 4)
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.69, -1.68), 1.42, 0.54, -42.0, 4, 24.0)
+		for sx: float in [-0.97, 0.97]:
+			KMF.add_rock_slider(kit, sx, 0.37, -1.26, 0.90, signf(sx))
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.985, -0.72), 1.24, 4)
 
 static func _build_carson_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	var ex_mat := KMF.get_mat("exhaust_steel")
+	var steel := KMF.get_mat("forged_steel")
 	if st_armor:
 		KMF.add_sculpted_v_ram(kit, -2.45, 0.24, 0.58, 0.78, 0.28, 0.0)
-		KMF.add_radiator_guard(kit, Vector3(0.0, 0.72, -2.14), Vector2(0.68, 0.40), false)
-		for sx: float in [-0.785, 0.785]:
+		KMF.add_radiator_guard(kit, Vector3(0.0, 0.72, -2.25), Vector2(0.68, 0.40), false)
+		for sx: float in [-0.67, 0.67]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.84, 0.12), 0.28, 1.65, signf(sx))
 
 	if st_engine:
-		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.275, -1.16), 1.12, 0.0)
-		for sx: float in [-0.82, 0.82]:
-			KMF._add_tube(kit, Vector3(sx * 0.90, 0.82, -1.35), Vector3(sx, 0.42, -1.05), 0.036, ex_mat)
-			KMF._add_tube(kit, Vector3(sx, 0.42, -1.05), Vector3(sx, 0.36, 0.58), 0.040, ex_mat)
+		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.275, -1.16), 1.04, 0.0)
+		for sx: float in [-0.70, 0.70]:
+			KMF._add_tube(kit, Vector3(sx * 0.65, 0.74, -1.35), Vector3(sx, 0.42, -1.00), 0.036, ex_mat)
+			KMF._add_tube(kit, Vector3(sx, 0.42, -1.00), Vector3(sx, 0.36, 0.58), 0.040, ex_mat)
+			KMF._add_tube(kit, Vector3(sx, 0.39, -0.60), Vector3(sx * 0.62, 0.42, -0.60), 0.022, steel)
+			KMF._add_tube(kit, Vector3(sx, 0.36, 0.35), Vector3(sx * 0.65, 0.40, 0.35), 0.022, steel)
 
 	if st_chassis:
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.40, -0.18), 1.06, 0.36, -70.0, 4, 24.0)
-		for sx: float in [-0.95, 0.95]:
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.38, 0.00), 1.06, 0.36, -70.0, 4, 24.0)
+		for sx: float in [-0.96, 0.96]:
 			KMF.add_rock_slider(kit, sx, 0.28, -0.96, 1.06, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.56, 0.32), 1.10, 4)
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.53, 0.32), 0.98, 4)
 
 static func _build_delorean_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	if st_armor:
 		KMF.add_sculpted_v_ram(kit, -2.11, 0.18, 0.48, 0.88, 0.28, 0.0)
 		KMF.add_radiator_guard(kit, Vector3(0.0, 0.54, -2.10), Vector2(1.10, 0.18), false)
-		for sx: float in [-0.985, 0.985]:
+		for sx: float in [-0.925, 0.925]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.50, -0.02), 0.22, 1.26, signf(sx))
 
 	if st_engine:
-		KMF.add_twin_turbo_rig(kit, Vector3(0.0, 1.045, 1.48), 1.00, -4.0)
-		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 1.07, 1.96), 1.72, 0.26, -11.0, 0.22, 0.94)
+		KMF.add_twin_turbo_rig(kit, Vector3(0.0, 0.995, 1.48), 1.00, -4.0)
+		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 1.055, 1.96), 1.72, 0.26, -11.0, 0.22, 0.94)
 
 	if st_chassis:
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 0.96, -0.50), 1.20, 0.50, -23.0, 4, 22.0)
-		for sx: float in [-0.98, 0.98]:
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 0.905, -0.50), 1.20, 0.50, -23.0, 4, 22.0)
+		for sx: float in [-0.88, 0.88]:
 			KMF.add_rock_slider(kit, sx, 0.24, -0.76, 0.74, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.14, 0.14), 1.06, 4)
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.10, 0.14), 0.94, 4)
 
 static func _build_k2500_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	var steel := KMF.get_mat("forged_steel")
 	if st_armor:
-		KMF.add_baja_prerunner_bumper(kit, -2.92, 0.56, 1.24, 1.04, 0.0)
+		KMF.add_baja_prerunner_bumper(kit, -2.84, 0.56, 1.24, 1.04, 0.0)
 		for sx: float in [-1.045, 1.045]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.92, -0.45), 0.34, 1.30, signf(sx))
 
 	if st_engine:
-		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.44, -2.05), 1.12, -4.0)
-		for sx: float in [-0.94, 0.94]:
-			KMF.add_exhaust_stack(kit, Vector3(sx, 1.42, 0.38), Vector3(sx, 2.48, 0.40), 0.048)
-		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 1.45, 2.74), 1.92, 0.28, -10.0, 0.18, 1.18)
+		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.435, -2.05), 1.05, -4.0)
+		for sx: float in [-0.98, 0.98]:
+			KMF.add_exhaust_stack(kit, Vector3(sx, 0.78, 0.42), Vector3(sx, 2.46, 0.42), 0.048)
+		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 1.44, 2.70), 1.82, 0.28, -10.0, 0.18, 1.18)
 
 	if st_chassis:
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.82, -1.02), 1.54, 0.56, -42.0, 4, 24.0)
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.755, -1.02), 1.54, 0.56, -42.0, 4, 24.0)
 		for sx: float in [-0.90, 0.90]:
-			KMF._add_tube(kit, Vector3(sx, 1.45, 0.44), Vector3(sx, 2.24, 0.44), 0.044, steel)
-			KMF._add_tube(kit, Vector3(sx, 2.24, 0.44), Vector3(sx, 1.46, 2.66), 0.042, steel)
-		KMF._add_tube(kit, Vector3(-0.90, 2.24, 0.44), Vector3(0.90, 2.24, 0.44), 0.044, steel)
-		for sx: float in [-1.04, 1.04]:
-			KMF.add_rock_slider(kit, sx, 0.50, -1.24, 0.98, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 2.22, -0.30), 1.48, 4)
+			KMF._add_tube(kit, Vector3(sx, 1.43, 0.44), Vector3(sx, 2.16, 0.44), 0.044, steel)
+			KMF._add_tube(kit, Vector3(sx, 2.16, 0.44), Vector3(sx, 1.43, 2.66), 0.042, steel)
+		KMF._add_tube(kit, Vector3(-0.90, 2.16, 0.44), Vector3(0.90, 2.16, 0.44), 0.044, steel)
+		for sx: float in [-1.02, 1.02]:
+			KMF.add_rock_slider(kit, sx, 0.59, -1.24, 0.98, signf(sx))
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 2.025, -0.30), 1.34, 4)
 
 static func _build_raptor_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	var steel := KMF.get_mat("forged_steel")
 	if st_armor:
 		KMF.add_baja_prerunner_bumper(kit, -2.72, 0.54, 1.22, 1.02, 0.0)
-		for sx: float in [-1.085, 1.085]:
+		for sx: float in [-1.025, 1.025]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.84, 0.0), 0.32, 1.80, signf(sx))
 
 	if st_engine:
-		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.445, -1.82), 1.10, -5.0)
-		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 1.41, 2.82), 1.88, 0.28, -10.0, 0.19, 1.22)
+		KMF.add_supercharger_blower(kit, Vector3(0.0, 1.44, -1.82), 1.04, -5.0)
+		KMF.add_sculpted_airfoil_wing(kit, Vector3(0.0, 1.39, 2.82), 1.88, 0.28, -10.0, 0.19, 1.22)
 
 	if st_chassis:
-		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.68, -0.98), 1.52, 0.58, -39.0, 4, 24.0)
-		for sx: float in [-0.88, 0.88]:
-			KMF._add_tube(kit, Vector3(sx, 1.42, 0.52), Vector3(sx, 1.96, 0.56), 0.044, steel)
-			KMF._add_tube(kit, Vector3(sx, 1.96, 0.56), Vector3(sx, 1.42, 2.68), 0.042, steel)
-			KMF._add_tube(kit, Vector3(sx, 1.42, 0.52), Vector3(sx, 1.42, 2.72), 0.036, steel)
-		KMF._add_tube(kit, Vector3(-0.88, 1.96, 0.56), Vector3(0.88, 1.96, 0.56), 0.044, steel)
-		for sx: float in [-1.08, 1.08]:
-			KMF.add_rock_slider(kit, sx, 0.44, -1.12, 1.12, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.99, -0.48), 1.50, 4)
+		KMF.add_armored_louver_shield(kit, Vector3(0.0, 1.70, -0.98), 1.52, 0.58, -39.0, 4, 24.0)
+		for sx: float in [-0.92, 0.92]:
+			KMF._add_tube(kit, Vector3(sx, 1.38, 1.18), Vector3(sx, 1.98, 1.22), 0.044, steel)
+			KMF._add_tube(kit, Vector3(sx, 1.98, 1.22), Vector3(sx, 1.38, 2.68), 0.042, steel)
+			KMF._add_tube(kit, Vector3(sx, 1.38, 1.18), Vector3(sx, 1.38, 2.72), 0.036, steel)
+		KMF._add_tube(kit, Vector3(-0.92, 1.98, 1.22), Vector3(0.92, 1.98, 1.22), 0.044, steel)
+		for sx: float in [-0.98, 0.98]:
+			KMF.add_rock_slider(kit, sx, 0.47, -1.12, 1.12, signf(sx))
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 1.90, -0.48), 1.34, 4)
 
 static func _build_paz3205_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	var armor := KMF.get_mat("gunmetal_armor")
 	if st_armor:
 		KMF.add_sculpted_v_ram(kit, -3.30, 0.34, 0.96, 1.22, 0.36, 0.0)
 		KMF.add_radiator_guard(kit, Vector3(0.0, 1.08, -3.28), Vector2(1.86, 0.44))
-		for sx: float in [-1.23, 1.23]:
+		for sx: float in [-1.145, 1.145]:
 			KMF.add_bolted_side_armor(kit, Vector3(sx, 0.92, -0.41), 0.48, 1.88, signf(sx))
 
 	if st_engine:
-		KMF.add_diesel_turbo_unit(kit, Vector3(0.0, 0.99, 1.85), 1.15)
-		for sx: float in [-1.06, 1.06]:
-			KMF.add_exhaust_stack(kit, Vector3(sx, 0.90, 3.22), Vector3(sx, 3.28, 3.22), 0.052)
+		KMF.add_diesel_turbo_unit(kit, Vector3(0.0, 0.965, 1.85), 1.15)
+		for sx: float in [-1.11, 1.11]:
+			KMF.add_exhaust_stack(kit, Vector3(sx, 0.56, 3.18), Vector3(sx, 3.24, 3.18), 0.052)
 
 	if st_chassis:
-		KMF._add_box(kit, Vector3(0.0, 2.66, -3.12), Vector3(2.22, 0.22, 0.14), Vector3(18.0, 0.0, 0.0), armor, "PAZCabBrowArmor")
-		for sx: float in [-1.23, 1.23]:
-			KMF.add_rock_slider(kit, sx, 0.48, -1.46, 0.65, signf(sx))
-		KMF.add_tactical_lightbar(kit, Vector3(0.0, 2.96, -2.72), 1.84, 4)
+		KMF._add_box(kit, Vector3(0.0, 2.64, -3.15), Vector3(2.22, 0.22, 0.14), Vector3(18.0, 0.0, 0.0), armor, "PAZCabBrowArmor")
+		for sx: float in [-1.15, 1.15]:
+			KMF.add_rock_slider(kit, sx, 0.54, -1.46, 0.65, signf(sx))
+		KMF.add_tactical_lightbar(kit, Vector3(0.0, 2.815, -2.72), 1.64, 4)
 
 static func _build_btr_kit(vehicle: Node3D, kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
 	var armor := KMF.get_mat("gunmetal_armor")
@@ -357,7 +363,7 @@ static func _build_btr_kit(vehicle: Node3D, kit: Node3D, st_engine: bool, st_arm
 		for sx: float in [-0.54, 0.54]:
 			KMF._add_tube(kit, Vector3(cx + sx, 0.74, -2.62), Vector3(cx + sx * 0.92, 0.52, -3.02), 0.048, steel)
 		for side: float in [-1.0, 1.0]:
-			KMF.add_bolted_side_armor(kit, Vector3(cx + side * 1.18, 0.72, -0.25), 0.26, 1.38, side, side * -8.0)
+			KMF.add_bolted_side_armor(kit, Vector3(cx + side * 1.105, 0.72, -0.25), 0.26, 1.38, side, side * -8.0)
 
 		var base_gun := vehicle.get_node_or_null("Sketchfab_model/5828856774f842698fde4b89440fa649_fbx/RootNode/Object007/Object_4/Base/base_gun") as Node3D
 		if is_instance_valid(base_gun):
@@ -377,14 +383,14 @@ static func _build_btr_kit(vehicle: Node3D, kit: Node3D, st_engine: bool, st_arm
 			KMF._add_box(t_kit, Vector3(3.4, 2.9, -4.1), Vector3(2.0, 0.65, 0.42), Vector3(-22.0, -10.0, 0.0), hazard, "TurretTrimR")
 
 	if st_engine:
-		KMF._add_box(kit, Vector3(cx, 1.06, -2.32), Vector3(1.18, 0.24, 0.05), Vector3(-34.0, 0.0, 0.0), grille, "GlacisCage")
+		KMF._add_box(kit, Vector3(cx, 1.01, -2.32), Vector3(1.18, 0.24, 0.05), Vector3(-34.0, 0.0, 0.0), grille, "GlacisCage")
 		KMF._add_box(kit, Vector3(-0.73, 0.92, -2.62), Vector3(0.24, 0.16, 0.18), Vector3.ZERO, grille, "HeadlampCageL")
 		KMF._add_box(kit, Vector3(0.73, 0.92, -2.62), Vector3(0.24, 0.16, 0.18), Vector3.ZERO, grille, "HeadlampCageR")
 		for sx: float in [-0.62, 0.62]:
-			KMF._add_box(kit, Vector3(cx + sx, 0.88, 2.26), Vector3(0.18, 0.18, 0.46), Vector3(12.0, sx * -10.0, 0.0), armor, "DieselMufflerBox")
+			KMF._add_box(kit, Vector3(cx + sx, 0.785, 2.26), Vector3(0.18, 0.18, 0.46), Vector3(12.0, sx * -10.0, 0.0), armor, "DieselMufflerBox")
 
 	if st_chassis:
 		for side: float in [-1.0, 1.0]:
-			KMF._add_box(kit, Vector3(cx + side * 1.06, 1.56, -0.05), Vector3(0.04, 0.22, 0.96), Vector3(0.0, 0.0, side * 30.0), grille, "UpperPortCage")
-			KMF.add_rock_slider(kit, cx + side * 1.24, 0.48, -1.05, 0.65, side)
-		KMF.add_tactical_lightbar(kit, Vector3(cx, 2.02, -0.35), 0.92, 3)
+			KMF._add_box(kit, Vector3(cx + side * 1.06, 1.35, -0.05), Vector3(0.04, 0.22, 0.96), Vector3(0.0, 0.0, side * 30.0), grille, "UpperPortCage")
+			KMF.add_rock_slider(kit, cx + side * 1.04, 0.50, -1.05, 0.65, side)
+		KMF.add_tactical_lightbar(kit, Vector3(cx, 1.505, -1.35), 0.92, 3)

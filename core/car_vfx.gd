@@ -1446,8 +1446,8 @@ func create_tire_smoke(parent: Node3D, local_pos: Vector3) -> CPUParticles3D:
 	smoke.emitting = false
 	smoke.local_coords = false
 	smoke.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	smoke.amount = maxi(roundi(28.0 * _get_vfx_scale()), 18)
-	smoke.lifetime = 1.35
+	smoke.amount = maxi(roundi(26.0 * _get_vfx_scale()), 16)
+	smoke.lifetime = 1.25
 	smoke.one_shot = false
 	smoke.explosiveness = 0.0
 	smoke.mesh = _mesh_quad
@@ -1458,31 +1458,32 @@ func create_tire_smoke(parent: Node3D, local_pos: Vector3) -> CPUParticles3D:
 		smoke.anim_speed_max = 1.25
 		smoke.anim_offset_max = 0.25
 	smoke.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-	smoke.emission_sphere_radius = 0.24
-	smoke.direction = Vector3(0.0, 0.35, 0.0)
-	smoke.spread = 65.0
-	smoke.initial_velocity_min = 1.4
-	smoke.initial_velocity_max = 4.2
-	smoke.damping_min = 1.8
-	smoke.damping_max = 3.2
-	smoke.gravity = Vector3(0.0, 1.8, 0.0)
-	smoke.scale_amount_min = 1.15
-	smoke.scale_amount_max = 2.65
+	smoke.emission_sphere_radius = 0.11
+	smoke.direction = Vector3(0.0, 0.14, 0.32)
+	smoke.spread = 48.0
+	smoke.initial_velocity_min = 0.55
+	smoke.initial_velocity_max = 1.65
+	smoke.damping_min = 1.6
+	smoke.damping_max = 2.8
+	smoke.gravity = Vector3(0.0, 0.72, 0.0)
+	smoke.scale_amount_min = 0.42
+	smoke.scale_amount_max = 0.95
 	var sc := Curve.new()
-	sc.add_point(Vector2(0.0, 0.42))
-	sc.add_point(Vector2(0.25, 0.78))
-	sc.add_point(Vector2(0.65, 1.15))
-	sc.add_point(Vector2(1.0, 1.45))
+	sc.add_point(Vector2(0.0, 0.28))
+	sc.add_point(Vector2(0.25, 0.62))
+	sc.add_point(Vector2(0.65, 1.00))
+	sc.add_point(Vector2(1.0, 1.28))
 	smoke.scale_amount_curve = sc
 	smoke.angle_min = 0.0
 	smoke.angle_max = 360.0
+	smoke.color = Color(1.0, 1.0, 1.0, 0.50)
 	var ramp := Gradient.new()
-	ramp.offsets = PackedFloat32Array([0.0, 0.12, 0.50, 1.0])
+	ramp.offsets = PackedFloat32Array([0.0, 0.12, 0.52, 1.0])
 	ramp.colors = PackedColorArray([
-		Color(0.86, 0.86, 0.88, 0.0),
-		Color(0.84, 0.84, 0.86, 0.68),
-		Color(0.76, 0.76, 0.79, 0.44),
-		Color(0.70, 0.70, 0.74, 0.0)
+		Color(0.88, 0.88, 0.90, 0.0),
+		Color(0.88, 0.88, 0.90, 0.66),
+		Color(0.82, 0.82, 0.85, 0.40),
+		Color(0.76, 0.76, 0.80, 0.0)
 	])
 	smoke.color_ramp = ramp
 
@@ -1490,7 +1491,7 @@ func create_tire_smoke(parent: Node3D, local_pos: Vector3) -> CPUParticles3D:
 	smoke.position = local_pos
 	return smoke
 
-func create_exhaust(parent: Node3D, local_pos: Vector3, style: String = "gasoline") -> CPUParticles3D:
+func create_exhaust(parent: Node3D, local_pos: Vector3, style: String = "gasoline", emit_dir: Vector3 = Vector3(0.0, 0.22, 1.0)) -> CPUParticles3D:
 	var exhaust := CPUParticles3D.new()
 	var vfx_scale := _get_vfx_scale()
 	exhaust.emitting = true
@@ -1503,7 +1504,7 @@ func create_exhaust(parent: Node3D, local_pos: Vector3, style: String = "gasolin
 	exhaust.material_override = _mat_exhaust_smoke
 	exhaust.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
 	exhaust.emission_sphere_radius = 0.09
-	exhaust.direction = Vector3(0.0, 0.22, 1.0)
+	exhaust.direction = emit_dir.normalized() if emit_dir.length_squared() > 0.001 else Vector3(0.0, 0.22, 1.0)
 	exhaust.spread = 22.0
 	exhaust.initial_velocity_min = 2.0
 	exhaust.initial_velocity_max = 4.2
@@ -1522,18 +1523,21 @@ func create_exhaust(parent: Node3D, local_pos: Vector3, style: String = "gasolin
 
 	var ramp := Gradient.new()
 	match style:
-		"diesel":
-			exhaust.amount = maxi(roundi(24.0 * vfx_scale), 8)
-			exhaust.lifetime = 1.25
-			exhaust.gravity = Vector3(0.0, 2.5, 0.0)
-			exhaust.scale_amount_min = 0.48
-			exhaust.scale_amount_max = 0.95
-			ramp.offsets = PackedFloat32Array([0.0, 0.18, 0.60, 1.0])
+		"diesel", "stack_diesel":
+			exhaust.amount = maxi(roundi(30.0 * vfx_scale), 12)
+			exhaust.lifetime = 1.35 if style == "stack_diesel" else 1.25
+			exhaust.emission_sphere_radius = 0.055 if style == "stack_diesel" else 0.08
+			exhaust.spread = 18.0 if style == "stack_diesel" else 22.0
+			exhaust.gravity = Vector3(0.0, 2.2, 0.0)
+			exhaust.scale_amount_min = 0.34
+			exhaust.scale_amount_max = 0.70
+			exhaust.color = Color(0.56, 0.56, 0.59, 0.46)
+			ramp.offsets = PackedFloat32Array([0.0, 0.16, 0.56, 1.0])
 			ramp.colors = PackedColorArray([
-				Color(0.42, 0.42, 0.44, 0.0),
-				Color(0.34, 0.34, 0.36, 0.26),
-				Color(0.44, 0.44, 0.46, 0.14),
-				Color(0.52, 0.52, 0.54, 0.0)
+				Color(1.0, 1.0, 1.0, 0.0),
+				Color(1.0, 1.0, 1.0, 0.86),
+				Color(1.0, 1.0, 1.0, 0.46),
+				Color(1.0, 1.0, 1.0, 0.0)
 			])
 		"muscle":
 			exhaust.amount = maxi(roundi(26.0 * vfx_scale), 8)
