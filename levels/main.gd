@@ -63,6 +63,8 @@ var _active_world_seed: int = 1
 var _biome_rng := RandomNumberGenerator.new()
 var _biome_order: Array[int] = []
 var _current_biome: int = -1
+var _current_sector: int = 0
+var _last_announced_sector: int = 0
 var _dir_light: DirectionalLight3D = null
 var _ash_particles: CPUParticles3D = null
 var _ash_mat: StandardMaterial3D = null
@@ -265,6 +267,52 @@ func _exit_tree() -> void:
 func get_difficulty(distance_m: float) -> float:
 	return maxf(absf(distance_m) / 11000.0, 0.0)
 
+func _compute_sector_horde_profile(sector: int, dist_m: float, cap_max: int) -> Dictionary:
+	var s: int = maxi(sector, 0)
+	var base_frac: float = 0.34
+	if s == 1:
+		base_frac = 0.52
+	elif s == 2:
+		base_frac = 0.70
+	elif s == 3:
+		base_frac = 0.86
+	elif s >= 4:
+		base_frac = minf(0.94 + float(s - 4) * 0.03, 1.0)
+	var span: float = maxf(bridge_interval_meters, 500.0)
+	var intra_t: float = clampf(fmod(maxf(dist_m, 0.0), span) / span, 0.0, 1.0)
+	var frac: float = minf(base_frac + 0.04 * intra_t, 1.0)
+	var safe_cap: int = maxi(cap_max, 1)
+	var dynamic_max: int = clampi(roundi(float(safe_cap) * frac), mini(14, safe_cap), safe_cap)
+	var spawn_cd: float = maxf(0.24, base_spawn_cooldown * pow(0.68, minf(float(s), 5.0)))
+	var c_min: int = 1
+	var c_max: int = 2
+	if s == 1:
+		c_min = 2
+		c_max = 3
+	elif s == 2:
+		c_min = 2
+		c_max = 4
+	elif s == 3:
+		c_min = 3
+		c_max = 5
+	elif s >= 4:
+		c_min = 3
+		c_max = 6
+	var runner_chance: float = clampf(0.18 + float(s) * 0.11, 0.18, 0.72)
+	var sector_diff: float = float(s) * 0.38 + clampf(maxf(dist_m, 0.0) / 3600.0, 0.0, 0.75)
+	var s0_base: float = maxf(float(roundi(float(safe_cap) * 0.34)), 1.0)
+	var density_mult: float = float(dynamic_max) / s0_base
+	return {
+		"sector": s,
+		"dynamic_max": dynamic_max,
+		"spawn_cooldown": spawn_cd,
+		"cluster_min": c_min,
+		"cluster_max": c_max,
+		"runner_chance": runner_chance,
+		"difficulty": sector_diff,
+		"density_mult": density_mult,
+	}
+
 func _process(delta: float) -> void:
 	if not scene_ready or not is_instance_valid(car) or (not use_procedural_generation and chunk_scenes_list.is_empty()):
 		return
@@ -276,26 +324,39 @@ func _process(delta: float) -> void:
 
 	var distance: float = _distance_along_forward(car.global_position)
 	var current_chunk_index: int = _get_chunk_index(distance)
-	var diff: float = get_difficulty(distance)
-	var diff01: float = clampf(diff, 0.0, 1.0)
+	var weather_seg: int = maxi(floori(float(maxi(current_chunk_index, 0)) / float(_chunks_per_bridge)), 0)
+	_current_sector = weather_seg
 
-	current_spawn_cooldown = lerpf(base_spawn_cooldown, min_spawn_cooldown, pow(diff01, 0.85))
+	var cap_max: int = mini(max_active_zombies, SettingsManager.get_max_zombies() if SettingsManager.has_method("get_max_zombies") else max_active_zombies)
+	var horde: Dictionary = _compute_sector_horde_profile(weather_seg, distance, cap_max)
+	var diff: float = maxf(get_difficulty(distance), float(horde["difficulty"]))
+	var dynamic_max_zombies: int = int(horde["dynamic_max"])
+	var h_cmin: int = int(horde["cluster_min"])
+	var h_cmax: int = int(horde["cluster_max"])
+	var h_runner: float = 1.0 if is_fog_red else float(horde["runner_chance"])
+
+	current_spawn_cooldown = float(horde["spawn_cooldown"])
 	if is_fog_red:
 		current_spawn_cooldown *= 0.85
 
-	var cap_max: int = mini(max_active_zombies, SettingsManager.get_max_zombies() if SettingsManager.has_method("get_max_zombies") else max_active_zombies)
-	var dynamic_max_zombies: int = roundi(lerpf(minf(50.0, float(cap_max)), float(cap_max), diff01))
 	if _intro_zombie_hold_timer > 0.0:
 		_intro_zombie_hold_timer = maxf(_intro_zombie_hold_timer - delta, 0.0)
 	else:
 		spawn_timer += delta
 		if spawn_timer >= current_spawn_cooldown:
 			spawn_timer = 0.0
-			_spawn_single_zombie_ahead(diff, dynamic_max_zombies)
+			_spawn_single_zombie_ahead(diff, dynamic_max_zombies, h_cmin, h_cmax, h_runner, cap_max)
 
-	var weather_seg: int = maxi(floori(float(maxi(current_chunk_index, 0)) / float(_chunks_per_bridge)), 0)
 	var target_biome: int = _get_biome_for_index(current_chunk_index)
 	var target_anomaly: int = _sanitize_anomaly_for_biome(_get_anomaly_for_segment(weather_seg), target_biome)
+
+	var sector_announced_now: bool = false
+	if weather_seg > _last_announced_sector:
+		_last_announced_sector = weather_seg
+		sector_announced_now = true
+		if is_instance_valid(car) and car.has_method("show_hud_notice"):
+			var sector_msg: String = "СЕКТОР %d: %s // ОРДА x%.1f" % [weather_seg + 1, _get_biome_title(target_biome), float(horde["density_mult"])]
+			car.call("show_hud_notice", sector_msg, Color(1.0, 0.44, 0.16), 3.8)
 
 	if target_biome != _current_biome or target_anomaly != _active_anomaly:
 		var prev_biome: int = _current_biome
@@ -313,7 +374,7 @@ func _process(delta: float) -> void:
 			_tod_blending = true
 			tod_label = String(_TOD_PRESETS[_tod_preset_idx]["label"])
 		_sync_anomaly_effects(anomaly_changed)
-		if biome_changed and prev_biome >= 0 and (not anomaly_changed or _active_anomaly == WeatherAnomaly.NONE):
+		if not sector_announced_now and biome_changed and prev_biome >= 0 and (not anomaly_changed or _active_anomaly == WeatherAnomaly.NONE):
 			if is_instance_valid(car) and car.has_method("show_hud_notice"):
 				var notice_str := "СЕКТОР: %s // %s" % [_get_biome_title(target_biome), tod_label if not tod_label.is_empty() else "ТРАССА"]
 				var notice_col := Color(0.62, 0.88, 1.0) if target_biome == ProceduralChunkScript.Biome.WINTER_ICE else Color(0.95, 0.68, 0.30)
@@ -469,16 +530,32 @@ func _spawn_chunk(index: int) -> void:
 
 	_chunk_nodes[index] = chunk
 
-func _spawn_single_zombie_ahead(diff: float = 0.0, dynamic_max: int = -1) -> void:
+func _spawn_single_zombie_ahead(diff: float = 0.0, dynamic_max: int = -1, cluster_min_override: int = -1, cluster_max_override: int = -1, runner_chance_override: float = -1.0, cap_max_limit: int = -1) -> void:
 	var effective_max: int = dynamic_max if dynamic_max > 0 else max_active_zombies
-	if ZombiePool.active_zombies.size() >= effective_max:
-		return
-
-	var diff01: float = clampf(diff, 0.0, 1.0)
+	var spawn_diff: float = diff
+	var diff01: float = clampf(spawn_diff, 0.0, 1.0)
 	var safe_fog_distance: float = spawn_distance_ahead
 	var base_ahead_dist: float = _distance_along_forward(car.global_position) + safe_fog_distance
 	var target_chunk: int = _get_chunk_index(base_ahead_dist)
 	var on_bridge: bool = _is_bridge_index(target_chunk)
+	var ahead_seg: int = maxi(floori(float(maxi(target_chunk, 0)) / float(_chunks_per_bridge)), 0)
+
+	var c_min: int = cluster_min_override
+	var c_max: int = cluster_max_override
+	var run_chance: float = runner_chance_override if runner_chance_override >= 0.0 else (1.0 if is_fog_red else lerpf(0.28, 0.78, diff01))
+
+	if ahead_seg > _current_sector and not on_bridge:
+		var ahead_cap: int = cap_max_limit if cap_max_limit > 0 else mini(max_active_zombies, SettingsManager.get_max_zombies() if SettingsManager.has_method("get_max_zombies") else max_active_zombies)
+		var ahead_horde: Dictionary = _compute_sector_horde_profile(ahead_seg, base_ahead_dist, ahead_cap)
+		effective_max = maxi(effective_max, int(ahead_horde["dynamic_max"]))
+		spawn_diff = maxf(spawn_diff, float(ahead_horde["difficulty"]))
+		c_min = int(ahead_horde["cluster_min"])
+		c_max = int(ahead_horde["cluster_max"])
+		run_chance = 1.0 if is_fog_red else maxf(run_chance, float(ahead_horde["runner_chance"]))
+		diff01 = clampf(spawn_diff, 0.0, 1.0)
+
+	if ZombiePool.active_zombies.size() >= effective_max:
+		return
 
 	var cluster_size: int = 1
 	if on_bridge:
@@ -486,7 +563,9 @@ func _spawn_single_zombie_ahead(diff: float = 0.0, dynamic_max: int = -1) -> voi
 		var bridge_start: float = _get_chunk_center_z(target_chunk) - _chunk_step * 0.5
 		if base_ahead_dist - bridge_start > (_chunk_step - bridge_shortfall_meters - 45.0):
 			return # Не спавним зомби в разрыве за трамплином моста
-	elif diff < 0.14:
+	elif c_min > 0 and c_max >= c_min:
+		cluster_size = randi_range(c_min, c_max)
+	elif spawn_diff < 0.14:
 		cluster_size = randi_range(1, 2)
 	else:
 		var min_c: int = roundi(lerpf(1.0, 3.0, diff01))
@@ -495,7 +574,6 @@ func _spawn_single_zombie_ahead(diff: float = 0.0, dynamic_max: int = -1) -> voi
 
 	var z_biome: int = _get_biome_for_index(target_chunk)
 	var x_half: float = 7.0 if on_bridge else (ProceduralChunkScript.get_playable_half_width(z_biome) - 5.0 if use_procedural_generation else road_spawn_width * 0.5)
-	var run_chance: float = 1.0 if is_fog_red else lerpf(0.28, 0.78, diff01)
 
 	for i in range(cluster_size):
 		if ZombiePool.active_zombies.size() >= effective_max:
@@ -514,8 +592,8 @@ func _spawn_single_zombie_ahead(diff: float = 0.0, dynamic_max: int = -1) -> voi
 			spawn_pos.x = road_cx + randf_range(-x_half, x_half)
 		if use_procedural_generation and not on_bridge:
 			spawn_pos.y = road_y + ProceduralChunkScript.sample_terrain_height(spawn_pos.x, spawn_pos.z, z_biome, _active_world_seed)
-		var z_node: Node3D = ZombiePool.spawn_zombie_at(spawn_pos, diff, randf() < run_chance)
-		if z_node and z_biome == ProceduralChunkScript.Biome.BURNING_CITY and z_node.has_method("set_burning"):
+		var z_node: Node3D = ZombiePool.spawn_zombie_at(spawn_pos, spawn_diff, randf() < run_chance)
+		if z_node and (z_biome == ProceduralChunkScript.Biome.BURNING_CITY or z_biome == ProceduralChunkScript.Biome.BURNT_FOREST) and z_node.has_method("set_burning"):
 			z_node.call("set_burning", true)
 
 func advance_to_next_biome() -> void:
@@ -1022,7 +1100,7 @@ func _update_weather_audio() -> void:
 			tornado_lvl = 0.0
 		elif is_instance_valid(_tornado_node) and is_instance_valid(car):
 			var d: float = _tornado_node.global_position.distance_to(car.global_position)
-			tornado_lvl = clampf(1.0 - (d - 18.0) / 160.0, 0.25, 1.0)
+			tornado_lvl = clampf(1.0 - (d - 14.0) / 180.0, 0.28, 1.0)
 		else:
 			tornado_lvl = 0.35
 	sm.call("set_weather_audio", rain_lvl, tornado_lvl)

@@ -60,6 +60,7 @@ func _init() -> void:
 	wheelbase_m = 2.37
 	steering_scrub_drag = 0.16
 	hull_half_extents = Vector2(1.06, 2.18)
+	vehicle_body_scale = 0.93
 	idle_fuel_per_sec = 0.21
 	crash_death_speed_mps = 23.0
 	engine_sound_id = "buhanka"
@@ -95,9 +96,11 @@ func _assemble_buhanka_visuals() -> void:
 	if model_root == null:
 		return
 	model_root.name = "BuhankaModelRoot"
-	model_root.position = Vector3(0.0, 0.0, 0.198)
+	var vs: float = vehicle_body_scale
+	model_root.position = Vector3(0.0, 0.0, 0.198) * vs
 	model_root.rotation.y = PI
-	model_root.scale = Vector3.ONE * 1.48
+	model_root.scale = Vector3.ONE * (1.48 * vs)
+	_visuals_prescaled = true
 	add_child(model_root)
 	GlbVehicleHelper.apply_material_overrides(model_root, {
 		"material_11": {"metallic": 0.06, "roughness": 0.88},

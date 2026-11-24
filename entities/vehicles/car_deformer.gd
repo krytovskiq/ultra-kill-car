@@ -6,8 +6,10 @@ extends RefCounted
 ## с сохранением защищённой зоны салона, складок металла и PBR-материалов (включая патину).
 
 const MAX_DENT_M: float = 0.38
+const MAX_WRECK_DENT_M: float = 1.65
 const DEFORM_COOLDOWN_MS: int = 480
-const MAX_DEFORMABLE_VERTS_PER_SURF: int = 9500
+const WRECK_DEFORM_COOLDOWN_MS: int = 120
+const MAX_DEFORMABLE_VERTS_PER_SURF: int = 24000
 const _PRESERVED_SURFACE_FLAGS_MASK: int = (
 	(Mesh.ARRAY_FORMAT_CUSTOM_MASK << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
 	| (Mesh.ARRAY_FORMAT_CUSTOM_MASK << Mesh.ARRAY_FORMAT_CUSTOM1_SHIFT)
@@ -24,13 +26,13 @@ var _initialized: bool = false
 var _last_deform_ms: int = -10000
 var _entries: Array[Dictionary] = []
 
-func _ensure_initialized(vehicle: Node3D) -> void:
+func _ensure_initialized(vehicle: Node3D, allow_override_mat: bool = false) -> void:
 	if _initialized or vehicle == null or not is_instance_valid(vehicle):
 		return
 	_initialized = true
 	var root_inv := vehicle.global_transform.affine_inverse()
 	var meshes: Array[MeshInstance3D] = []
-	_collect_body_meshes(vehicle, meshes)
+	_collect_body_meshes(vehicle, meshes, allow_override_mat)
 
 	for mi: MeshInstance3D in meshes:
 		if not (mi.mesh is ArrayMesh):
@@ -135,7 +137,7 @@ func _ensure_initialized(vehicle: Node3D) -> void:
 			"surfaces": surf_records,
 		})
 
-func _collect_body_meshes(node: Node, out: Array[MeshInstance3D]) -> void:
+func _collect_body_meshes(node: Node, out: Array[MeshInstance3D], allow_override_mat: bool = false) -> void:
 	for child in node.get_children():
 		if child is RaycastWheel or child is CPUParticles3D:
 			continue
@@ -144,9 +146,9 @@ func _collect_body_meshes(node: Node, out: Array[MeshInstance3D]) -> void:
 			continue
 		if child is MeshInstance3D:
 			var mi := child as MeshInstance3D
-			if mi.material_override == null:
+			if allow_override_mat or mi.material_override == null:
 				out.append(mi)
-		_collect_body_meshes(child, out)
+		_collect_body_meshes(child, out, allow_override_mat)
 
 func deform_at_world_point(
 	vehicle: Node3D,
@@ -266,6 +268,208 @@ func deform_at_world_point(
 			if surf_dirty:
 				entry_dirty = true
 				var out_arrays: Array = rec["arrays"]
+				var out_v := PackedVector3Array()
+				out_v.resize(v_count)
+				for i in range(v_count):
+					out_v[i] = car_to_mesh * cur_car[i]
+				out_arrays[Mesh.ARRAY_VERTEX] = out_v
+				if has_norms:
+					var out_n := PackedVector3Array()
+					out_n.resize(v_count)
+					for i in range(v_count):
+						out_n[i] = (norm_to_mesh * cur_norms[i]).normalized()
+					out_arrays[Mesh.ARRAY_NORMAL] = out_n
+
+		if entry_dirty:
+			var target_mesh := entry.get("mesh") as ArrayMesh
+			if is_instance_valid(target_mesh):
+				target_mesh.clear_surfaces()
+				for s_var in surfaces:
+					var rec := s_var as Dictionary
+					var arrays: Array = rec["arrays"]
+					if arrays.is_empty():
+						continue
+					target_mesh.add_surface_from_arrays(int(rec["prim"]), arrays, [], {}, int(rec.get("flags", 0)))
+					var s_idx := target_mesh.get_surface_count() - 1
+					var mat: Material = rec.get("mat") as Material
+					if mat:
+						target_mesh.surface_set_material(s_idx, mat)
+				for s_idx in range(mini(surfaces.size(), target_mesh.get_surface_count())):
+					var rec := surfaces[s_idx] as Dictionary
+					var ov: Material = rec.get("ov_mat") as Material
+					if ov != null:
+						mi.set_surface_override_material(s_idx, ov)
+
+	if dent_sum > 0.001:
+		_last_deform_ms = now_ms
+		hit_count += 1
+		total_deformation_m += dent_sum
+	return dent_sum
+
+func _recompute_deformed_normals(
+	orig_car: PackedVector3Array,
+	cur_car: PackedVector3Array,
+	orig_norms: PackedVector3Array,
+	cur_norms: PackedVector3Array,
+	out_arrays: Array
+) -> void:
+	var v_count: int = cur_car.size()
+	if orig_norms.is_empty() or v_count < 3:
+		return
+	var has_idx: bool = out_arrays.size() > Mesh.ARRAY_INDEX and out_arrays[Mesh.ARRAY_INDEX] is PackedInt32Array
+	var idx_arr: PackedInt32Array = out_arrays[Mesh.ARRAY_INDEX] as PackedInt32Array if has_idx else PackedInt32Array()
+	@warning_ignore("integer_division")
+	var tri_count: int = (idx_arr.size() / 3) if has_idx else (v_count / 3)
+	if tri_count <= 0:
+		return
+	var acc_n := PackedVector3Array()
+	acc_n.resize(v_count)
+	for ti in range(tri_count):
+		var base_t: int = ti * 3
+		var i0: int = idx_arr[base_t] if has_idx else base_t
+		var i1: int = idx_arr[base_t + 1] if has_idx else (base_t + 1)
+		var i2: int = idx_arr[base_t + 2] if has_idx else (base_t + 2)
+		var p0: Vector3 = cur_car[i0]
+		var p1: Vector3 = cur_car[i1]
+		var p2: Vector3 = cur_car[i2]
+		var fn: Vector3 = (p2 - p0).cross(p1 - p0)
+		var p0_o: Vector3 = orig_car[i0]
+		var p1_o: Vector3 = orig_car[i1]
+		var p2_o: Vector3 = orig_car[i2]
+		var fn_o: Vector3 = (p2_o - p0_o).cross(p1_o - p0_o)
+		var orig_avg: Vector3 = orig_norms[i0] + orig_norms[i1] + orig_norms[i2]
+		if fn_o.dot(orig_avg) < 0.0:
+			fn = -fn
+		acc_n[i0] += fn
+		acc_n[i1] += fn
+		acc_n[i2] += fn
+	for i in range(v_count):
+		var gn: Vector3 = acc_n[i]
+		if gn.length_squared() > 0.00001:
+			cur_norms[i] = gn.normalized().lerp(cur_norms[i], 0.15).normalized()
+
+## Сильная реалистичная 3D-деформация остова (сломанной машины на трассе) без защиты крыши и салона.
+func deform_wreck_at_world_point(
+	wreck: Node3D,
+	world_hit_pos: Vector3,
+	impact_vel_world: Vector3,
+	severity: float = 1.0
+) -> float:
+	if wreck == null or not is_instance_valid(wreck):
+		return 0.0
+	var now_ms := Time.get_ticks_msec()
+	if now_ms - _last_deform_ms < WRECK_DEFORM_COOLDOWN_MS:
+		return 0.0
+
+	_ensure_initialized(wreck, true)
+	if _entries.is_empty():
+		return 0.0
+
+	var union_aabb := AABB()
+	var has_union: bool = false
+	for entry: Dictionary in _entries:
+		var surfaces: Array = entry["surfaces"]
+		for s_var in surfaces:
+			var rec := s_var as Dictionary
+			if bool(rec.get("skip", true)):
+				continue
+			var aabb_s: AABB = rec["aabb_car"]
+			if not has_union:
+				union_aabb = aabb_s
+				has_union = true
+			else:
+				union_aabb = union_aabb.merge(aabb_s)
+	if not has_union:
+		return 0.0
+
+	var root_xform := wreck.global_transform
+	var hit_local: Vector3 = root_xform.affine_inverse() * world_hit_pos
+	var impact_pt: Vector3 = hit_local.clamp(union_aabb.position, union_aabb.end)
+	var union_center: Vector3 = union_aabb.get_center()
+	var wreck_diag: float = maxf(union_aabb.size.length(), 2.8)
+
+	var vel_local: Vector3 = root_xform.basis.inverse() * impact_vel_world
+	var push_vel: Vector3 = vel_local.normalized() if vel_local.length_squared() > 0.04 else Vector3.FORWARD
+	var to_core: Vector3 = union_center - impact_pt
+	var to_core_dir: Vector3 = to_core.normalized() if to_core.length_squared() > 0.01 else push_vel
+	var push_dir: Vector3 = (push_vel * 0.72 + to_core_dir * 0.28).normalized()
+
+	var sev: float = clampf(severity, 0.50, 2.0)
+	var max_dent_m: float = clampf(wreck_diag * 0.22, 0.78, 1.85)
+	var radius_m: float = clampf(wreck_diag * 0.34 + sev * 0.58, 1.65, 3.95)
+	var chassis_span: float = maxf(wreck_diag * 0.65, 2.5)
+	var step_m: float = clampf(max_dent_m * (0.58 + sev * 0.26), 0.48, max_dent_m)
+	var dent_sum: float = 0.0
+
+	for entry: Dictionary in _entries:
+		var mi := entry["mi"] as MeshInstance3D
+		if not is_instance_valid(mi):
+			continue
+		var car_to_mesh: Transform3D = entry["car_to_mesh"]
+		var norm_to_mesh: Basis = entry["norm_to_mesh"]
+		var surfaces: Array = entry["surfaces"]
+		var entry_dirty := false
+
+		for s_var in surfaces:
+			var rec := s_var as Dictionary
+			if bool(rec.get("skip", true)):
+				continue
+			var aabb: AABB = rec["aabb_car"]
+			if not aabb.grow(chassis_span + max_dent_m).has_point(impact_pt):
+				continue
+
+			var orig_car: PackedVector3Array = rec["orig_car"]
+			var cur_car: PackedVector3Array = rec["cur_car"]
+			var orig_norms: PackedVector3Array = rec["orig_norms_car"]
+			var cur_norms: PackedVector3Array = rec["cur_norms_car"]
+			var has_norms: bool = not orig_norms.is_empty()
+			var v_count := cur_car.size()
+			var surf_dirty := false
+
+			for i in range(v_count):
+				var v := cur_car[i]
+				var dist := v.distance_to(impact_pt)
+				if dist >= chassis_span:
+					continue
+
+				var bend_u: float = clampf(1.0 - dist / chassis_span, 0.0, 1.0)
+				var bend_falloff: float = bend_u * bend_u
+				var v0 := orig_car[i]
+				var disp: Vector3 = push_dir * (step_m * 0.28 * bend_falloff)
+				var falloff: float = 0.0
+				var buckle: float = 0.0
+
+				if dist < radius_m:
+					var u := 1.0 - dist / radius_m
+					falloff = u * u * (3.0 - 2.0 * u)
+					buckle = sin(v0.x * 3.9 + v0.z * 3.4) * 0.5 + cos(v0.z * 4.7 - v0.y * 3.8) * 0.5
+					disp += push_dir * (step_m * falloff)
+					disp += to_core_dir * (step_m * 0.34 * falloff * buckle)
+					if v0.y > union_center.y:
+						disp.y -= step_m * 0.20 * falloff
+					disp.y += buckle * step_m * 0.16 * falloff
+
+				var target_v := v + disp
+				var total_off := target_v - v0
+				if total_off.length() > max_dent_m:
+					target_v = v0 + total_off.normalized() * max_dent_m
+
+				var move_len := (target_v - v).length()
+				if move_len > 0.0005:
+					cur_car[i] = target_v
+					dent_sum += move_len
+					surf_dirty = true
+					if has_norms:
+						var n0 := orig_norms[i]
+						var fold_weight: float = maxf(falloff, bend_falloff * 0.35)
+						var n_crumple := Vector3(buckle * 0.32, absf(buckle) * 0.20, -buckle * 0.28) * clampf((target_v - v0).length() / 0.32, 0.20, 1.0)
+						cur_norms[i] = (n0 - push_dir * (0.42 * fold_weight) + n_crumple).normalized()
+
+			if surf_dirty:
+				entry_dirty = true
+				var out_arrays: Array = rec["arrays"]
+				if has_norms:
+					_recompute_deformed_normals(orig_car, cur_car, orig_norms, cur_norms, out_arrays)
 				var out_v := PackedVector3Array()
 				out_v.resize(v_count)
 				for i in range(v_count):

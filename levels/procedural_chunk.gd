@@ -355,11 +355,11 @@ func _build_highway_mesh() -> void:
 			_add_curved_quad_up(yellow_st, cx0 + 0.12, cx0 + 0.34, z0, cx1 + 0.12, cx1 + 0.34, z1, sy, 0.0, 1.0, 0.0, 1.0, 0.23, 0.23)
 	else:
 		var dash_z: float = -z_half + 2.0
-		while dash_z + 7.0 <= z_half:
+		while dash_z + 4.2 <= z_half:
 			var cx0 := _local_road_cx(dash_z)
-			var cx1 := _local_road_cx(dash_z + 7.0)
-			_add_curved_quad_up(yellow_st, cx0 - 0.16, cx0 + 0.16, dash_z, cx1 - 0.16, cx1 + 0.16, dash_z + 7.0, sy, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
-			dash_z += 16.0
+			var cx1 := _local_road_cx(dash_z + 4.2)
+			_add_curved_quad_up(yellow_st, cx0 - 0.16, cx0 + 0.16, dash_z, cx1 - 0.16, cx1 + 0.16, dash_z + 4.2, sy, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
+			dash_z += 10.0
 	yellow_st.generate_normals()
 	var yellow_mesh := yellow_st.commit()
 	if yellow_mesh and yellow_mesh.get_surface_count() > 0:
@@ -1008,7 +1008,7 @@ func _populate_city_scenery(rng: RandomNumberGenerator, density: float) -> void:
 					_spawn_knockable_mesh("KnockCityTrashCan", trash_mesh, Vector3(lx, prop_y, lz), Vector3(0.0, yaw, 0.0), Vector3.ONE, Vector3.ZERO, Vector3(1.6, 0.95, 0.75), "metal", 55.0, 1.8, 0.025)
 			1:
 				if hydrant_mesh:
-					_spawn_knockable_mesh("KnockCityHydrant", hydrant_mesh, Vector3(lx, prop_y, lz), Vector3(0.0, yaw, 0.0), Vector3.ONE, Vector3.ZERO, Vector3(0.85, 0.92, 0.55), "metal", 75.0, 2.5, 0.035)
+					_spawn_knockable_mesh("KnockCityHydrant", hydrant_mesh, Vector3(lx, prop_y, lz), Vector3(0.0, yaw, 0.0), Vector3.ONE, Vector3.ZERO, Vector3(0.85, 0.92, 0.55), "hydrant", 75.0, 2.5, 0.035)
 			2:
 				if pbox_mesh:
 					_spawn_knockable_mesh("KnockCityPowerBox", pbox_mesh, Vector3(lx, prop_y, lz), Vector3(0.0, yaw, 0.0), Vector3.ONE, Vector3.ZERO, Vector3(0.75, 1.40, 0.65), "metal_electric", 120.0, 3.8, 0.05)
@@ -1681,7 +1681,7 @@ func _populate_burning_city_scenery(rng: RandomNumberGenerator, _chunk_xform: Tr
 					_spawn_knockable_mesh("KnockBurningTrashCan", trash_mesh, Vector3(lx, prop_y, lz), Vector3(0.0, yaw, 0.0), Vector3.ONE, Vector3.ZERO, Vector3(1.6, 0.95, 0.75), "metal", 55.0, 1.8, 0.025)
 			2:
 				if hydrant_mesh:
-					_spawn_knockable_mesh("KnockBurningHydrant", hydrant_mesh, Vector3(lx, prop_y, lz), Vector3(0.0, yaw, 0.0), Vector3.ONE, Vector3.ZERO, Vector3(0.85, 0.92, 0.55), "metal", 75.0, 2.5, 0.035)
+					_spawn_knockable_mesh("KnockBurningHydrant", hydrant_mesh, Vector3(lx, prop_y, lz), Vector3(0.0, yaw, 0.0), Vector3.ONE, Vector3.ZERO, Vector3(0.85, 0.92, 0.55), "hydrant", 75.0, 2.5, 0.035)
 			3:
 				if crate_mesh:
 					_spawn_knockable_mesh("KnockBurningCrate", crate_mesh, Vector3(lx, prop_y, lz), Vector3(0.0, yaw, 0.0), Vector3.ONE, Vector3.ZERO, Vector3(1.75, 0.80, 0.95), "wood", 75.0, 2.0, 0.032)

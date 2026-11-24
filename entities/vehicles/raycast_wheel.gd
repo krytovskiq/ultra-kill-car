@@ -47,6 +47,7 @@ const RAY_ORIGIN_LIFT: float = 0.62
 var _steer_pivot: Node3D = null
 var _spin_pivot: Node3D = null
 var _visual_y: float = 0.0
+var _spin_angle: float = 0.0
 var _initialized_pivots: bool = false
 var _ray_query: PhysicsRayQueryParameters3D = null
 var _ray_exclude: Array[RID] = []
@@ -149,4 +150,5 @@ func update_visuals(steer_angle: float, forward_mps: float, delta: float, is_pre
 	if not is_preview_mode:
 		var r: float = maxf(wheel_radius, 0.12)
 		var spin_delta: float = (forward_mps / r) * delta
-		_spin_pivot.rotate_x(-spin_delta)
+		_spin_angle = fposmod(_spin_angle - spin_delta, TAU)
+		_spin_pivot.rotation = Vector3(_spin_angle, 0.0, 0.0)

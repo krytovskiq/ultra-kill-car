@@ -74,6 +74,7 @@ func _init() -> void:
 	wheelbase_m = 3.37
 	steering_scrub_drag = 0.20
 	hull_half_extents = Vector2(1.36, 3.32)
+	vehicle_body_scale = 0.94
 	idle_fuel_per_sec = 0.25
 	crash_death_speed_mps = 35.0
 	engine_sound_id = "paz3205"
@@ -110,9 +111,11 @@ func _assemble_paz_visuals() -> void:
 	if model_root == null:
 		return
 	model_root.name = "PAZModelRoot"
-	model_root.position = Vector3(-0.01, 0.161, 0.24)
+	var vs: float = vehicle_body_scale
+	model_root.position = Vector3(-0.01, 0.161, 0.24) * vs
 	model_root.rotation.y = PI * 0.5
-	model_root.scale = Vector3.ONE * 0.095
+	model_root.scale = Vector3.ONE * (0.095 * vs)
+	_visuals_prescaled = true
 	add_child(model_root)
 	var wheel_map: Dictionary = {
 		"Wheel_FL": get_node_or_null("VehicleWheelFL") as RaycastWheel,

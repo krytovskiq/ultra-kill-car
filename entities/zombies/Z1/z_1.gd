@@ -37,7 +37,9 @@ class ZombiePostureModifier extends SkeletonModifier3D:
 var skeleton: Skeleton3D = null
 var _bone_sim: PhysicalBoneSimulator3D = null
 var _physical_bones: Array[PhysicalBone3D] = []
+var _hips_bone: PhysicalBone3D = null
 var _posture_mod: ZombiePostureModifier = null
+var _dead_start_ms: int = 0
 
 var _idx_spine: int = -1
 var _idx_spine1: int = -1
@@ -95,7 +97,10 @@ var _orig_surface_mats: Array = []
 var _orig_model_parts: Array = []
 var _run_xform: Transform3D = Transform3D.IDENTITY
 var _burn_vfx: CPUParticles3D = null
+var _burn_smoke_vfx: CPUParticles3D = null
 var _is_burning: bool = false
+static var _shared_burn_fire_mesh: QuadMesh = null
+static var _shared_burn_smoke_mesh: QuadMesh = null
 
 @onready var detection_radius_sq: float = detection_radius * detection_radius
 @onready var lose_target_radius_sq: float = lose_target_radius * lose_target_radius
@@ -155,7 +160,10 @@ func _ready() -> void:
 		if _bone_sim:
 			for child in _bone_sim.get_children():
 				if child is PhysicalBone3D:
-					_physical_bones.append(child as PhysicalBone3D)
+					var pb_ref := child as PhysicalBone3D
+					_physical_bones.append(pb_ref)
+					if pb_ref.name.ends_with("Hips"):
+						_hips_bone = pb_ref
 			_configure_ragdoll_bones()
 			_set_ragdoll_collision(false)
 			_bone_sim.active = false
@@ -565,6 +573,8 @@ func _compute_car_hull_info() -> Dictionary:
 	}
 
 func _push_outside_car_hull(info: Dictionary) -> float:
+	if _get_player_horiz_speed_mps() >= 2.0:
+		return float(info["hull_dist"])
 	var ext: Vector2 = info["ext"]
 	var car_r: Vector2 = info["car_r"]
 	var car_f: Vector2 = info["car_f"]
@@ -626,12 +636,17 @@ func _advance_lod_animation(delta: float, horiz_dist_sq: float) -> void:
 			anim_player.advance(_lod_anim_accum)
 			_lod_anim_accum = 0.0
 
+func get_visual_world_position() -> Vector3:
+	if _using_ragdoll and is_instance_valid(_hips_bone):
+		return _hips_bone.global_position
+	return global_position
+
 func _physics_process(delta: float) -> void:
 	_anim_clock += delta
 	_lod_anim_tick = (_lod_anim_tick + 1) % 6
 	if state == ZombieState.DEAD:
 		if _ballistic_dead:
-			_ballistic_vel.y -= 26.0 * delta
+			_ballistic_vel.y -= 16.5 * delta
 			global_position += _ballistic_vel * delta
 			if global_position.y <= _ballistic_ground_y:
 				global_position.y = _ballistic_ground_y
@@ -640,6 +655,11 @@ func _physics_process(delta: float) -> void:
 				_ballistic_vel.z = move_toward(_ballistic_vel.z, 0.0, 22.0 * delta)
 			if anim_player and anim_player.active and not _lod_anim_paused:
 				anim_player.advance(delta)
+		if _is_burning and _using_ragdoll and is_instance_valid(_hips_bone):
+			if is_instance_valid(_burn_vfx):
+				_burn_vfx.global_position = _hips_bone.global_position + Vector3(0.0, 0.18, 0.0)
+			if is_instance_valid(_burn_smoke_vfx):
+				_burn_smoke_vfx.global_position = _hips_bone.global_position + Vector3(0.0, 0.42, 0.0)
 		return
 	if state == ZombieState.FALLEN:
 		global_position = global_position.move_toward(_knockback_target, 8.0 * delta)
@@ -820,12 +840,6 @@ func _update_state_and_movement(
 			return
 		if _attack_hit_pending and _attack_elapsed >= attack_hit_delay:
 			_attack_hit_pending = false
-			if hull_dist <= attack_hull_hit_range and dy < 2.2 and car_speed < attack_hit_max_car_speed_mps:
-				if player and player.has_method("take_damage"):
-					player.take_damage(current_damage, "РАСТЕРЗАН ОРДОЙ")
-					var sm: Node = get_node_or_null("/root/SoundManager")
-					if sm and sm.has_method("play_sfx"):
-						sm.call("play_sfx", "zombie_bite_car", -2.5, randf_range(0.88, 1.15))
 			attack_timer = _current_attack_cooldown
 		return
 
@@ -906,12 +920,16 @@ func _on_animation_finished(anim_name: String) -> void:
 		_attack_hit_pending = false
 		state = ZombieState.IDLE
 		play_anim(_idle_anim)
-	elif anim_name == "Death" and state == ZombieState.DEAD and not _ballistic_dead:
+	elif anim_name == "Death" and state == ZombieState.DEAD and not _ballistic_dead and not _using_ragdoll:
 		ZombiePool.return_zombie(self)
 
 func on_pooled() -> void:
 	_generation += 1
+	_dead_start_ms = 0
 	_release_ragdoll_slot()
+	for mi: MeshInstance3D in _mesh_instances:
+		if is_instance_valid(mi):
+			mi.extra_cull_margin = 2.5
 	set_burning(false)
 	_ballistic_dead = false
 	_ballistic_vel = Vector3.ZERO
@@ -934,7 +952,11 @@ func on_pooled() -> void:
 
 func reset_zombie(is_running: bool = false, difficulty: float = 0.0) -> void:
 	_generation += 1
+	_dead_start_ms = 0
 	_release_ragdoll_slot()
+	for mi: MeshInstance3D in _mesh_instances:
+		if is_instance_valid(mi):
+			mi.extra_cull_margin = 2.5
 	set_burning(false)
 	_ballistic_dead = false
 	_ballistic_vel = Vector3.ZERO
@@ -942,10 +964,11 @@ func reset_zombie(is_running: bool = false, difficulty: float = 0.0) -> void:
 	_lod_anim_accum = 0.0
 	difficulty_tier = maxf(difficulty, 0.0)
 	var d01: float = clampf(difficulty_tier, 0.0, 1.0)
-	var over: float = minf(maxf(difficulty_tier - 1.0, 0.0), 1.5)
+	var over: float = minf(maxf(difficulty_tier - 1.0, 0.0), 1.8)
+	var threat_t: float = clampf(difficulty_tier / 2.2, 0.0, 1.0)
 
 	state = ZombieState.IDLE
-	current_hp = max_hp
+	current_hp = max_hp * (1.0 + over * 0.22)
 	attack_timer = 0.0
 	_attack_hit_pending = false
 	_attack_elapsed = 0.0
@@ -977,17 +1000,23 @@ func reset_zombie(is_running: bool = false, difficulty: float = 0.0) -> void:
 	_current_attack_cooldown = lerpf(1.45, 0.80, d01)
 
 	# Roll individual archetype, visual outfit palette, silhouette scale & behavior traits
-	var roll := randf()
+	var roll: float = randf()
 	if is_running:
-		archetype = ZombieArchetype.SPRINTER if roll < 0.52 else (ZombieArchetype.STALKER if roll < 0.78 else ZombieArchetype.BRUTE)
+		var p_sprinter: float = lerpf(0.56, 0.44, threat_t)
+		var p_stalker_run: float = p_sprinter + lerpf(0.26, 0.24, threat_t)
+		archetype = ZombieArchetype.SPRINTER if roll < p_sprinter else (ZombieArchetype.STALKER if roll < p_stalker_run else ZombieArchetype.BRUTE)
 	else:
-		if roll < 0.30:
+		var p_shambler: float = lerpf(0.36, 0.12, threat_t)
+		var p_crawler: float = p_shambler + lerpf(0.28, 0.12, threat_t)
+		var p_stalker: float = p_crawler + lerpf(0.18, 0.24, threat_t)
+		var p_brute: float = p_stalker + lerpf(0.10, 0.26, threat_t)
+		if roll < p_shambler:
 			archetype = ZombieArchetype.SHAMBLER
-		elif roll < 0.56:
+		elif roll < p_crawler:
 			archetype = ZombieArchetype.CRAWLER_LIMP
-		elif roll < 0.74:
+		elif roll < p_stalker:
 			archetype = ZombieArchetype.STALKER
-		elif roll < 0.88:
+		elif roll < p_brute:
 			archetype = ZombieArchetype.BRUTE
 		else:
 			archetype = ZombieArchetype.SPRINTER
@@ -1024,7 +1053,7 @@ func reset_zombie(is_running: bool = false, difficulty: float = 0.0) -> void:
 		ZombieArchetype.BRUTE:
 			var sc_b := randf_range(1.18, 1.32)
 			scale = Vector3.ONE * sc_b
-			current_hp = max_hp * 1.75
+			current_hp *= 1.75
 			current_damage = roundi(float(current_damage) * 1.35)
 			ram_damage_mult *= 1.25
 			_hunch_bias = randf_range(0.20, 0.32)
@@ -1070,10 +1099,11 @@ func reset_zombie(is_running: bool = false, difficulty: float = 0.0) -> void:
 			anim_player.seek(randf_range(0.0, anim_res.length), true)
 		anim_player.advance(0.0)
 
-func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> void:
+func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0, launch_override: Vector3 = Vector3.INF, side_override: float = 0.0) -> void:
 	if state == ZombieState.DEAD:
 		return
 	_generation += 1
+	_dead_start_ms = Time.get_ticks_msec()
 	var my_gen := _generation
 	state = ZombieState.DEAD
 	_attack_hit_pending = false
@@ -1096,9 +1126,14 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 		if sm and sm.has_method("play_zombie_sound") and (randi() % 2) == 0:
 			sm.call("play_zombie_sound", global_position, false, archetype, true)
 
+	var use_override: bool = launch_override.is_finite() and launch_override.length_squared() > 0.25
+
 	if near_player and _bone_sim and ZombiePool.try_acquire_ragdoll():
 		_using_ragdoll = true
 		_ballistic_dead = false
+		for mi: MeshInstance3D in _mesh_instances:
+			if is_instance_valid(mi):
+				mi.extra_cull_margin = 65.0
 		if anim_player:
 			anim_player.stop()
 			anim_player.active = false
@@ -1109,15 +1144,30 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 		_bone_sim.physical_bones_start_simulation()
 		set_physics_process(false)
 
-		var push_xz := Vector3(impact_force.x, 0.0, impact_force.z)
-		var push_len: float = push_xz.length()
-		var push_dir: Vector3 = (push_xz / push_len) if push_len > 0.01 else (-global_transform.basis.z)
-		var side_dir := Vector3(-push_dir.z, 0.0, push_dir.x)
-		var eff_speed: float = clampf(maxf(impact_speed, push_len * 0.78), 4.5, 28.0)
-		var base_horiz: float = clampf(eff_speed * 0.56, 3.0, 15.0)
-		var base_up: float = clampf(1.8 + eff_speed * 0.16, 2.2, 6.4)
+		var push_dir: Vector3 = Vector3.BACK
+		var side_dir: Vector3 = Vector3.RIGHT
+		var base_horiz: float = 4.0
+		var base_up: float = 2.6
 		var side_sign: float = -1.0 if (randi() % 2) == 0 else 1.0
-		var lat_whip: float = randf_range(0.6, 1.9) * side_sign
+		var lat_whip: float = 0.0
+		if use_override:
+			var ov_xz := Vector3(launch_override.x, 0.0, launch_override.z)
+			base_horiz = ov_xz.length()
+			push_dir = (ov_xz / base_horiz) if base_horiz > 0.01 else (-global_transform.basis.z)
+			side_dir = Vector3(-push_dir.z, 0.0, push_dir.x)
+			base_up = launch_override.y
+			if absf(side_override) > 0.05:
+				side_sign = signf(side_override)
+			lat_whip = 0.45 * side_sign
+		else:
+			var push_xz := Vector3(impact_force.x, 0.0, impact_force.z)
+			var push_len: float = push_xz.length()
+			push_dir = (push_xz / push_len) if push_len > 0.01 else (-global_transform.basis.z)
+			side_dir = Vector3(-push_dir.z, 0.0, push_dir.x)
+			var eff_speed: float = clampf(maxf(impact_speed, push_len * 0.78), 4.5, 28.0)
+			base_horiz = clampf(eff_speed * 0.56, 3.0, 15.0)
+			base_up = clampf(1.8 + eff_speed * 0.16, 2.2, 6.4)
+			lat_whip = randf_range(0.6, 1.9) * side_sign
 
 		for child in _physical_bones:
 			if not is_instance_valid(child):
@@ -1128,33 +1178,34 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 			var l_mult: float = 0.45
 			if b_name.contains("UpLeg") or b_name.contains("Leg") or b_name.contains("Foot"):
 				# Bumper sweeps legs forward sharply so torso pitches over the hood cleanly
-				h_mult = 1.25
+				h_mult = 1.22
 				u_mult = 0.85
 				l_mult = 0.35
 			elif b_name.ends_with("Hips"):
-				h_mult = 1.08
+				h_mult = 1.06
 				u_mult = 1.00
 				l_mult = 0.45
 			elif b_name.contains("Spine"):
-				h_mult = 0.92
-				u_mult = 1.12
+				h_mult = 0.94
+				u_mult = 1.10
 				l_mult = 0.60
 			elif b_name.ends_with("Head") or b_name.ends_with("Neck"):
-				h_mult = 0.82
-				u_mult = 1.18
+				h_mult = 0.84
+				u_mult = 1.15
 				l_mult = 0.72
 			elif b_name.contains("Arm") or b_name.contains("Hand") or b_name.contains("Shoulder"):
-				h_mult = 0.86
+				h_mult = 0.88
 				u_mult = 1.08
 				l_mult = 0.55 + randf_range(-0.20, 0.25)
 			var bone_vel: Vector3 = push_dir * (base_horiz * h_mult) + Vector3(0.0, base_up * u_mult, 0.0) + side_dir * (lat_whip * l_mult)
+			var spin_k: float = clampf(base_horiz / 20.0, 0.28, 1.15)
 			child.linear_velocity = bone_vel
-			child.angular_velocity = side_dir * randf_range(5.5, 11.0) + push_dir * (side_sign * randf_range(1.8, 4.5)) + Vector3(0.0, randf_range(-3.0, 3.0), 0.0)
+			child.angular_velocity = (side_dir * randf_range(6.0, 12.0) + push_dir * (side_sign * randf_range(2.2, 5.2)) + Vector3(0.0, side_sign * randf_range(1.5, 4.0), 0.0)) * spin_k
 
 		var st_rag := get_tree()
 		if st_rag:
 			var wr_rag: WeakRef = weakref(self)
-			st_rag.create_timer(4.6).timeout.connect(
+			st_rag.create_timer(6.0).timeout.connect(
 				func():
 					var z_ref = wr_rag.get_ref()
 					if z_ref and is_instance_valid(z_ref) and z_ref.get("_generation") == my_gen and z_ref.get("state") == ZombieState.DEAD:
@@ -1163,12 +1214,15 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 	else:
 		_ballistic_dead = true
 		_ballistic_ground_y = minf(global_position.y, 0.05)
-		var push_xz := Vector3(impact_force.x, 0.0, impact_force.z)
-		var push_len := push_xz.length()
-		var push_dir := (push_xz / push_len) if push_len > 0.01 else Vector3.BACK
-		var launch_horiz := clampf(impact_speed * 0.48 + push_len * 0.35, 3.0, 20.0)
-		var launch_up := clampf(3.8 + impact_speed * 0.22 + push_len * 0.14, 3.8, 10.5)
-		_ballistic_vel = Vector3(push_dir.x * launch_horiz, launch_up, push_dir.z * launch_horiz)
+		if use_override:
+			_ballistic_vel = launch_override
+		else:
+			var push_xz := Vector3(impact_force.x, 0.0, impact_force.z)
+			var push_len := push_xz.length()
+			var push_dir := (push_xz / push_len) if push_len > 0.01 else Vector3.BACK
+			var launch_horiz := clampf(impact_speed * 0.48 + push_len * 0.35, 3.0, 20.0)
+			var launch_up := clampf(1.8 + impact_speed * 0.15 + push_len * 0.10, 1.8, 6.4)
+			_ballistic_vel = Vector3(push_dir.x * launch_horiz, launch_up, push_dir.z * launch_horiz)
 		_lod_anim_paused = false
 		if anim_player:
 			anim_player.active = true
@@ -1176,7 +1230,7 @@ func die(impact_force: Vector3 = Vector3.ZERO, impact_speed: float = 0.0) -> voi
 		var st_bal := get_tree()
 		if st_bal:
 			var wr_bal: WeakRef = weakref(self)
-			st_bal.create_timer(2.2).timeout.connect(
+			st_bal.create_timer(5.2).timeout.connect(
 				func():
 					var z_ref = wr_bal.get_ref()
 					if z_ref and is_instance_valid(z_ref) and z_ref.get("_generation") == my_gen and z_ref.get("state") == ZombieState.DEAD:
@@ -1264,56 +1318,117 @@ func set_burning(active: bool) -> void:
 		_apply_visual_variant(6, -1)
 		if _burn_vfx == null:
 			var vfx := get_node_or_null("/root/CarVFX")
-			var fire_tex: Texture2D = vfx.get("tex_muzzle_fire") as Texture2D if vfx else null
-			var qm := QuadMesh.new()
-			qm.size = Vector2(0.75, 0.95)
-			var mat := StandardMaterial3D.new()
-			mat.vertex_color_use_as_albedo = true
-			mat.vertex_color_is_srgb = true
-			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-			mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-			mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-			mat.billboard_keep_scale = true
-			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-			if fire_tex:
-				mat.albedo_texture = fire_tex
-			qm.material = mat
+			if _shared_burn_fire_mesh == null:
+				var fire_tex: Texture2D = vfx.get("tex_muzzle_fire") as Texture2D if vfx else null
+				var qm := QuadMesh.new()
+				qm.size = Vector2(0.86, 1.08)
+				var mat := StandardMaterial3D.new()
+				mat.vertex_color_use_as_albedo = true
+				mat.vertex_color_is_srgb = true
+				mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+				mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+				mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+				mat.billboard_keep_scale = true
+				mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+				if fire_tex:
+					mat.albedo_texture = fire_tex
+				qm.material = mat
+				_shared_burn_fire_mesh = qm
 			var cp := CPUParticles3D.new()
 			cp.name = "ZombieBurnVFX"
 			cp.position = Vector3(0.0, 1.05, 0.0)
-			cp.mesh = qm
+			cp.mesh = _shared_burn_fire_mesh
 			cp.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			cp.visibility_range_end = 155.0
-			cp.amount = 7
-			cp.lifetime = 0.65
+			cp.amount = 11
+			cp.lifetime = 0.62
 			cp.local_coords = false
 			cp.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
-			cp.emission_box_extents = Vector3(0.24, 0.45, 0.20)
+			cp.emission_box_extents = Vector3(0.26, 0.48, 0.22)
 			cp.direction = Vector3(0.0, 1.0, 0.0)
-			cp.spread = 22.0
-			cp.gravity = Vector3(0.0, 2.2, 0.0)
-			cp.initial_velocity_min = 0.6
-			cp.initial_velocity_max = 1.6
-			cp.scale_amount_min = 0.55
-			cp.scale_amount_max = 1.15
+			cp.spread = 24.0
+			cp.gravity = Vector3(0.0, 2.8, 0.0)
+			cp.initial_velocity_min = 0.7
+			cp.initial_velocity_max = 1.9
+			cp.scale_amount_min = 0.62
+			cp.scale_amount_max = 1.25
 			var ramp := Gradient.new()
-			ramp.offsets = PackedFloat32Array([0.0, 0.25, 0.72, 1.0])
+			ramp.offsets = PackedFloat32Array([0.0, 0.22, 0.68, 1.0])
 			ramp.colors = PackedColorArray([
-				Color(1.0, 0.85, 0.35, 0.0),
-				Color(1.0, 0.48, 0.08, 0.85),
-				Color(0.85, 0.16, 0.02, 0.48),
-				Color(0.35, 0.05, 0.01, 0.0),
+				Color(1.0, 0.96, 0.58, 0.0),
+				Color(1.0, 0.52, 0.08, 0.92),
+				Color(0.88, 0.16, 0.02, 0.52),
+				Color(0.35, 0.04, 0.01, 0.0),
 			])
 			cp.color_ramp = ramp
 			add_child(cp)
 			_burn_vfx = cp
+		if _burn_smoke_vfx == null:
+			var vfx2 := get_node_or_null("/root/CarVFX")
+			if _shared_burn_smoke_mesh == null:
+				var smoke_tex: Texture2D = vfx2.get("tex_smoke_puff") as Texture2D if vfx2 else null
+				var sqm := QuadMesh.new()
+				sqm.size = Vector2(0.95, 0.95)
+				var smat := StandardMaterial3D.new()
+				smat.vertex_color_use_as_albedo = true
+				smat.vertex_color_is_srgb = true
+				smat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+				smat.blend_mode = BaseMaterial3D.BLEND_MODE_MIX
+				smat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+				smat.billboard_keep_scale = true
+				smat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+				if smoke_tex:
+					smat.albedo_texture = smoke_tex
+				sqm.material = smat
+				_shared_burn_smoke_mesh = sqm
+			var scp := CPUParticles3D.new()
+			scp.name = "ZombieBurnSmokeVFX"
+			scp.position = Vector3(0.0, 1.32, 0.0)
+			scp.mesh = _shared_burn_smoke_mesh
+			scp.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			scp.visibility_range_end = 155.0
+			scp.amount = 8
+			scp.lifetime = 1.08
+			scp.local_coords = false
+			scp.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+			scp.emission_box_extents = Vector3(0.24, 0.36, 0.22)
+			scp.direction = Vector3(0.0, 1.0, 0.0)
+			scp.spread = 28.0
+			scp.gravity = Vector3(0.0, 3.0, 0.0)
+			scp.initial_velocity_min = 0.55
+			scp.initial_velocity_max = 1.35
+			scp.scale_amount_min = 0.72
+			scp.scale_amount_max = 1.65
+			scp.angle_min = 0.0
+			scp.angle_max = 360.0
+			var sramp := Gradient.new()
+			sramp.offsets = PackedFloat32Array([0.0, 0.20, 0.65, 1.0])
+			sramp.colors = PackedColorArray([
+				Color(0.06, 0.055, 0.05, 0.0),
+				Color(0.05, 0.045, 0.04, 0.64),
+				Color(0.08, 0.075, 0.07, 0.34),
+				Color(0.10, 0.095, 0.09, 0.0),
+			])
+			scp.color_ramp = sramp
+			add_child(scp)
+			_burn_smoke_vfx = scp
 		if is_instance_valid(_burn_vfx):
+			_burn_vfx.position = Vector3(0.0, 1.05, 0.0)
 			_burn_vfx.visible = true
 			_burn_vfx.emitting = true
+		if is_instance_valid(_burn_smoke_vfx):
+			_burn_smoke_vfx.position = Vector3(0.0, 1.32, 0.0)
+			_burn_smoke_vfx.visible = true
+			_burn_smoke_vfx.emitting = true
 	else:
 		if is_instance_valid(_burn_vfx):
+			_burn_vfx.position = Vector3(0.0, 1.05, 0.0)
 			_burn_vfx.emitting = false
 			_burn_vfx.visible = false
+		if is_instance_valid(_burn_smoke_vfx):
+			_burn_smoke_vfx.position = Vector3(0.0, 1.32, 0.0)
+			_burn_smoke_vfx.emitting = false
+			_burn_smoke_vfx.visible = false
 
 func trigger_menu_ragdoll(impact_force: Vector3, impact_speed: float = 22.0) -> void:
 	if state == ZombieState.DEAD:

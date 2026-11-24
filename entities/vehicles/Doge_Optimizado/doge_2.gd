@@ -63,6 +63,7 @@ func _init() -> void:
 	wheelbase_m = 3.02
 	steering_scrub_drag = 0.13
 	hull_half_extents = Vector2(1.14, 2.68)
+	vehicle_body_scale = 0.96
 	idle_fuel_per_sec = 0.22
 	crash_death_speed_mps = 24.0
 	engine_sound_id = "doge2"

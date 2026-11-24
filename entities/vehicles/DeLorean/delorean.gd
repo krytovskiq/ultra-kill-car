@@ -59,6 +59,7 @@ func _init() -> void:
 	wheelbase_m = 2.44
 	steering_scrub_drag = 0.10
 	hull_half_extents = Vector2(0.98, 2.12)
+	vehicle_body_scale = 0.90
 	idle_fuel_per_sec = 0.21
 	crash_death_speed_mps = 26.0
 	engine_sound_id = "delorean"
@@ -94,8 +95,11 @@ func _assemble_delorean_visuals() -> void:
 	if model_root == null:
 		return
 	model_root.name = "DeLoreanModelRoot"
-	model_root.position = Vector3(0.0, 0.01, 0.0)
+	var vs: float = vehicle_body_scale
+	model_root.position = Vector3(0.0, 0.01, 0.0) * vs
 	model_root.rotation.y = PI * 0.5
+	model_root.scale = Vector3.ONE * vs
+	_visuals_prescaled = true
 	add_child(model_root)
 	GlbVehicleHelper.apply_material_overrides(model_root, {
 		"DSV2581_bodymat": {

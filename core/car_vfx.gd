@@ -14,20 +14,33 @@ var tex_blood_splat: ImageTexture
 var tex_blood_mist: ImageTexture
 var tex_ash_flake: ImageTexture
 var tex_rain_streak: ImageTexture
+var tex_water_mist: ImageTexture
 
 var _mat_smoke: StandardMaterial3D
 var _mat_exhaust_smoke: StandardMaterial3D
+var _mat_tire_smoke: StandardMaterial3D
 var _mat_muzzle_smoke: StandardMaterial3D
 var _mat_muzzle_fire: StandardMaterial3D
 var _mat_sparks: StandardMaterial3D
 var _mat_electric_sparks: StandardMaterial3D
 var _mat_debris_chunks: StandardMaterial3D
+var _mat_wood_debris: StandardMaterial3D
+var _mat_metal_debris: StandardMaterial3D
+var _mat_concrete_debris: StandardMaterial3D
+var _mat_glass_shard: StandardMaterial3D
+var _mat_water_drop: StandardMaterial3D
+var _mat_water_mist: StandardMaterial3D
 var _mat_blood: StandardMaterial3D
 var _mat_blood_mist: StandardMaterial3D
 
 var _mesh_quad: QuadMesh
 var _mesh_spark: ArrayMesh
 var _mesh_chunk: ArrayMesh
+var _mesh_wood_splinter: ArrayMesh
+var _mesh_metal_scrap: ArrayMesh
+var _mesh_concrete_rubble: ArrayMesh
+var _mesh_glass_shard: ArrayMesh
+var _mesh_water_drop: ArrayMesh
 
 var _grad_steam_smoke: Gradient
 var _grad_oil_smoke: Gradient
@@ -36,6 +49,7 @@ var _impact_pools: Dictionary = {
 	"blood": [],
 	"blood_mist": [],
 	"sparks": [],
+	"contact_sparks": [],
 	"landing_sparks": [],
 	"dust": [],
 	"muzzle_fire": [],
@@ -45,6 +59,12 @@ var _impact_pools: Dictionary = {
 	"crash_dust": [],
 	"electric_sparks": [],
 	"car_wreck_shards": [],
+	"wood_splinters": [],
+	"metal_scraps": [],
+	"concrete_rubble": [],
+	"glass_shards": [],
+	"water_drops": [],
+	"water_geyser": [],
 }
 var _pool_scene_id: int = 0
 var _skid_manager: TireSkidManager = null
@@ -80,6 +100,7 @@ func _ready() -> void:
 	tex_blood_mist = _build_blood_mist_texture()
 	tex_ash_flake = _build_ash_flake_texture()
 	tex_rain_streak = _build_rain_streak_texture()
+	tex_water_mist = _build_water_mist_texture()
 
 	_mat_smoke = StandardMaterial3D.new()
 	_mat_smoke.vertex_color_use_as_albedo = true
@@ -98,6 +119,25 @@ func _ready() -> void:
 	_mat_exhaust_smoke.billboard_keep_scale = true
 	_mat_exhaust_smoke.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_mat_exhaust_smoke.albedo_texture = tex_smoke_puff
+
+	_mat_tire_smoke = StandardMaterial3D.new()
+	_mat_tire_smoke.vertex_color_use_as_albedo = true
+	_mat_tire_smoke.vertex_color_is_srgb = true
+	_mat_tire_smoke.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_mat_tire_smoke.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	_mat_tire_smoke.billboard_keep_scale = true
+	_mat_tire_smoke.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	if ResourceLoader.exists("res://assets/textures/vfx/smoke_flipbook_8x8.png"):
+		var flip_tex := ResourceLoader.load("res://assets/textures/vfx/smoke_flipbook_8x8.png") as Texture2D
+		if flip_tex != null:
+			_mat_tire_smoke.albedo_texture = flip_tex
+			_mat_tire_smoke.particles_anim_h_frames = 8
+			_mat_tire_smoke.particles_anim_v_frames = 8
+			_mat_tire_smoke.particles_anim_loop = false
+		else:
+			_mat_tire_smoke.albedo_texture = tex_smoke_puff
+	else:
+		_mat_tire_smoke.albedo_texture = tex_smoke_puff
 
 	_mat_muzzle_smoke = StandardMaterial3D.new()
 	_mat_muzzle_smoke.vertex_color_use_as_albedo = true
@@ -128,7 +168,7 @@ func _ready() -> void:
 	_mat_sparks.albedo_texture = tex_spark_streak
 	_mat_sparks.emission_enabled = true
 	_mat_sparks.emission = Color(1.0, 0.72, 0.25)
-	_mat_sparks.emission_energy_multiplier = 4.0
+	_mat_sparks.emission_energy_multiplier = 5.5
 
 	_mat_electric_sparks = StandardMaterial3D.new()
 	_mat_electric_sparks.vertex_color_use_as_albedo = true
@@ -145,8 +185,51 @@ func _ready() -> void:
 	_mat_debris_chunks = StandardMaterial3D.new()
 	_mat_debris_chunks.vertex_color_use_as_albedo = true
 	_mat_debris_chunks.vertex_color_is_srgb = true
-	_mat_debris_chunks.roughness = 0.68
-	_mat_debris_chunks.metallic = 0.25
+	_mat_debris_chunks.roughness = 0.65
+	_mat_debris_chunks.metallic = 0.18
+
+	_mat_wood_debris = StandardMaterial3D.new()
+	_mat_wood_debris.vertex_color_use_as_albedo = true
+	_mat_wood_debris.vertex_color_is_srgb = true
+	_mat_wood_debris.roughness = 0.88
+	_mat_wood_debris.metallic = 0.0
+
+	_mat_metal_debris = StandardMaterial3D.new()
+	_mat_metal_debris.vertex_color_use_as_albedo = true
+	_mat_metal_debris.vertex_color_is_srgb = true
+	_mat_metal_debris.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_mat_metal_debris.roughness = 0.30
+	_mat_metal_debris.metallic = 0.42
+
+	_mat_concrete_debris = StandardMaterial3D.new()
+	_mat_concrete_debris.vertex_color_use_as_albedo = true
+	_mat_concrete_debris.vertex_color_is_srgb = true
+	_mat_concrete_debris.roughness = 0.94
+	_mat_concrete_debris.metallic = 0.0
+
+	_mat_glass_shard = StandardMaterial3D.new()
+	_mat_glass_shard.vertex_color_use_as_albedo = true
+	_mat_glass_shard.vertex_color_is_srgb = true
+	_mat_glass_shard.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_mat_glass_shard.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_mat_glass_shard.roughness = 0.08
+	_mat_glass_shard.metallic = 0.18
+
+	_mat_water_drop = StandardMaterial3D.new()
+	_mat_water_drop.vertex_color_use_as_albedo = true
+	_mat_water_drop.vertex_color_is_srgb = true
+	_mat_water_drop.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_mat_water_drop.roughness = 0.12
+	_mat_water_drop.metallic = 0.05
+
+	_mat_water_mist = StandardMaterial3D.new()
+	_mat_water_mist.vertex_color_use_as_albedo = true
+	_mat_water_mist.vertex_color_is_srgb = true
+	_mat_water_mist.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_mat_water_mist.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	_mat_water_mist.billboard_keep_scale = true
+	_mat_water_mist.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+	_mat_water_mist.albedo_texture = tex_water_mist
 
 	_mat_blood = StandardMaterial3D.new()
 	_mat_blood.vertex_color_use_as_albedo = true
@@ -170,7 +253,12 @@ func _ready() -> void:
 	_mesh_quad.size = Vector2(1.0, 1.0)
 
 	_mesh_spark = _build_spark_streak_mesh()
-	_mesh_chunk = _build_jagged_shard_mesh()
+	_mesh_wood_splinter = _build_wood_splinter_mesh()
+	_mesh_metal_scrap = _build_metal_scrap_mesh()
+	_mesh_concrete_rubble = _build_concrete_rubble_mesh()
+	_mesh_glass_shard = _build_glass_shard_mesh()
+	_mesh_water_drop = _build_water_drop_mesh()
+	_mesh_chunk = _mesh_concrete_rubble
 
 	_grad_steam_smoke = Gradient.new()
 	_grad_steam_smoke.offsets = PackedFloat32Array([0.0, 0.18, 0.55, 1.0])
@@ -251,6 +339,7 @@ func _build_smoke_puff_texture() -> ImageTexture:
 			var alpha := clampf(density * wisp * outer_fade, 0.0, 1.0)
 			var lit := clampf(0.66 + (0.50 - v) * 0.28 + fbm * 0.22 + density * 0.08, 0.58, 1.0)
 			img.set_pixel(x, y, Color(lit, lit, lit, alpha))
+	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
 
 func _build_fire_puff_texture() -> ImageTexture:
@@ -269,24 +358,45 @@ func _build_fire_puff_texture() -> ImageTexture:
 			var val := pow(falloff, 1.45)
 			var core := clampf(1.0 - r * 1.45, 0.0, 1.0)
 			img.set_pixel(x, y, Color(1.0, lerpf(0.78, 0.99, core), lerpf(0.45, 0.94, core * core), val))
+	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
 
 func _build_spark_streak_texture() -> ImageTexture:
-	var w := 48
-	var h := 96
+	var w := 64
+	var h := 128
 	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
 	for y in range(h):
 		var v := (float(y) + 0.5) / float(h)
 		var dv := (v - 0.5) * 2.0
 		var profile_y := clampf(1.0 - dv * dv, 0.0, 1.0)
-		var half_w := maxf(0.10, 0.85 * profile_y)
+		var half_w := maxf(0.06, 0.72 * pow(profile_y, 0.75))
 		for x in range(w):
 			var u := (float(x) + 0.5) / float(w)
 			var du := absf((u - 0.5) * 2.0) / half_w
 			var radial := clampf(1.0 - du, 0.0, 1.0)
-			var a := clampf(pow(radial, 2.0) * pow(profile_y, 0.85), 0.0, 1.0)
-			var core := clampf(1.0 - du * 1.9, 0.0, 1.0) * profile_y
+			var a := clampf(pow(radial, 2.3) * pow(profile_y, 1.1), 0.0, 1.0)
+			var core := clampf(1.0 - du * 2.1, 0.0, 1.0) * profile_y
 			img.set_pixel(x, y, Color(1.0, lerpf(0.84, 0.99, core), lerpf(0.48, 0.96, core * core), a))
+	img.generate_mipmaps()
+	return ImageTexture.create_from_image(img)
+
+func _build_water_mist_texture() -> ImageTexture:
+	var size := 128
+	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	for y in range(size):
+		var v := (float(y) + 0.5) / float(size)
+		for x in range(size):
+			var u := (float(x) + 0.5) / float(size)
+			var dx := (u - 0.5) * 2.0
+			var dy := (v - 0.5) * 2.0
+			var r := sqrt(dx * dx + dy * dy)
+			var wisp := _fbm2(u * 8.0, v * 8.0, 773, 4)
+			var fine := _fbm2(u * 18.0, v * 18.0, 911, 3)
+			var edge := clampf(1.0 - pow(clampf(r / 0.92, 0.0, 1.0), 1.9), 0.0, 1.0)
+			var a := clampf(edge * (0.28 + 0.58 * wisp + 0.24 * fine), 0.0, 0.92)
+			var bright := clampf(0.84 + 0.16 * fine, 0.75, 1.0)
+			img.set_pixel(x, y, Color(bright, lerpf(0.92, 1.0, fine), 1.0, a))
+	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
 
 func _build_blood_splat_texture() -> ImageTexture:
@@ -317,6 +427,7 @@ func _build_blood_splat_texture() -> ImageTexture:
 			var a := clampf((d_max - 0.18) * 3.6, 0.0, 1.0)
 			var core_shade := clampf(0.84 + 0.16 * n_fine, 0.78, 1.0)
 			img.set_pixel(x, y, Color(core_shade, core_shade * 0.90, core_shade * 0.90, a))
+	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
 
 func _build_blood_mist_texture() -> ImageTexture:
@@ -331,6 +442,7 @@ func _build_blood_mist_texture() -> ImageTexture:
 			var radial := clampf(1.0 - pow(clampf(r, 0.0, 1.0), 1.8), 0.0, 1.0)
 			var a := clampf(radial * (0.35 + 0.78 * fbm), 0.0, 1.0)
 			img.set_pixel(x, y, Color(0.95, 0.88, 0.88, a))
+	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
 
 func _build_ash_flake_texture() -> ImageTexture:
@@ -348,6 +460,7 @@ func _build_ash_flake_texture() -> ImageTexture:
 			var rag := 0.54 + 0.24 * n + 0.16 * sin(ang * 5.0 + 0.8) + 0.12 * cos(ang * 9.0 - u * 6.0)
 			var a := clampf((rag - r) * 3.8, 0.0, 1.0)
 			img.set_pixel(x, y, Color(0.92, 0.90, 0.88, a))
+	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
 
 func _build_rain_streak_texture() -> ImageTexture:
@@ -363,13 +476,14 @@ func _build_rain_streak_texture() -> ImageTexture:
 			var profile_x := clampf(1.0 - du * du, 0.0, 1.0)
 			var a := clampf(pow(profile_x, 2.2) * pow(profile_y, 0.65), 0.0, 1.0)
 			img.set_pixel(x, y, Color(0.96, 1.0, 0.94, a))
+	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
 
 func _build_spark_streak_mesh() -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var hw := 0.065
-	var hh := 0.34
+	var hw := 0.024
+	var hh := 0.22
 	for rot_y: float in [0.0, PI * 0.5]:
 		var b := Basis(Vector3.UP, rot_y)
 		var v0 := b * Vector3(-hw, -hh, 0.0)
@@ -385,33 +499,134 @@ func _build_spark_streak_mesh() -> ArrayMesh:
 	st.generate_normals()
 	return st.commit()
 
-func _build_jagged_shard_mesh() -> ArrayMesh:
+func _add_tri_double(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
+	var ctr: Vector3 = (a + b + c) / 3.0
+	if (c - a).cross(b - a).dot(ctr) < 0.0:
+		st.add_vertex(a); st.add_vertex(c); st.add_vertex(b)
+	else:
+		st.add_vertex(a); st.add_vertex(b); st.add_vertex(c)
+
+func _build_wood_splinter_mesh() -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var p_top := Vector3(0.04, 0.20, -0.02)
-	var p_bot := Vector3(-0.03, -0.18, 0.03)
-	var ring := [
-		Vector3(0.18, 0.02, 0.04),
-		Vector3(-0.06, 0.05, 0.16),
-		Vector3(-0.17, -0.03, -0.05),
-		Vector3(0.05, -0.02, -0.15),
+	st.set_smooth_group(-1)
+	var tip_top := Vector3(0.012, 0.004, -0.22)
+	var tip_bot := Vector3(-0.014, -0.004, 0.21)
+	var mid_ring: Array[Vector3] = [
+		Vector3(-0.028,  0.009, -0.04),
+		Vector3( 0.026,  0.008, -0.06),
+		Vector3( 0.024, -0.008,  0.05),
+		Vector3(-0.025, -0.009,  0.06),
 	]
 	for i in range(4):
-		var a: Vector3 = ring[i]
-		var b: Vector3 = ring[(i + 1) % 4]
-		st.add_vertex(p_top); st.add_vertex(a); st.add_vertex(b)
-		st.add_vertex(p_bot); st.add_vertex(b); st.add_vertex(a)
+		var a: Vector3 = mid_ring[i]
+		var b: Vector3 = mid_ring[(i + 1) % 4]
+		_add_tri_double(st, tip_top, b, a)
+		_add_tri_double(st, tip_bot, a, b)
+	st.generate_normals()
+	return st.commit()
+
+func _build_metal_scrap_mesh() -> ArrayMesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_smooth_group(-1)
+	# Crumpled bent folded sheet-metal plate
+	var pts: Array[Vector3] = [
+		Vector3(-0.11, -0.02, -0.10),
+		Vector3( 0.00,  0.035, -0.12),
+		Vector3( 0.12, -0.015, -0.07),
+		Vector3( 0.10, -0.03,  0.11),
+		Vector3(-0.02,  0.025,  0.12),
+		Vector3(-0.11,  0.005,  0.08),
+	]
+	var center := Vector3(0.0, 0.018, 0.0)
+	for i in range(pts.size()):
+		var a: Vector3 = pts[i]
+		var b: Vector3 = pts[(i + 1) % pts.size()]
+		_add_tri_double(st, center, a, b)
+	st.generate_normals()
+	return st.commit()
+
+func _build_concrete_rubble_mesh() -> ArrayMesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_smooth_group(-1)
+	var t := (1.0 + sqrt(5.0)) * 0.5
+	var raw_pts: Array[Vector3] = [
+		Vector3(-1, t, 0), Vector3(1, t, 0), Vector3(-1, -t, 0), Vector3(1, -t, 0),
+		Vector3(0, -1, t), Vector3(0, 1, t), Vector3(0, -1, -t), Vector3(0, 1, -t),
+		Vector3(t, 0, -1), Vector3(t, 0, 1), Vector3(-t, 0, -1), Vector3(-t, 0, 1),
+	]
+	var pts: Array[Vector3] = []
+	for idx in range(raw_pts.size()):
+		var jit: float = 0.085 + 0.055 * sin(float(idx) * 2.7 + 0.9)
+		var v := raw_pts[idx].normalized() * jit
+		v.y *= 0.72
+		pts.append(v)
+	var faces: Array = [
+		[0,11,5], [0,5,1], [0,1,7], [0,7,10], [0,10,11],
+		[1,5,9], [5,11,4], [11,10,2], [10,7,6], [7,1,8],
+		[3,9,4], [3,4,2], [3,2,6], [3,6,8], [3,8,9],
+		[4,9,5], [2,4,11], [6,2,10], [8,6,7], [9,8,1],
+	]
+	for f in faces:
+		var fa := f as Array
+		_add_tri_double(st, pts[int(fa[0])], pts[int(fa[1])], pts[int(fa[2])])
+	st.generate_normals()
+	return st.commit()
+
+func _build_glass_shard_mesh() -> ArrayMesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_smooth_group(-1)
+	var p0 := Vector3(0.0, 0.0, -0.09)
+	var p1 := Vector3(0.055, 0.008, 0.03)
+	var p2 := Vector3(-0.015, 0.0, 0.085)
+	var p3 := Vector3(-0.05, -0.008, -0.01)
+	_add_tri_double(st, p0, p1, p2)
+	_add_tri_double(st, p0, p2, p3)
+	st.generate_normals()
+	return st.commit()
+
+func _build_water_drop_mesh() -> ArrayMesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_smooth_group(1)
+	var segs: int = 8
+	var tip := Vector3(0.0, 0.065, 0.0)
+	var mid_y := -0.012
+	var bot := Vector3(0.0, -0.045, 0.0)
+	var rad := 0.026
+	for i in range(segs):
+		var a0: float = (float(i) / float(segs)) * TAU
+		var a1: float = (float(i + 1) / float(segs)) * TAU
+		var p0 := Vector3(cos(a0) * rad, mid_y, sin(a0) * rad)
+		var p1 := Vector3(cos(a1) * rad, mid_y, sin(a1) * rad)
+		st.add_vertex(tip); st.add_vertex(p1); st.add_vertex(p0)
+		st.add_vertex(bot); st.add_vertex(p0); st.add_vertex(p1)
 	st.generate_normals()
 	return st.commit()
 
 func _get_material(type: String) -> StandardMaterial3D:
 	match type:
-		"sparks", "landing_sparks", "muzzle_sparks", "he_sparks":
+		"sparks", "contact_sparks", "landing_sparks", "muzzle_sparks", "he_sparks":
 			return _mat_sparks
 		"electric_sparks":
 			return _mat_electric_sparks
 		"crash_chunks", "car_wreck_shards":
 			return _mat_debris_chunks
+		"wood_splinters":
+			return _mat_wood_debris
+		"metal_scraps":
+			return _mat_metal_debris
+		"concrete_rubble":
+			return _mat_concrete_debris
+		"glass_shards":
+			return _mat_glass_shard
+		"water_drops":
+			return _mat_water_drop
+		"water_geyser":
+			return _mat_water_mist
 		"blood":
 			return _mat_blood
 		"blood_mist":
@@ -424,10 +639,20 @@ func _get_material(type: String) -> StandardMaterial3D:
 			return _mat_smoke
 
 func _get_mesh(type: String) -> Mesh:
-	if type == "sparks" or type == "landing_sparks" or type == "muzzle_sparks" or type == "he_sparks" or type == "electric_sparks":
+	if type == "sparks" or type == "contact_sparks" or type == "landing_sparks" or type == "muzzle_sparks" or type == "he_sparks" or type == "electric_sparks":
 		return _mesh_spark
-	if type == "crash_chunks" or type == "car_wreck_shards":
-		return _mesh_chunk
+	if type == "wood_splinters":
+		return _mesh_wood_splinter
+	if type == "metal_scraps":
+		return _mesh_metal_scrap
+	if type == "concrete_rubble" or type == "crash_chunks":
+		return _mesh_concrete_rubble
+	if type == "glass_shards":
+		return _mesh_glass_shard
+	if type == "water_drops":
+		return _mesh_water_drop
+	if type == "car_wreck_shards":
+		return _mesh_metal_scrap
 	return _mesh_quad
 
 func _get_vfx_scale() -> float:
@@ -523,20 +748,48 @@ func _create_impact_particles(type: String) -> CPUParticles3D:
 			p.scale_amount_min = 0.2
 			p.scale_amount_max = 1.5
 			p.particle_flag_align_y = true
+		"contact_sparks":
+			p.amount = maxi(roundi(64.0 * vfx_scale), 18)
+			p.lifetime = 0.52
+			p.explosiveness = 0.94
+			p.local_coords = false
+			p.emission_sphere_radius = 0.16
+			p.direction = Vector3(0.0, 0.32, -1.0).normalized()
+			p.spread = 58.0
+			p.initial_velocity_min = 8.5
+			p.initial_velocity_max = 23.0
+			p.damping_min = 1.8
+			p.damping_max = 3.8
+			p.gravity = Vector3(0.0, -18.5, 0.0)
+			p.color = Color(1.0, 0.88, 0.46, 1.0)
+			p.scale_amount_min = 0.55
+			p.scale_amount_max = 1.30
+			p.particle_flag_align_y = true
+			var cs_ramp := Gradient.new()
+			cs_ramp.offsets = PackedFloat32Array([0.0, 0.30, 0.76, 1.0])
+			cs_ramp.colors = PackedColorArray([
+				Color(1.0, 0.99, 0.88, 1.0),
+				Color(1.0, 0.74, 0.24, 0.96),
+				Color(0.98, 0.34, 0.06, 0.68),
+				Color(0.60, 0.10, 0.0, 0.0)
+			])
+			p.color_ramp = cs_ramp
 		"landing_sparks":
-			p.amount = maxi(roundi(68.0 * vfx_scale), 18)
-			p.lifetime = 0.55
+			p.amount = maxi(roundi(42.0 * vfx_scale), 14)
+			p.lifetime = 0.42
 			p.explosiveness = 0.92
 			p.local_coords = false
-			p.emission_sphere_radius = 0.52
-			p.direction = Vector3(0.0, 0.42, 1.0)
-			p.spread = 56.0
-			p.initial_velocity_min = 11.0
-			p.initial_velocity_max = 28.0
-			p.gravity = Vector3(0.0, -22.0, 0.0)
+			p.emission_sphere_radius = 0.16
+			p.direction = Vector3(0.0, 0.36, -1.0).normalized()
+			p.spread = 52.0
+			p.initial_velocity_min = 9.0
+			p.initial_velocity_max = 22.0
+			p.damping_min = 2.0
+			p.damping_max = 4.2
+			p.gravity = Vector3(0.0, -21.0, 0.0)
 			p.color = Color(1.0, 0.86, 0.38, 1.0)
-			p.scale_amount_min = 0.65
-			p.scale_amount_max = 1.95
+			p.scale_amount_min = 0.30
+			p.scale_amount_max = 0.88
 			p.particle_flag_align_y = true
 			var ls_ramp := Gradient.new()
 			ls_ramp.offsets = PackedFloat32Array([0.0, 0.35, 0.80, 1.0])
@@ -711,19 +964,21 @@ func _create_impact_particles(type: String) -> CPUParticles3D:
 			p.scale_amount_max = 1.45
 			p.particle_flag_align_y = true
 		"electric_sparks":
-			p.amount = maxi(roundi(36.0 * vfx_scale), 10)
-			p.lifetime = 0.55
+			p.amount = maxi(roundi(52.0 * vfx_scale), 16)
+			p.lifetime = 0.50
 			p.explosiveness = 0.94
 			p.local_coords = false
-			p.emission_sphere_radius = 0.55
-			p.direction = Vector3(0, 0.55, 0.85)
-			p.spread = 72.0
-			p.initial_velocity_min = 12.0
-			p.initial_velocity_max = 28.0
-			p.gravity = Vector3(0, -19.0, 0)
+			p.emission_sphere_radius = 0.18
+			p.direction = Vector3(0, 0.38, -0.92).normalized()
+			p.spread = 64.0
+			p.initial_velocity_min = 8.5
+			p.initial_velocity_max = 22.0
+			p.damping_min = 2.0
+			p.damping_max = 4.2
+			p.gravity = Vector3(0, -18.0, 0)
 			p.color = Color(0.65, 0.92, 1.0, 1.0)
-			p.scale_amount_min = 0.45
-			p.scale_amount_max = 1.55
+			p.scale_amount_min = 0.52
+			p.scale_amount_max = 1.25
 			p.particle_flag_align_y = true
 		"crash_chunks":
 			p.amount = maxi(roundi(18.0 * vfx_scale), 6)
@@ -731,7 +986,7 @@ func _create_impact_particles(type: String) -> CPUParticles3D:
 			p.explosiveness = 0.94
 			p.local_coords = false
 			p.emission_sphere_radius = 0.65
-			p.direction = Vector3(0, 0.55, 0.65)
+			p.direction = Vector3(0, 0.35, -0.92).normalized()
 			p.spread = 75.0
 			p.initial_velocity_min = 6.5
 			p.initial_velocity_max = 18.5
@@ -744,20 +999,20 @@ func _create_impact_particles(type: String) -> CPUParticles3D:
 			p.angular_velocity_max = 420.0
 			p.color = Color(0.38, 0.36, 0.34, 1.0)
 		"crash_dust":
-			p.amount = maxi(roundi(16.0 * vfx_scale), 6)
-			p.lifetime = 1.25
+			p.amount = maxi(roundi(24.0 * vfx_scale), 8)
+			p.lifetime = 1.35
 			p.explosiveness = 0.86
 			p.local_coords = false
 			p.emission_sphere_radius = 0.85
-			p.direction = Vector3(0, 0.65, 0.4)
+			p.direction = Vector3(0, 0.50, -0.82).normalized()
 			p.spread = 70.0
 			p.initial_velocity_min = 2.2
 			p.initial_velocity_max = 7.5
 			p.damping_min = 3.2
 			p.damping_max = 5.4
 			p.gravity = Vector3(0, 0.85, 0)
-			p.scale_amount_min = 1.15
-			p.scale_amount_max = 2.85
+			p.scale_amount_min = 1.25
+			p.scale_amount_max = 3.10
 			p.angle_min = 0.0
 			p.angle_max = 360.0
 			var cd_sc := Curve.new()
@@ -783,6 +1038,141 @@ func _create_impact_particles(type: String) -> CPUParticles3D:
 			p.angular_velocity_min = -520.0
 			p.angular_velocity_max = 520.0
 			p.color = Color(0.28, 0.24, 0.22, 1.0)
+		"wood_splinters":
+			p.amount = maxi(roundi(44.0 * vfx_scale), 14)
+			p.lifetime = 1.45
+			p.explosiveness = 0.96
+			p.local_coords = false
+			p.emission_sphere_radius = 0.26
+			p.direction = Vector3(0.0, 0.30, -1.0).normalized()
+			p.spread = 66.0
+			p.initial_velocity_min = 6.5
+			p.initial_velocity_max = 18.0
+			p.damping_min = 0.5
+			p.damping_max = 1.3
+			p.gravity = Vector3(0.0, -16.5, 0.0)
+			p.scale_amount_min = 0.72
+			p.scale_amount_max = 1.60
+			p.angle_min = 0.0
+			p.angle_max = 360.0
+			p.angular_velocity_min = -480.0
+			p.angular_velocity_max = 480.0
+			p.color = Color(0.56, 0.37, 0.20, 1.0)
+		"metal_scraps":
+			p.amount = maxi(roundi(42.0 * vfx_scale), 14)
+			p.lifetime = 1.50
+			p.explosiveness = 0.96
+			p.local_coords = false
+			p.emission_sphere_radius = 0.26
+			p.direction = Vector3(0.0, 0.28, -1.0).normalized()
+			p.spread = 68.0
+			p.initial_velocity_min = 7.5
+			p.initial_velocity_max = 20.5
+			p.damping_min = 0.5
+			p.damping_max = 1.4
+			p.gravity = Vector3(0.0, -17.5, 0.0)
+			p.scale_amount_min = 0.65
+			p.scale_amount_max = 1.55
+			p.angle_min = 0.0
+			p.angle_max = 360.0
+			p.angular_velocity_min = -520.0
+			p.angular_velocity_max = 520.0
+			p.color = Color(0.54, 0.56, 0.58, 1.0)
+		"concrete_rubble":
+			p.amount = maxi(roundi(42.0 * vfx_scale), 14)
+			p.lifetime = 1.45
+			p.explosiveness = 0.95
+			p.local_coords = false
+			p.emission_sphere_radius = 0.28
+			p.direction = Vector3(0.0, 0.26, -1.0).normalized()
+			p.spread = 64.0
+			p.initial_velocity_min = 6.0
+			p.initial_velocity_max = 16.5
+			p.damping_min = 0.6
+			p.damping_max = 1.4
+			p.gravity = Vector3(0.0, -19.5, 0.0)
+			p.scale_amount_min = 0.62
+			p.scale_amount_max = 1.48
+			p.angle_min = 0.0
+			p.angle_max = 360.0
+			p.angular_velocity_min = -360.0
+			p.angular_velocity_max = 360.0
+			p.color = Color(0.62, 0.60, 0.56, 1.0)
+		"glass_shards":
+			p.amount = maxi(roundi(36.0 * vfx_scale), 12)
+			p.lifetime = 1.15
+			p.explosiveness = 0.97
+			p.local_coords = false
+			p.emission_sphere_radius = 0.26
+			p.direction = Vector3(0.0, 0.34, -1.0).normalized()
+			p.spread = 72.0
+			p.initial_velocity_min = 8.0
+			p.initial_velocity_max = 21.0
+			p.damping_min = 0.5
+			p.damping_max = 1.2
+			p.gravity = Vector3(0.0, -18.5, 0.0)
+			p.scale_amount_min = 0.65
+			p.scale_amount_max = 1.45
+			p.angle_min = 0.0
+			p.angle_max = 360.0
+			p.angular_velocity_min = -620.0
+			p.angular_velocity_max = 620.0
+			p.color = Color(0.84, 0.95, 0.99, 0.78)
+		"water_drops":
+			p.amount = maxi(roundi(42.0 * vfx_scale), 14)
+			p.lifetime = 1.15
+			p.explosiveness = 0.88
+			p.local_coords = false
+			p.emission_sphere_radius = 0.26
+			p.direction = Vector3.UP
+			p.spread = 28.0
+			p.initial_velocity_min = 9.0
+			p.initial_velocity_max = 17.5
+			p.gravity = Vector3(0.0, -18.5, 0.0)
+			p.scale_amount_min = 0.85
+			p.scale_amount_max = 1.85
+			p.particle_flag_align_y = true
+			var wd_ramp := Gradient.new()
+			wd_ramp.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+			wd_ramp.colors = PackedColorArray([
+				Color(0.92, 0.97, 1.0, 0.90),
+				Color(0.80, 0.92, 0.98, 0.72),
+				Color(0.72, 0.88, 0.96, 0.0),
+			])
+			p.color_ramp = wd_ramp
+		"water_geyser":
+			p.amount = maxi(roundi(34.0 * vfx_scale), 12)
+			p.lifetime = 1.75
+			p.explosiveness = 0.72
+			p.local_coords = false
+			p.emission_sphere_radius = 0.22
+			p.direction = Vector3.UP
+			p.spread = 22.0
+			p.initial_velocity_min = 7.5
+			p.initial_velocity_max = 15.0
+			p.damping_min = 2.8
+			p.damping_max = 4.6
+			p.gravity = Vector3(0.0, -7.5, 0.0)
+			p.scale_amount_min = 0.95
+			p.scale_amount_max = 2.45
+			p.angle_min = 0.0
+			p.angle_max = 360.0
+			p.angular_velocity_min = -95.0
+			p.angular_velocity_max = 95.0
+			var wg_sc := Curve.new()
+			wg_sc.add_point(Vector2(0.0, 0.35))
+			wg_sc.add_point(Vector2(0.32, 1.15))
+			wg_sc.add_point(Vector2(1.0, 2.25))
+			p.scale_amount_curve = wg_sc
+			var wg_ramp := Gradient.new()
+			wg_ramp.offsets = PackedFloat32Array([0.0, 0.22, 0.68, 1.0])
+			wg_ramp.colors = PackedColorArray([
+				Color(0.95, 0.98, 1.0, 0.78),
+				Color(0.84, 0.94, 0.99, 0.56),
+				Color(0.74, 0.89, 0.96, 0.24),
+				Color(0.68, 0.85, 0.94, 0.0),
+			])
+			p.color_ramp = wg_ramp
 
 	return p
 
@@ -1056,26 +1446,43 @@ func create_tire_smoke(parent: Node3D, local_pos: Vector3) -> CPUParticles3D:
 	smoke.emitting = false
 	smoke.local_coords = false
 	smoke.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	smoke.amount = maxi(roundi(18.0 * _get_vfx_scale()), 6)
-	smoke.lifetime = 0.75
+	smoke.amount = maxi(roundi(28.0 * _get_vfx_scale()), 18)
+	smoke.lifetime = 1.35
 	smoke.one_shot = false
 	smoke.explosiveness = 0.0
 	smoke.mesh = _mesh_quad
-	smoke.material_override = _mat_exhaust_smoke
-	smoke.initial_velocity_min = 0.8
-	smoke.initial_velocity_max = 2.4
-	smoke.gravity = Vector3(0, 1.4, 0)
-	smoke.spread = 45.0
-	smoke.scale_amount_min = 0.75
-	smoke.scale_amount_max = 1.85
+	var use_flip: bool = (_mat_tire_smoke != null and _mat_tire_smoke.particles_anim_h_frames > 1)
+	smoke.material_override = _mat_tire_smoke if _mat_tire_smoke != null else _mat_exhaust_smoke
+	if use_flip:
+		smoke.anim_speed_min = 0.85
+		smoke.anim_speed_max = 1.25
+		smoke.anim_offset_max = 0.25
+	smoke.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	smoke.emission_sphere_radius = 0.24
+	smoke.direction = Vector3(0.0, 0.35, 0.0)
+	smoke.spread = 65.0
+	smoke.initial_velocity_min = 1.4
+	smoke.initial_velocity_max = 4.2
+	smoke.damping_min = 1.8
+	smoke.damping_max = 3.2
+	smoke.gravity = Vector3(0.0, 1.8, 0.0)
+	smoke.scale_amount_min = 1.15
+	smoke.scale_amount_max = 2.65
+	var sc := Curve.new()
+	sc.add_point(Vector2(0.0, 0.42))
+	sc.add_point(Vector2(0.25, 0.78))
+	sc.add_point(Vector2(0.65, 1.15))
+	sc.add_point(Vector2(1.0, 1.45))
+	smoke.scale_amount_curve = sc
 	smoke.angle_min = 0.0
 	smoke.angle_max = 360.0
 	var ramp := Gradient.new()
-	ramp.offsets = PackedFloat32Array([0.0, 0.25, 1.0])
+	ramp.offsets = PackedFloat32Array([0.0, 0.12, 0.50, 1.0])
 	ramp.colors = PackedColorArray([
-		Color(0.72, 0.72, 0.74, 0.0),
-		Color(0.68, 0.68, 0.70, 0.36),
-		Color(0.65, 0.65, 0.68, 0.0)
+		Color(0.86, 0.86, 0.88, 0.0),
+		Color(0.84, 0.84, 0.86, 0.68),
+		Color(0.76, 0.76, 0.79, 0.44),
+		Color(0.70, 0.70, 0.74, 0.0)
 	])
 	smoke.color_ramp = ramp
 
@@ -1200,6 +1607,40 @@ func create_barrel_linger_smoke(parent: Node3D, local_pos: Vector3) -> CPUPartic
 	smoke.position = local_pos
 	return smoke
 
+func spawn_contact_sparks(
+	world_pos: Vector3,
+	dir_hint: Vector3 = Vector3.UP,
+	impact_speed: float = 14.0,
+	is_electric: bool = false
+) -> void:
+	var scene := get_tree().current_scene
+	if not scene:
+		return
+	var scene_id := scene.get_instance_id()
+	var v_scale: float = clampf(impact_speed / 15.0, 0.50, 2.0)
+	var dir := dir_hint.normalized() if dir_hint.length_squared() > 0.001 else Vector3.UP
+	var aim := (dir + Vector3(0.0, 0.34, 0.0)).normalized()
+	var up_ref := Vector3.UP if absf(aim.y) < 0.94 else Vector3.RIGHT
+	var s_type: String = "electric_sparks" if is_electric else "contact_sparks"
+	var sp := _acquire_impact(s_type, scene)
+	sp.global_position = world_pos
+	sp.look_at(world_pos + aim, up_ref)
+	sp.initial_velocity_min = 7.0 * v_scale
+	sp.initial_velocity_max = 19.0 * v_scale
+	sp.visible = true
+	sp.restart()
+	sp.emitting = true
+	_recycle_after(sp, s_type, scene_id)
+
+func spawn_prop_smash(
+	world_pos: Vector3,
+	dir_hint: Vector3 = Vector3.UP,
+	mat_kind: String = "metal",
+	impact_speed: float = 14.0,
+	paint_color: Color = Color(0.45, 0.45, 0.48)
+) -> void:
+	spawn_crash_debris(world_pos, dir_hint, impact_speed, mat_kind, paint_color)
+
 func spawn_crash_debris(
 	world_pos: Vector3,
 	dir_hint: Vector3 = Vector3.UP,
@@ -1213,32 +1654,72 @@ func spawn_crash_debris(
 	var scene_id := scene.get_instance_id()
 	var v_scale: float = clampf(impact_speed / 15.0, 0.55, 2.2)
 	var dir := dir_hint.normalized() if dir_hint.length_squared() > 0.001 else Vector3.UP
-	var aim := (dir + Vector3(0.0, 0.42, 0.0)).normalized()
+	var aim := (dir + Vector3(0.0, 0.36, 0.0)).normalized()
 	var up_ref := Vector3.UP if absf(aim.y) < 0.94 else Vector3.RIGHT
 
-	var chunks := _acquire_impact("crash_chunks", scene)
-	chunks.global_position = world_pos
-	chunks.look_at(world_pos + aim, up_ref)
-	chunks.initial_velocity_min = 5.5 * v_scale
-	chunks.initial_velocity_max = 15.0 * v_scale
+	var shard_type: String = "metal_scraps"
+	var shard_col: Color = paint_color.lerp(Color(0.56, 0.58, 0.60, 1.0), 0.50)
+	var dust_tint := Color(0.36, 0.35, 0.37, 0.45)
+	var emit_sparks: bool = false
+	var spark_type: String = "contact_sparks"
+	var emit_glass: bool = false
+
 	match mat_kind:
 		"wood":
-			chunks.color = Color(0.36, 0.23, 0.13, 1.0)
+			shard_type = "wood_splinters"
+			shard_col = Color(0.58, 0.38, 0.19, 1.0)
+			dust_tint = Color(0.54, 0.42, 0.26, 0.46)
+			emit_sparks = false
 		"concrete":
-			chunks.color = Color(0.48, 0.47, 0.44, 1.0)
+			shard_type = "concrete_rubble"
+			shard_col = Color(0.64, 0.62, 0.58, 1.0)
+			dust_tint = Color(0.66, 0.64, 0.60, 0.58)
+			emit_sparks = false
+		"barrel_blue":
+			shard_type = "metal_scraps"
+			shard_col = Color(0.24, 0.52, 0.86, 1.0)
+			dust_tint = Color(0.28, 0.30, 0.34, 0.42)
+			emit_sparks = true
+		"metal_electric":
+			shard_type = "metal_scraps"
+			shard_col = Color(0.46, 0.49, 0.54, 1.0)
+			dust_tint = Color(0.45, 0.58, 0.70, 0.40)
+			emit_sparks = true
+			spark_type = "electric_sparks"
+			emit_glass = true
+		"hydrant":
+			shard_type = "metal_scraps"
+			shard_col = Color(0.84, 0.22, 0.16, 1.0)
+			dust_tint = Color(0.84, 0.94, 1.0, 0.45)
+			emit_sparks = true
+		"wreck":
+			shard_type = "metal_scraps"
+			shard_col = paint_color.lerp(Color(0.55, 0.44, 0.36, 1.0), 0.55)
+			dust_tint = Color(0.38, 0.35, 0.33, 0.50)
+			emit_sparks = true
+			emit_glass = true
 		_:
-			chunks.color = paint_color.lerp(Color(0.24, 0.22, 0.20, 1.0), 0.35)
+			shard_type = "metal_scraps"
+			shard_col = paint_color.lerp(Color(0.52, 0.54, 0.56, 1.0), 0.50)
+			dust_tint = Color(0.38, 0.38, 0.40, 0.44)
+			emit_sparks = true
+
+	var chunks := _acquire_impact(shard_type, scene)
+	chunks.global_position = world_pos
+	chunks.look_at(world_pos + aim, up_ref)
+	chunks.initial_velocity_min = 6.0 * v_scale
+	chunks.initial_velocity_max = 16.5 * v_scale
+	chunks.color = shard_col
 	chunks.visible = true
 	chunks.restart()
 	chunks.emitting = true
-	_recycle_after(chunks, "crash_chunks", scene_id)
+	_recycle_after(chunks, shard_type, scene_id)
 
 	var dust := _acquire_impact("crash_dust", scene)
 	dust.global_position = world_pos
 	dust.look_at(world_pos + aim, up_ref)
-	var dust_tint := Color(0.55, 0.53, 0.49, 0.52) if mat_kind == "concrete" else (Color(0.44, 0.35, 0.24, 0.44) if mat_kind == "wood" else Color(0.30, 0.30, 0.33, 0.45))
 	var dust_ramp := Gradient.new()
-	dust_ramp.offsets = PackedFloat32Array([0.0, 0.22, 1.0])
+	dust_ramp.offsets = PackedFloat32Array([0.0, 0.20, 1.0])
 	dust_ramp.colors = PackedColorArray([Color(dust_tint.r, dust_tint.g, dust_tint.b, 0.0), dust_tint, Color(dust_tint.r, dust_tint.g, dust_tint.b, 0.0)])
 	dust.color_ramp = dust_ramp
 	dust.visible = true
@@ -1246,17 +1727,44 @@ func spawn_crash_debris(
 	dust.emitting = true
 	_recycle_after(dust, "crash_dust", scene_id)
 
-	if mat_kind == "metal" or mat_kind == "metal_electric":
-		var sp_type: String = "electric_sparks" if mat_kind == "metal_electric" else "landing_sparks"
-		var sp := _acquire_impact(sp_type, scene)
+	if emit_sparks:
+		var sp := _acquire_impact(spark_type, scene)
 		sp.global_position = world_pos
 		sp.look_at(world_pos + aim, up_ref)
-		sp.initial_velocity_min = 9.0 * v_scale
-		sp.initial_velocity_max = 24.0 * v_scale
+		sp.initial_velocity_min = 9.5 * v_scale
+		sp.initial_velocity_max = 25.0 * v_scale
 		sp.visible = true
 		sp.restart()
 		sp.emitting = true
-		_recycle_after(sp, sp_type, scene_id)
+		_recycle_after(sp, spark_type, scene_id)
+
+	if emit_glass:
+		var gl := _acquire_impact("glass_shards", scene)
+		gl.global_position = world_pos + Vector3(0.0, 0.25, 0.0)
+		gl.look_at(gl.global_position + aim, up_ref)
+		gl.initial_velocity_min = 7.5 * v_scale
+		gl.initial_velocity_max = 19.0 * v_scale
+		gl.visible = true
+		gl.restart()
+		gl.emitting = true
+		_recycle_after(gl, "glass_shards", scene_id)
+
+	if mat_kind == "hydrant":
+		var geyser := _acquire_impact("water_geyser", scene)
+		geyser.global_position = Vector3(world_pos.x, maxf(world_pos.y - 0.35, 0.05), world_pos.z)
+		geyser.rotation = Vector3.ZERO
+		geyser.visible = true
+		geyser.restart()
+		geyser.emitting = true
+		_recycle_after(geyser, "water_geyser", scene_id)
+
+		var drops := _acquire_impact("water_drops", scene)
+		drops.global_position = geyser.global_position + Vector3(0.0, 0.25, 0.0)
+		drops.rotation = Vector3.ZERO
+		drops.visible = true
+		drops.restart()
+		drops.emitting = true
+		_recycle_after(drops, "water_drops", scene_id)
 
 func create_engine_damage_smoke(parent: Node3D, local_pos: Vector3) -> CPUParticles3D:
 	var smoke := CPUParticles3D.new()

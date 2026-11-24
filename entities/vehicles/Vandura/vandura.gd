@@ -62,6 +62,7 @@ func _init() -> void:
 	wheelbase_m = 3.18
 	steering_scrub_drag = 0.16
 	hull_half_extents = Vector2(1.12, 2.58)
+	vehicle_body_scale = 0.96
 	idle_fuel_per_sec = 0.23
 	crash_death_speed_mps = 26.0
 	engine_sound_id = "vandura"
@@ -97,7 +98,10 @@ func _assemble_vandura_visuals() -> void:
 	if model_root == null:
 		return
 	model_root.name = "VanduraModelRoot"
-	model_root.position = Vector3(0.0, 0.0, -0.20)
+	var vs: float = vehicle_body_scale
+	model_root.position = Vector3(0.0, 0.0, -0.20) * vs
+	model_root.scale = Vector3.ONE * vs
+	_visuals_prescaled = true
 	add_child(model_root)
 	GlbVehicleHelper.apply_material_overrides(model_root, {
 		"exterior.012": {

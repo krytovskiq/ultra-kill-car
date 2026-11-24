@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://3avkcy757eav" path="res://entities/vehicles/BTR/texture/BTR_BTR_Image_2.jpg" id="4_ouyga"]
 [ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://entities/camera/camera_3d.tscn" id="4_vlebh"]
 [ext_resource type="Shader" uid="uid://cbvk81cqd1ey6" path="res://entities/vehicles/BTR/btr.gdshader" id="5_1jed2"]
-[ext_resource type="PackedScene" uid="uid://cq3n4b78h5nv" path="res://entities/vehicles/Wheel/wheel.tscn" id="6_fwtlp"]
+[ext_resource type="PackedScene" path="res://entities/vehicles/BTR/btr_wheel.tscn" id="6_fwtlp"]
 [ext_resource type="Shader" uid="uid://baa1v3ttxc68m" path="res://entities/vehicles/Death_shader.gdshader" id="8_2cwyt"]
 [ext_resource type="Texture2D" uid="uid://dflunt5pvepti" path="res://entities/vehicles/texture/Brake.png" id="8_rks3q"]
 [ext_resource type="Texture2D" uid="uid://duvq5xocns3d8" path="res://entities/vehicles/texture/Gas.png" id="9_kcxae"]
@@ -201,46 +201,46 @@ transform = Transform3D(0.9999999, 0, 0, 0, 0.9999999, 0, 0, 0, 0.9999999, -1.08
 mesh = SubResource("ArrayMesh_kcxae")
 
 [node name="VehicleWheel3D" type="RayCast3D" parent="." unique_id=1142800316]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 0.3, 1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.14, 0.3, 1.5)
 script = ExtResource("14_rcwhl")
 is_front = false
 is_left = false
 use_as_steering = false
-wheel_radius = 0.5
+wheel_radius = 0.52
 rest_length = 0.22
 
 [node name="Wheel" parent="VehicleWheel3D" unique_id=1354525169 instance=ExtResource("6_fwtlp")]
-transform = Transform3D(0.27, 0, 0, 0, 0.367, 0, 0, 0, 0.367, 0, 2.9742718e-05, 0.00019025803)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="VehicleWheel3D2" type="RayCast3D" parent="." unique_id=198562234]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 0.3, -2.08)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.14, 0.3, -2.08)
 script = ExtResource("14_rcwhl")
 is_left = false
-wheel_radius = 0.5
+wheel_radius = 0.52
 rest_length = 0.22
 
 [node name="Wheel" parent="VehicleWheel3D2" unique_id=1682060707 instance=ExtResource("6_fwtlp")]
-transform = Transform3D(0.27, 0, 0, 0, 0.367, 0, 0, 0, 0.367, 0, 2.9742718e-05, 0.00019025803)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="VehicleWheel3D4" type="RayCast3D" parent="." unique_id=116731700]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.3, -2.08)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.14, 0.3, -2.08)
 script = ExtResource("14_rcwhl")
-wheel_radius = 0.5
+wheel_radius = 0.52
 rest_length = 0.22
 
 [node name="Wheel" parent="VehicleWheel3D4" unique_id=235302760 instance=ExtResource("6_fwtlp")]
-transform = Transform3D(-0.27, 0, -5.5415462e-08, 0, 0.367, 0, 4.0768867e-08, 0, -0.367, 0, 2.9742718e-05, 0.00019025803)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
 [node name="VehicleWheel3D5" type="RayCast3D" parent="." unique_id=731396373]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.3, 1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.14, 0.3, 1.5)
 script = ExtResource("14_rcwhl")
 is_front = false
 use_as_steering = false
-wheel_radius = 0.5
+wheel_radius = 0.52
 rest_length = 0.22
 
 [node name="Wheel" parent="VehicleWheel3D5" unique_id=1197181126 instance=ExtResource("6_fwtlp")]
-transform = Transform3D(-0.27, 0, -5.5415462e-08, 0, 0.367, 0, 4.0768867e-08, 0, -0.367, 0, 2.9742718e-05, 0.00019025803)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=448854531]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0.12)

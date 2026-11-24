@@ -59,6 +59,7 @@ func _init() -> void:
 	wheelbase_m = 3.26
 	steering_scrub_drag = 0.14
 	hull_half_extents = Vector2(0.98, 2.46)
+	vehicle_body_scale = 0.92
 	idle_fuel_per_sec = 0.23
 	crash_death_speed_mps = 26.0
 	engine_sound_id = "carson"
@@ -94,8 +95,11 @@ func _assemble_carson_visuals() -> void:
 	if model_root == null:
 		return
 	model_root.name = "CarsonModelRoot"
-	model_root.position = Vector3(0.0, 0.05, -0.09)
+	var vs: float = vehicle_body_scale
+	model_root.position = Vector3(0.0, 0.05, -0.09) * vs
 	model_root.rotation.y = PI * 0.5
+	model_root.scale = Vector3.ONE * vs
+	_visuals_prescaled = true
 	add_child(model_root)
 	var wheel_map: Dictionary = {
 		"E4_38_E5_39_001_5": get_node_or_null("VehicleWheelFL") as RaycastWheel,

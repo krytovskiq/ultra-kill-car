@@ -41,6 +41,23 @@ func setup_tornado(
 
 func _ready() -> void:
 	_build_visuals()
+	var roar := get_node_or_null("Tornado3DRoar") as AudioStreamPlayer3D
+	if roar == null and SoundManager != null and SoundManager.has_method("get_stream"):
+		var roar_st: AudioStream = SoundManager.call("get_stream", "tornado_vortex_roar") as AudioStream
+		if roar_st == null:
+			roar_st = SoundManager.call("get_stream", "weather_tornado_loop") as AudioStream
+		if roar_st != null:
+			roar = AudioStreamPlayer3D.new()
+			roar.name = "Tornado3DRoar"
+			roar.stream = roar_st
+			roar.bus = &"Ambience"
+			roar.unit_size = 18.0
+			roar.max_distance = 190.0
+			roar.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+			roar.volume_db = -2.0
+			roar.autoplay = true
+			add_child(roar)
+			roar.play()
 
 func _build_visuals() -> void:
 	var smoke_tex := load("res://assets/textures/vfx/smoke_flipbook_8x8.png") as Texture2D
@@ -364,6 +381,8 @@ func _physics_process(delta: float) -> void:
 			continue
 		rb.freeze = false
 		rb.sleeping = false
+		if rb.has_method("enable_fall_audio"):
+			rb.call("enable_fall_audio")
 		var dist: float = sqrt(maxf(h_sq, 0.5))
 		var in_dir := Vector3(to_v.x, 0.0, to_v.z) / dist
 		var tang_dir := Vector3(-in_dir.z, 0.0, in_dir.x)

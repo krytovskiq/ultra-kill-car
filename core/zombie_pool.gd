@@ -2,7 +2,7 @@ extends Node
 
 const GRID_CELL_SIZE := 4.0
 const INV_GRID_CELL_SIZE := 0.25
-const MAX_ACTIVE_RAGDOLLS := 14
+const MAX_ACTIVE_RAGDOLLS := 24
 const ZOMBIE_MODEL_COUNT := 7
 
 var zombie_scene: PackedScene = load("res://entities/zombies/Z1/Z1.tscn")
@@ -30,7 +30,7 @@ var _empty_cell: Array = []
 
 func _process(delta: float) -> void:
 	cleanup_timer += delta
-	if cleanup_timer > 0.75:
+	if cleanup_timer > 0.40:
 		cleanup_timer = 0.0
 		_validate_pool()
 		_cleanup_distant_zombies()
@@ -93,7 +93,7 @@ func get_shared_surface_material(orig_mat: Material, variant_idx: int = 0, is_ex
 		Color(0.64, 0.60, 0.56, 1.0),
 		Color(0.92, 0.84, 0.72, 1.0),
 		Color(0.76, 0.84, 0.95, 1.0),
-		Color(0.15, 0.12, 0.11, 1.0)
+		Color(0.08, 0.08, 0.08, 1.0)
 	]
 	var cloth_tints: Array[Color] = [
 		Color(1.00, 1.00, 1.00, 1.0),
@@ -102,7 +102,7 @@ func get_shared_surface_material(orig_mat: Material, variant_idx: int = 0, is_ex
 		Color(0.42, 0.40, 0.42, 1.0),
 		Color(0.84, 0.54, 0.34, 1.0),
 		Color(0.38, 0.48, 0.68, 1.0),
-		Color(0.14, 0.11, 0.10, 1.0)
+		Color(0.07, 0.07, 0.07, 1.0)
 	]
 	var ext_tints: Array[Color] = [
 		Color(1.00, 1.00, 1.00, 1.0),
@@ -111,7 +111,7 @@ func get_shared_surface_material(orig_mat: Material, variant_idx: int = 0, is_ex
 		Color(0.86, 0.84, 0.82, 1.0),
 		Color(0.96, 0.92, 0.84, 1.0),
 		Color(0.88, 0.92, 0.98, 1.0),
-		Color(0.18, 0.14, 0.12, 1.0)
+		Color(0.09, 0.09, 0.09, 1.0)
 	]
 	var eye_cols: Array[Color] = [
 		Color(1.0, 0.35, 0.12, 1.0),
@@ -120,31 +120,28 @@ func get_shared_surface_material(orig_mat: Material, variant_idx: int = 0, is_ex
 		Color(1.0, 0.55, 0.14, 1.0),
 		Color(1.0, 0.78, 0.20, 1.0),
 		Color(0.42, 0.86, 1.0, 1.0),
-		Color(1.0, 0.34, 0.04, 1.0)
+		Color(1.0, 0.42, 0.05, 1.0)
 	]
-	var blood_amts: Array[float] = [0.18, 0.62, 0.28, 0.48, 0.32, 0.24, 0.55]
-	var ext_blood_amts: Array[float] = [0.10, 0.26, 0.14, 0.22, 0.16, 0.12, 0.38]
+	var blood_amts: Array[float] = [0.18, 0.62, 0.28, 0.48, 0.32, 0.24, 0.0]
+	var ext_blood_amts: Array[float] = [0.10, 0.26, 0.14, 0.22, 0.16, 0.12, 0.0]
 
 	var mod_col: Color = ext_tints[v_idx] if is_external_model else (skin_tints[v_idx] if is_skin else cloth_tints[v_idx])
 	var final_tint := Color(tint.r * mod_col.r, tint.g * mod_col.g, tint.b * mod_col.b, tint.a)
 	if em_on:
 		em_col = eye_cols[v_idx]
-	elif v_idx == 6:
-		# Тлеющие угли на обугленной коже для биома «Пылающий город»
-		em_col = Color(1.0, 0.26, 0.04, 1.0)
-		em_e = 0.42 if is_external_model else 0.36
 
 	var mat := ShaderMaterial.new()
 	mat.shader = _zombie_shader
 	mat.set_shader_parameter("albedo_tex", tex)
 	mat.set_shader_parameter("albedo_tint", final_tint)
-	mat.set_shader_parameter("roughness_val", rough)
-	mat.set_shader_parameter("metallic_val", metal)
+	mat.set_shader_parameter("roughness_val", 0.95 if v_idx == 6 else rough)
+	mat.set_shader_parameter("metallic_val", 0.02 if v_idx == 6 else metal)
 	mat.set_shader_parameter("base_emission", em_col)
 	mat.set_shader_parameter("base_emission_energy", em_e)
 	mat.set_shader_parameter("grime_seed", float(v_idx) * 2.17 + 0.5)
 	mat.set_shader_parameter("blood_amount", ext_blood_amts[v_idx] if is_external_model else blood_amts[v_idx])
 	mat.set_shader_parameter("alpha_cut", alpha_cut_val)
+	mat.set_shader_parameter("char_amount", 1.0 if v_idx == 6 else 0.0)
 	_shared_materials[key] = mat
 	return mat
 
@@ -384,6 +381,8 @@ func _cleanup_distant_zombies() -> void:
 
 	var car: Node3D = main_node.car
 	var forward_vector: Vector3 = main_node.get("_forward") if "_forward" in main_node else Vector3.BACK
+	var right_vector: Vector3 = Vector3(-forward_vector.z, 0.0, forward_vector.x)
+	var now_ms: int = Time.get_ticks_msec()
 
 	for i in range(active_zombies.size() - 1, -1, -1):
 		var zombie := active_zombies[i]
@@ -391,10 +390,24 @@ func _cleanup_distant_zombies() -> void:
 			active_zombies.remove_at(i)
 			continue
 
-		var rel_pos := zombie.global_position - car.global_position
-		var dist_along_forward := rel_pos.dot(forward_vector)
-		if dist_along_forward < -32.0 or dist_along_forward > 320.0:
-			return_zombie(zombie)
+		var z_st = zombie.get("state")
+		var is_dead: bool = (z_st != null and int(z_st) == 3)
+		var z_pos: Vector3 = zombie.call("get_visual_world_position") if (is_dead and zombie.has_method("get_visual_world_position")) else zombie.global_position
+		var rel_pos: Vector3 = z_pos - car.global_position
+		var dist_along_forward: float = rel_pos.dot(forward_vector)
+		var lat_dist: float = absf(rel_pos.dot(right_vector))
+
+		if is_dead:
+			var dead_start: int = int(zombie.get("_dead_start_ms")) if zombie.get("_dead_start_ms") != null else 0
+			var dead_age_ms: int = (now_ms - dead_start) if dead_start > 0 else 99999
+			if dead_age_ms < 3200:
+				if dist_along_forward < -95.0 or dist_along_forward > 195.0 or lat_dist > 115.0:
+					return_zombie(zombie)
+			elif dist_along_forward < -65.0 or dist_along_forward > 185.0 or lat_dist > 105.0:
+				return_zombie(zombie)
+		else:
+			if dist_along_forward < -22.0 or dist_along_forward > 175.0 or lat_dist > 92.0:
+				return_zombie(zombie)
 
 func spawn_zombie_at(global_pos: Vector3, difficulty: float = 0.0, force_run: bool = false) -> Node3D:
 	if zombie_scene == null:

@@ -67,6 +67,7 @@ func _init() -> void:
 	wheelbase_m = 3.38
 	steering_scrub_drag = 0.16
 	hull_half_extents = Vector2(1.22, 2.78)
+	vehicle_body_scale = 0.93
 	idle_fuel_per_sec = 0.23
 	crash_death_speed_mps = 28.0
 	engine_sound_id = "raptor"
@@ -134,7 +135,10 @@ func _assemble_raptor_visuals() -> void:
 
 	var model_root: Node3D = _cached_model_template.duplicate() as Node3D
 	model_root.name = "RaptorModelRoot"
-	model_root.position = Vector3(0.0, 0.33, 0.0)
+	var vs: float = vehicle_body_scale
+	model_root.position = Vector3(0.0, 0.33, 0.0) * vs
+	model_root.scale = Vector3.ONE * vs
+	_visuals_prescaled = true
 	add_child(model_root)
 	_apply_apocalyptic_paint(model_root)
 
@@ -149,6 +153,8 @@ func _assemble_raptor_visuals() -> void:
 		var w_mesh: Node3D = model_root.find_child(w_name, true, false) as Node3D
 		if rc_w == null or w_mesh == null:
 			continue
+		rc_w.position *= vs
+		rc_w.wheel_radius *= vs
 		rc_w._setup_visual_pivots()
 		var orig_scale: Vector3 = w_mesh.scale
 		var orig_rot: Vector3 = w_mesh.rotation
@@ -156,7 +162,7 @@ func _assemble_raptor_visuals() -> void:
 		w_mesh.reparent(target_parent, false)
 		w_mesh.position = Vector3.ZERO
 		w_mesh.rotation = orig_rot
-		w_mesh.scale = orig_scale
+		w_mesh.scale = orig_scale * vs
 
 func _apply_apocalyptic_paint(node: Node) -> void:
 	if node is MeshInstance3D:

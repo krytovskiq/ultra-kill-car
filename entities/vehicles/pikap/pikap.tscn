@@ -978,17 +978,17 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0
 mesh = SubResource("ArrayMesh_ixvxa")
 
 [node name="VehicleWheel3D6" type="RayCast3D" parent="." unique_id=777896494]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7663876, 0.3728347, -1.3843995)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7689, 0.3678, -1.394)
 script = ExtResource("22_rcwhl")
 wheel_radius = 0.377
 rest_length = 0.2
 
 [node name="Wheel4" type="MeshInstance3D" parent="VehicleWheel3D6" unique_id=1291120298]
-transform = Transform3D(-4.371139e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.371139e-08, 0.7663876, -0.3728347, 1.3843995)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.7689, -0.3678, 1.394)
 mesh = SubResource("ArrayMesh_qyvxa")
 
 [node name="VehicleWheel3D7" type="RayCast3D" parent="." unique_id=450442478]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.766, 0.373, 1.426)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7689, 0.3678, 1.4314)
 script = ExtResource("22_rcwhl")
 is_front = false
 use_as_steering = false
@@ -996,22 +996,22 @@ wheel_radius = 0.377
 rest_length = 0.2
 
 [node name="Wheel3" type="MeshInstance3D" parent="VehicleWheel3D7" unique_id=108954237]
-transform = Transform3D(-4.371139e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.371139e-08, 0.673067, -0.373, -1.4259999)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.7689, -0.3678, -1.4314)
 mesh = SubResource("ArrayMesh_oomhd")
 
 [node name="VehicleWheel3D8" type="RayCast3D" parent="." unique_id=182629625]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.768, 0.373, -1.384)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7689, 0.3678, -1.394)
 script = ExtResource("22_rcwhl")
 is_left = false
 wheel_radius = 0.377
 rest_length = 0.2
 
 [node name="Wheel" type="MeshInstance3D" parent="VehicleWheel3D8" unique_id=1948288338]
-transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, -0.768, -0.373, 1.384)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.7689, -0.3678, 1.394)
 mesh = SubResource("ArrayMesh_lhu12")
 
 [node name="VehicleWheel3D9" type="RayCast3D" parent="." unique_id=770729457]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.367, 1.4223075)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7689, 0.3678, 1.4314)
 script = ExtResource("22_rcwhl")
 is_front = false
 is_left = false
@@ -1020,7 +1020,7 @@ wheel_radius = 0.377
 rest_length = 0.2
 
 [node name="Wheel2" type="MeshInstance3D" parent="VehicleWheel3D9" unique_id=1680400734]
-transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, -0.7410472, -0.367, -1.4223076)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.7689, -0.3678, -1.4314)
 mesh = SubResource("ArrayMesh_u8t3y")
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=1620227068]

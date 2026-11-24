@@ -18,12 +18,12 @@ void fragment() {
 	vec2 dir = uv - center;
 	float dist = length(dir);
 
-	float active = smoothstep(0.18, 1.0, speed_ratio) * effect_scale;
-	float edge_mask = smoothstep(0.24, 0.72, dist);
+	float active = smoothstep(0.14, 0.95, speed_ratio) * effect_scale;
+	float edge_mask = smoothstep(0.28, 0.74, dist);
 
 	vec3 col;
 	if (active > 0.005 && edge_mask > 0.005) {
-		float blur_amt = active * edge_mask * (0.018 + boost_pulse * 0.010);
+		float blur_amt = active * edge_mask * (0.022 + boost_pulse * 0.012);
 		vec2 radial = normalize(dir + vec2(0.0001));
 
 		// Subtle 4-tap peripheral radial motion blur keeping screen center crisp
@@ -46,9 +46,9 @@ void fragment() {
 		float sector = floor(ang * 42.0);
 		float line_seed = hash12(vec2(sector, 1.73));
 		float angular_shape = smoothstep(0.68, 0.96, sin(ang * 42.0 + line_seed * 6.283));
-		float streak_phase = fract(dist * 3.8 - TIME * (4.5 + speed_ratio * 11.0) + line_seed * 10.0);
+		float streak_phase = fract(dist * 3.8 - TIME * (5.5 + speed_ratio * 15.0) + line_seed * 10.0);
 		float streak_body = smoothstep(0.0, 0.18, streak_phase) * smoothstep(0.95, 0.25, streak_phase);
-		float streak = angular_shape * streak_body * smoothstep(0.32, 0.72, dist) * active * 0.20;
+		float streak = angular_shape * streak_body * smoothstep(0.32, 0.72, dist) * active * 0.28;
 		col += vec3(0.78, 0.86, 0.96) * streak;
 	} else {
 		col = texture(screen_texture, uv).rgb;

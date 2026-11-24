@@ -64,6 +64,7 @@ func _init() -> void:
 	wheelbase_m = 3.47
 	steering_scrub_drag = 0.18
 	hull_half_extents = Vector2(1.24, 2.94)
+	vehicle_body_scale = 0.84
 	idle_fuel_per_sec = 0.24
 	crash_death_speed_mps = 29.0
 	engine_sound_id = "k2500"
@@ -99,7 +100,10 @@ func _assemble_k2500_visuals() -> void:
 	if model_root == null:
 		return
 	model_root.name = "GMCK2500ModelRoot"
-	model_root.position = Vector3(0.0, 0.0, -0.14)
+	var vs: float = vehicle_body_scale
+	model_root.position = Vector3(0.0, 0.0, -0.14) * vs
+	model_root.scale = Vector3.ONE * vs
+	_visuals_prescaled = true
 	add_child(model_root)
 	GlbVehicleHelper.apply_material_overrides(model_root, {
 		"exterior.010": {

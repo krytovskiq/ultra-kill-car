@@ -23,6 +23,9 @@ var _wind_rush_player: AudioStreamPlayer = null
 var _death_drone_player: AudioStreamPlayer = null
 var _weather_rain_player: AudioStreamPlayer = null
 var _weather_tornado_player: AudioStreamPlayer = null
+var _biome_env_player: AudioStreamPlayer = null
+var _biome_fire_player: AudioStreamPlayer = null
+var _tornado_sub_player: AudioStreamPlayer = null
 var _muted: bool = false
 var _last_zombie_vox_ms: int = 0
 var _last_splat_ms: int = 0
@@ -30,12 +33,20 @@ var _last_thud_ms: int = 0
 var _last_crash_ms: int = 0
 var _last_ui_hover_ms: int = 0
 var _last_thunder_ms: int = 0
+var _last_env_detail_ms: int = 0
+var _next_env_detail_delay_ms: int = 4200
+var _current_biome_id: int = 0
+var _in_gameplay_biome: bool = false
 
 var _target_amb_db: float = -16.0
 var _target_amb_pitch: float = 1.0
 var _target_death_drone_db: float = -60.0
 var _target_rain_db: float = -60.0
 var _target_tornado_db: float = -60.0
+var _target_biome_env_db: float = -60.0
+var _target_biome_env_pitch: float = 1.0
+var _target_biome_fire_db: float = -60.0
+var _target_tornado_sub_db: float = -60.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -169,6 +180,34 @@ func _preload_all() -> void:
 	_streams["zombie_soft_hit_1"] = _build_soft_zombie_hit_stream(41101, 0.94)
 	_streams["zombie_soft_hit_2"] = _build_soft_zombie_hit_stream(41102, 1.00)
 	_streams["zombie_soft_hit_3"] = _build_soft_zombie_hit_stream(41103, 1.08)
+	_streams["susp_bump_1"] = _build_suspension_bump_wav(61101, 0.95)
+	_streams["susp_bump_2"] = _build_suspension_bump_wav(61102, 1.00)
+	_streams["susp_bump_3"] = _build_suspension_bump_wav(61103, 1.06)
+	_streams["susp_land_cushion_1"] = _build_landing_cushion_wav(62101, 0.96)
+	_streams["susp_land_cushion_2"] = _build_landing_cushion_wav(62102, 1.04)
+	_streams["landing_scrape_soft_1"] = _build_landing_scrape_soft_wav(63101)
+	_streams["landing_scrape_soft_2"] = _build_landing_scrape_soft_wav(63102)
+	_streams["ice_slide_loop"] = _build_ice_slide_loop_wav(64201)
+	_streams["prop_fall_metal_1"] = _build_prop_fall_metal_wav(65101)
+	_streams["prop_fall_metal_2"] = _build_prop_fall_metal_wav(65102)
+	_streams["prop_fall_wood_1"] = _build_prop_fall_wood_wav(65201)
+	_streams["prop_fall_wood_2"] = _build_prop_fall_wood_wav(65202)
+	_streams["prop_fall_concrete_1"] = _build_prop_fall_concrete_wav(65301)
+	_streams["prop_fall_concrete_2"] = _build_prop_fall_concrete_wav(65302)
+	_streams["wreck_fall_heavy_1"] = _build_wreck_fall_heavy_wav(65401)
+	_streams["wreck_fall_heavy_2"] = _build_wreck_fall_heavy_wav(65402)
+	_streams["env_desert_wind_loop"] = _build_env_biome_loop_wav("desert", 66101)
+	_streams["env_city_ruins_loop"] = _build_env_biome_loop_wav("city", 66201)
+	_streams["env_forest_wind_loop"] = _build_env_biome_loop_wav("forest", 66301)
+	_streams["env_winter_blizzard_loop"] = _build_env_biome_loop_wav("winter", 66401)
+	_streams["env_toxic_marsh_loop"] = _build_env_biome_loop_wav("toxic", 66501)
+	_streams["env_fire_inferno_loop"] = _build_env_biome_loop_wav("fire", 66601)
+	_streams["tornado_vortex_roar"] = _build_env_biome_loop_wav("tornado", 66701)
+	_streams["env_detail_fire_pop"] = _build_env_detail_wav("fire_pop", 67101)
+	_streams["env_detail_crow"] = _build_env_detail_wav("crow", 67201)
+	_streams["env_detail_metal_creak"] = _build_env_detail_wav("metal_creak", 67301)
+	_streams["env_detail_acid_bubble"] = _build_env_detail_wav("acid_bubble", 67401)
+	_streams["env_detail_ice_gust"] = _build_env_detail_wav("ice_gust", 67501)
 	if not _streams.has("water_splash_heavy"):
 		_streams["water_splash_heavy"] = _build_water_splash_wav(52101)
 
@@ -290,6 +329,275 @@ func _build_water_sink_glug_wav(seed_val: int) -> AudioStreamWAV:
 	wav.data = data
 	return wav
 
+func _build_suspension_bump_wav(seed_val: int, pitch_bias: float) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 0.19
+	var samples: int = int(mix_rate * duration)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var lp_oil: float = 0.0
+	var lp_sub: float = 0.0
+	for i in range(samples):
+		var t: float = float(i) / float(mix_rate)
+		var atk: float = clampf(t / 0.008, 0.0, 1.0)
+		var sub_f: float = lerpf(58.0, 30.0, clampf(t * 14.0, 0.0, 1.0)) * pitch_bias
+		var sub_thud: float = sin(TAU * sub_f * t) * atk * exp(-t * 21.0) * 0.78
+		var bush_t: float = maxf(t - 0.014, 0.0)
+		var bush: float = sin(TAU * (86.0 * pitch_bias) * bush_t) * clampf(bush_t / 0.006, 0.0, 1.0) * exp(-bush_t * 28.0) * 0.28
+		var n: float = rng.randf_range(-1.0, 1.0)
+		lp_oil = lerpf(lp_oil, n, 0.16)
+		lp_sub = lerpf(lp_sub, n, 0.05)
+		var valve_bp: float = (lp_oil - lp_sub) * clampf(t / 0.012, 0.0, 1.0) * exp(-t * 19.0) * 0.42
+		var mixed: float = (sub_thud + bush + valve_bp) * 1.10
+		var warm: float = mixed / (1.0 + absf(mixed) * 0.48)
+		data.encode_s16(i * 2, int(round(clampf(warm, -0.98, 0.98) * 32767.0)))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
+func _build_landing_cushion_wav(seed_val: int, pitch_bias: float) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 0.34
+	var samples: int = int(mix_rate * duration)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var lp_oil: float = 0.0
+	var lp_tire: float = 0.0
+	for i in range(samples):
+		var t: float = float(i) / float(mix_rate)
+		var atk: float = clampf(t / 0.010, 0.0, 1.0)
+		var f_body: float = lerpf(74.0, 26.0, clampf(t * 10.0, 0.0, 1.0)) * pitch_bias
+		var body_thump: float = sin(TAU * f_body * t) * atk * exp(-t * 12.5) * 0.85
+		var t_reb: float = maxf(t - 0.055, 0.0)
+		var rebound_swish: float = sin(TAU * (44.0 * pitch_bias) * t_reb) * clampf(t_reb / 0.018, 0.0, 1.0) * exp(-t_reb * 16.0) * 0.32
+		var n: float = rng.randf_range(-1.0, 1.0)
+		lp_tire = lerpf(lp_tire, n, 0.07)
+		lp_oil = lerpf(lp_oil, n, 0.22)
+		var air_valve: float = (lp_oil - lp_tire) * clampf(t / 0.018, 0.0, 1.0) * exp(-t * 10.5) * 0.44
+		var tire_pad: float = lp_tire * atk * exp(-t * 15.0) * 0.50
+		var mixed: float = (body_thump + rebound_swish + air_valve + tire_pad) * 1.12
+		var warm: float = mixed / (1.0 + absf(mixed) * 0.45)
+		data.encode_s16(i * 2, int(round(clampf(warm, -0.98, 0.98) * 32767.0)))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
+func _build_landing_scrape_soft_wav(seed_val: int) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 0.26
+	var samples: int = int(mix_rate * duration)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var lp_hi: float = 0.0
+	var lp_lo: float = 0.0
+	for i in range(samples):
+		var t: float = float(i) / float(mix_rate)
+		var n: float = rng.randf_range(-1.0, 1.0)
+		lp_hi = lerpf(lp_hi, n, 0.56)
+		lp_lo = lerpf(lp_lo, n, 0.22)
+		var band: float = lp_hi - lp_lo
+		var env: float = clampf(t / 0.012, 0.0, 1.0) * exp(-t * 14.0)
+		var grit: float = 0.65 + 0.35 * sin(TAU * 42.0 * t + sin(t * 95.0))
+		var mixed: float = band * env * grit * 0.95
+		var warm: float = mixed / (1.0 + absf(mixed) * 0.50)
+		data.encode_s16(i * 2, int(round(clampf(warm, -0.98, 0.98) * 32767.0)))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
+func _build_ice_slide_loop_wav(seed_val: int) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 2.20
+	var samples: int = int(mix_rate * duration)
+	var fade_len: int = int(mix_rate * 0.18)
+	var total_gen: int = samples + fade_len
+	var buf := PackedFloat32Array()
+	buf.resize(total_gen)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var lp_hi: float = 0.0
+	var lp_lo: float = 0.0
+	var lp_sub: float = 0.0
+	for i in range(total_gen):
+		var u: float = float(i % samples) / float(samples)
+		var n: float = rng.randf_range(-1.0, 1.0)
+		lp_hi = lerpf(lp_hi, n, 0.36)
+		lp_lo = lerpf(lp_lo, n, 0.10)
+		lp_sub = lerpf(lp_sub, n, 0.035)
+		var frost_glide: float = (lp_hi - lp_lo) * 0.62
+		var ice_rumble: float = lp_sub * 0.28
+		var swell: float = 0.84 + 0.16 * sin(TAU * 3.0 * u) * cos(TAU * 5.0 * u)
+		buf[i] = (frost_glide + ice_rumble) * swell * 0.68
+
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	for i in range(samples):
+		var val: float = buf[i]
+		if i < fade_len:
+			var w: float = float(i) / float(fade_len)
+			val = lerpf(buf[samples + i], buf[i], w)
+		var warm: float = val / (1.0 + absf(val) * 0.45)
+		data.encode_s16(i * 2, int(round(clampf(warm, -0.96, 0.96) * 32767.0)))
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	wav.loop_begin = 0
+	wav.loop_end = samples
+	return wav
+
+func _build_prop_fall_metal_wav(seed_val: int) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 0.42
+	var samples: int = int(mix_rate * duration)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var f_bias: float = 0.94 if (seed_val % 2) == 1 else 1.07
+	var lp_n: float = 0.0
+	for i in range(samples):
+		var t: float = float(i) / float(mix_rate)
+		var atk: float = clampf(t / 0.005, 0.0, 1.0)
+		var thud: float = sin(TAU * lerpf(130.0, 62.0, clampf(t * 18.0, 0.0, 1.0)) * f_bias * t) * atk * exp(-t * 17.0) * 0.65
+		var ring: float = (
+			sin(TAU * 218.0 * f_bias * t) * 0.45
+			+ sin(TAU * 348.0 * f_bias * t) * 0.30
+			+ sin(TAU * 524.0 * f_bias * t) * 0.16
+		) * atk * exp(-t * 11.5)
+		var t2: float = maxf(t - 0.105, 0.0)
+		var bounce: float = (1.0 if t >= 0.105 else 0.0) * clampf(t2 / 0.004, 0.0, 1.0) * exp(-t2 * 19.0) * (
+			sin(TAU * 185.0 * f_bias * t2) * 0.42 + sin(TAU * 395.0 * f_bias * t2) * 0.25
+		)
+		lp_n = lerpf(lp_n, rng.randf_range(-1.0, 1.0), 0.34)
+		var clatter: float = lp_n * atk * exp(-t * 22.0) * 0.28
+		var mixed: float = (thud + ring + bounce + clatter) * 1.05
+		var warm: float = mixed / (1.0 + absf(mixed) * 0.48)
+		data.encode_s16(i * 2, int(round(clampf(warm, -0.98, 0.98) * 32767.0)))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
+func _build_prop_fall_wood_wav(seed_val: int) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 0.34
+	var samples: int = int(mix_rate * duration)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var f_bias: float = 0.95 if (seed_val % 2) == 1 else 1.06
+	var lp_w: float = 0.0
+	for i in range(samples):
+		var t: float = float(i) / float(mix_rate)
+		var atk: float = clampf(t / 0.004, 0.0, 1.0)
+		var body: float = (
+			sin(TAU * lerpf(165.0, 88.0, clampf(t * 24.0, 0.0, 1.0)) * f_bias * t) * 0.72
+			+ sin(TAU * 292.0 * f_bias * t) * 0.32
+		) * atk * exp(-t * 23.0)
+		var t2: float = maxf(t - 0.092, 0.0)
+		var clack: float = (1.0 if t >= 0.092 else 0.0) * clampf(t2 / 0.004, 0.0, 1.0) * exp(-t2 * 26.0) * (
+			sin(TAU * 145.0 * f_bias * t2) * 0.45 + sin(TAU * 265.0 * f_bias * t2) * 0.24
+		)
+		lp_w = lerpf(lp_w, rng.randf_range(-1.0, 1.0), 0.24)
+		var dry_crack: float = lp_w * atk * exp(-t * 28.0) * 0.35
+		var mixed: float = (body + clack + dry_crack) * 1.12
+		var warm: float = mixed / (1.0 + absf(mixed) * 0.45)
+		data.encode_s16(i * 2, int(round(clampf(warm, -0.98, 0.98) * 32767.0)))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
+func _build_prop_fall_concrete_wav(seed_val: int) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 0.40
+	var samples: int = int(mix_rate * duration)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var f_bias: float = 0.93 if (seed_val % 2) == 1 else 1.05
+	var lp_sub: float = 0.0
+	var lp_grit: float = 0.0
+	for i in range(samples):
+		var t: float = float(i) / float(mix_rate)
+		var atk: float = clampf(t / 0.006, 0.0, 1.0)
+		var thud: float = sin(TAU * lerpf(82.0, 32.0, clampf(t * 16.0, 0.0, 1.0)) * f_bias * t) * atk * exp(-t * 16.0) * 0.92
+		var n: float = rng.randf_range(-1.0, 1.0)
+		lp_sub = lerpf(lp_sub, n, 0.09)
+		lp_grit = lerpf(lp_grit, n, 0.45)
+		var crunch: float = (lp_grit - lp_sub) * atk * exp(-t * 12.5) * 0.46 + lp_sub * exp(-t * 15.0) * 0.55
+		var mixed: float = (thud + crunch) * 1.12
+		var warm: float = mixed / (1.0 + absf(mixed) * 0.48)
+		data.encode_s16(i * 2, int(round(clampf(warm, -0.98, 0.98) * 32767.0)))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
+func _build_wreck_fall_heavy_wav(seed_val: int) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 0.62
+	var samples: int = int(mix_rate * duration)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var f_bias: float = 0.94 if (seed_val % 2) == 1 else 1.04
+	var lp_low: float = 0.0
+	var lp_rattle: float = 0.0
+	for i in range(samples):
+		var t: float = float(i) / float(mix_rate)
+		var atk: float = clampf(t / 0.008, 0.0, 1.0)
+		var slam: float = sin(TAU * lerpf(58.0, 22.0, clampf(t * 10.0, 0.0, 1.0)) * f_bias * t) * atk * exp(-t * 10.5) * 0.92
+		var panel: float = (
+			sin(TAU * 138.0 * f_bias * t) * 0.36
+			+ sin(TAU * 236.0 * f_bias * t) * 0.24
+		) * atk * exp(-t * 13.0)
+		var t2: float = maxf(t - 0.14, 0.0)
+		var rebound: float = (1.0 if t >= 0.14 else 0.0) * clampf(t2 / 0.010, 0.0, 1.0) * exp(-t2 * 12.0) * (
+			sin(TAU * 46.0 * f_bias * t2) * 0.48 + sin(TAU * 168.0 * f_bias * t2) * 0.22
+		)
+		var n: float = rng.randf_range(-1.0, 1.0)
+		lp_low = lerpf(lp_low, n, 0.08)
+		lp_rattle = lerpf(lp_rattle, n, 0.38)
+		var rattle_burst: float = (lp_rattle - lp_low) * (0.55 + 0.45 * sin(t * 54.0)) * atk * exp(-t * 8.0) * 0.42
+		var mixed: float = (slam + panel + rebound + rattle_burst + lp_low * atk * exp(-t * 9.0) * 0.45) * 1.15
+		var warm: float = mixed / (1.0 + absf(mixed) * 0.48)
+		data.encode_s16(i * 2, int(round(clampf(warm, -0.98, 0.98) * 32767.0)))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
 func _setup_pools() -> void:
 	for i in range(20):
 		var p := AudioStreamPlayer.new()
@@ -370,6 +678,36 @@ func _setup_ambience() -> void:
 		_weather_tornado_player.stream = tornado_stream
 		_weather_tornado_player.play()
 
+	var env_init := _streams.get("env_desert_wind_loop", _streams.get("ambient_wind")) as AudioStream
+	_biome_env_player = AudioStreamPlayer.new()
+	_biome_env_player.name = "BiomeEnvSoundscape"
+	_biome_env_player.bus = BUS_AMBIENCE
+	_biome_env_player.volume_db = -60.0
+	add_child(_biome_env_player)
+	if env_init:
+		_biome_env_player.stream = env_init
+		_biome_env_player.play()
+
+	var fire_init := _streams.get("fire_crackle_loop") as AudioStream
+	_biome_fire_player = AudioStreamPlayer.new()
+	_biome_fire_player.name = "BiomeFireLoop"
+	_biome_fire_player.bus = BUS_AMBIENCE
+	_biome_fire_player.volume_db = -60.0
+	add_child(_biome_fire_player)
+	if fire_init:
+		_biome_fire_player.stream = fire_init
+		_biome_fire_player.play()
+
+	var tornado_sub := _streams.get("tornado_vortex_roar", tornado_stream) as AudioStream
+	_tornado_sub_player = AudioStreamPlayer.new()
+	_tornado_sub_player.name = "TornadoSubRoar"
+	_tornado_sub_player.bus = BUS_AMBIENCE
+	_tornado_sub_player.volume_db = -60.0
+	add_child(_tornado_sub_player)
+	if tornado_sub:
+		_tornado_sub_player.stream = tornado_sub
+		_tornado_sub_player.play()
+
 func _process(delta: float) -> void:
 	var paused_now := false
 	if get_tree():
@@ -393,13 +731,63 @@ func _process(delta: float) -> void:
 		var tor_dest: float = -60.0 if (paused_now or _muted) else _target_tornado_db
 		_weather_tornado_player.volume_db = lerpf(_weather_tornado_player.volume_db, tor_dest, clampf(real_dt * 3.5, 0.0, 1.0))
 
+	if is_instance_valid(_biome_env_player):
+		var env_dest: float = -60.0 if (paused_now or _muted) else _target_biome_env_db
+		_biome_env_player.volume_db = lerpf(_biome_env_player.volume_db, env_dest, clampf(real_dt * 2.4, 0.0, 1.0))
+		_biome_env_player.pitch_scale = lerpf(_biome_env_player.pitch_scale, _target_biome_env_pitch, clampf(real_dt * 1.8, 0.0, 1.0))
+
+	if is_instance_valid(_biome_fire_player):
+		var fire_dest: float = -60.0 if (paused_now or _muted) else _target_biome_fire_db
+		_biome_fire_player.volume_db = lerpf(_biome_fire_player.volume_db, fire_dest, clampf(real_dt * 2.8, 0.0, 1.0))
+
+	if is_instance_valid(_tornado_sub_player):
+		var tsub_dest: float = -60.0 if (paused_now or _muted) else _target_tornado_sub_db
+		_tornado_sub_player.volume_db = lerpf(_tornado_sub_player.volume_db, tsub_dest, clampf(real_dt * 3.6, 0.0, 1.0))
+
 	if is_instance_valid(_wind_rush_player) and paused_now:
 		_wind_rush_player.volume_db = -60.0
 
+	if _in_gameplay_biome and not paused_now and not _muted and not _sfx_pool.is_empty():
+		var now_ms: int = Time.get_ticks_msec()
+		if now_ms - _last_env_detail_ms >= _next_env_detail_delay_ms:
+			_last_env_detail_ms = now_ms
+			match _current_biome_id:
+				5, 6, 7:
+					var st_pop := _streams.get("env_detail_fire_pop") as AudioStream
+					if st_pop:
+						var pop_db: float = -15.5 if _current_biome_id == 6 else (-19.0 if _current_biome_id == 7 else -24.0)
+						_play_pool_slot(st_pop, BUS_AMBIENCE, pop_db, randf_range(0.84, 1.24))
+					_next_env_detail_delay_ms = randi_range(1200, 2900)
+				4:
+					var st_bub := _streams.get("env_detail_acid_bubble") as AudioStream
+					if st_bub:
+						_play_pool_slot(st_bub, BUS_AMBIENCE, -19.0, randf_range(0.86, 1.18))
+					_next_env_detail_delay_ms = randi_range(2600, 5200)
+				3:
+					var st_ice := _streams.get("env_detail_ice_gust") as AudioStream
+					if st_ice:
+						_play_pool_slot(st_ice, BUS_AMBIENCE, -18.5, randf_range(0.88, 1.15))
+					_next_env_detail_delay_ms = randi_range(3400, 6800)
+				1:
+					var key_c: String = "env_detail_metal_creak" if (randi() % 2) == 0 else "env_detail_crow"
+					var st_c := _streams.get(key_c) as AudioStream
+					if st_c:
+						_play_pool_slot(st_c, BUS_AMBIENCE, -21.0, randf_range(0.86, 1.14))
+					_next_env_detail_delay_ms = randi_range(4200, 8200)
+				_:
+					var st_crow := _streams.get("env_detail_crow") as AudioStream
+					if st_crow:
+						_play_pool_slot(st_crow, BUS_AMBIENCE, -22.5, randf_range(0.88, 1.14))
+					_next_env_detail_delay_ms = randi_range(4800, 9200)
+
 func set_menu_ambience() -> void:
+	_in_gameplay_biome = false
 	_target_death_drone_db = -60.0
 	_target_rain_db = -60.0
 	_target_tornado_db = -60.0
+	_target_biome_env_db = -60.0
+	_target_biome_fire_db = -60.0
+	_target_tornado_sub_db = -60.0
 	_target_amb_db = -8.0
 	_target_amb_pitch = 1.0
 	var menu_st := _streams.get("music_wasteland", _streams.get("ambient_wind")) as AudioStream
@@ -408,70 +796,129 @@ func set_menu_ambience() -> void:
 		_ambience_player.play()
 	if is_instance_valid(_wind_rush_player):
 		_wind_rush_player.volume_db = -60.0
+	if is_instance_valid(_biome_env_player):
+		_biome_env_player.volume_db = -60.0
+	if is_instance_valid(_biome_fire_player):
+		_biome_fire_player.volume_db = -60.0
+	if is_instance_valid(_tornado_sub_player):
+		_tornado_sub_player.volume_db = -60.0
 
 func set_biome_ambience(biome_id: int, red_zone: bool) -> void:
+	_current_biome_id = biome_id
+	_in_gameplay_biome = true
 	_target_death_drone_db = -19.5 if red_zone else -60.0
 	var stream_key: String = "music_wasteland"
+	var env_key: String = "env_desert_wind_loop"
+	_target_biome_fire_db = -60.0
+	_target_biome_env_pitch = 1.0
 	match biome_id:
 		1: # RUINED_CITY
 			stream_key = "music_city"
 			_target_amb_db = -7.8
 			_target_amb_pitch = 1.00
+			env_key = "env_city_ruins_loop"
+			_target_biome_env_db = -15.5
 		2: # DARK_FOREST
 			stream_key = "music_forest"
 			_target_amb_db = -7.4
 			_target_amb_pitch = 1.00
+			env_key = "env_forest_wind_loop"
+			_target_biome_env_db = -15.0
 		3: # WINTER_ICE
 			stream_key = "music_winter"
 			_target_amb_db = -7.2
 			_target_amb_pitch = 1.00
+			env_key = "env_winter_blizzard_loop"
+			_target_biome_env_db = -13.5
+			_target_biome_env_pitch = 1.02
 		4: # TOXIC_MARSH / ACID_STORM
 			stream_key = "music_toxic"
 			_target_amb_db = -7.5
 			_target_amb_pitch = 0.98
+			env_key = "env_toxic_marsh_loop"
+			_target_biome_env_db = -14.5
+			_target_biome_env_pitch = 0.98
 		5: # SCORCHED_CANYON
 			stream_key = "music_scorched"
 			_target_amb_db = -7.5
 			_target_amb_pitch = 0.98
+			env_key = "env_desert_wind_loop"
+			_target_biome_env_db = -16.0
+			_target_biome_env_pitch = 0.94
+			_target_biome_fire_db = -21.5
 		6: # BURNING_CITY
 			stream_key = "music_scorched"
 			_target_amb_db = -7.3
 			_target_amb_pitch = 0.95
+			env_key = "env_fire_inferno_loop"
+			_target_biome_env_db = -10.5
+			_target_biome_fire_db = -10.0
 		7: # BURNT_FOREST
 			stream_key = "music_forest"
 			_target_amb_db = -7.6
 			_target_amb_pitch = 0.92
+			env_key = "env_fire_inferno_loop"
+			_target_biome_env_db = -14.5
+			_target_biome_env_pitch = 0.92
+			_target_biome_fire_db = -15.5
 		8: # OVERGROWN_HIGHWAY
 			stream_key = "music_forest"
 			_target_amb_db = -7.4
 			_target_amb_pitch = 1.03
+			env_key = "env_forest_wind_loop"
+			_target_biome_env_db = -16.5
+			_target_biome_env_pitch = 1.05
 		_: # WASTELAND
 			stream_key = "music_wasteland"
 			_target_amb_db = -7.6
 			_target_amb_pitch = 1.00
+			env_key = "env_desert_wind_loop"
+			_target_biome_env_db = -16.5
 	if red_zone:
 		_target_amb_db += 0.8
 		_target_amb_pitch *= 0.95
+		_target_biome_env_db += 1.5
+		if _target_biome_fire_db > -55.0:
+			_target_biome_fire_db += 1.0
 	var target_st := _streams.get(stream_key, _streams.get("ambient_wind")) as AudioStream
 	if is_instance_valid(_ambience_player) and target_st:
 		if _ambience_player.stream != target_st or not _ambience_player.playing:
 			_ambience_player.volume_db = minf(_ambience_player.volume_db, -18.0)
 			_ambience_player.stream = target_st
 			_ambience_player.play()
+	var env_st := _streams.get(env_key, _streams.get("ambient_wind")) as AudioStream
+	if is_instance_valid(_biome_env_player) and env_st:
+		if _biome_env_player.stream != env_st or not _biome_env_player.playing:
+			_biome_env_player.volume_db = minf(_biome_env_player.volume_db, -24.0)
+			_biome_env_player.stream = env_st
+			_biome_env_player.play()
+	if is_instance_valid(_biome_fire_player):
+		var fire_st := _streams.get("fire_crackle_loop") as AudioStream
+		if fire_st and (_biome_fire_player.stream != fire_st or (not _biome_fire_player.playing and _target_biome_fire_db > -55.0)):
+			_biome_fire_player.stream = fire_st
+			_biome_fire_player.play()
 
 func set_death_ambience(active: bool) -> void:
 	if active:
 		# После смерти не запускаем зацикленный дрон и не искажаем звук — остаётся только чистый эмбиент текущего биома
 		_target_death_drone_db = -60.0
 		_target_tornado_db = -60.0
+		_target_tornado_sub_db = -60.0
 		_target_amb_db = -10.5
 		_target_amb_pitch = 1.0
+		if _target_biome_env_db > -55.0:
+			_target_biome_env_db = minf(_target_biome_env_db, -17.5)
+		if _target_biome_fire_db > -55.0:
+			_target_biome_fire_db = minf(_target_biome_fire_db, -17.5)
 		if is_instance_valid(_death_drone_player):
 			_death_drone_player.stop()
 			_death_drone_player.volume_db = -60.0
 		if is_instance_valid(_weather_tornado_player):
 			_weather_tornado_player.stop()
 			_weather_tornado_player.volume_db = -60.0
+		if is_instance_valid(_tornado_sub_player):
+			_tornado_sub_player.stop()
+			_tornado_sub_player.volume_db = -60.0
 		if is_instance_valid(_wind_rush_player):
 			_wind_rush_player.volume_db = -60.0
 	else:
@@ -592,6 +1039,15 @@ func attach_vehicle_audio(vehicle: Node, engine_id: String, upgrade_tier: int = 
 	skid.volume_db = -60.0
 	vehicle.add_child(skid)
 
+	var ice_slide := AudioStreamPlayer.new()
+	ice_slide.name = "IceSlideAudioPlayer"
+	ice_slide.bus = BUS_VEHICLES
+	var ice_stream := get_stream("ice_slide_loop")
+	if ice_stream:
+		ice_slide.stream = ice_stream
+	ice_slide.volume_db = -60.0
+	vehicle.add_child(ice_slide)
+
 	var fire_p := AudioStreamPlayer.new()
 	fire_p.name = "EngineFireAudioPlayer"
 	fire_p.bus = BUS_VEHICLES
@@ -601,7 +1057,7 @@ func attach_vehicle_audio(vehicle: Node, engine_id: String, upgrade_tier: int = 
 	fire_p.volume_db = -60.0
 	vehicle.add_child(fire_p)
 
-	return {"engine": eng, "engine_idle": eng_idle, "engine_howl": eng_howl, "engine_boost": eng_boost, "skid": skid, "fire": fire_p}
+	return {"engine": eng, "engine_idle": eng_idle, "engine_howl": eng_howl, "engine_boost": eng_boost, "skid": skid, "ice_slide": ice_slide, "fire": fire_p}
 
 func _play_pool_slot(st: AudioStream, bus_name: StringName, volume_db: float, pitch: float) -> void:
 	if _muted or _sfx_pool.is_empty() or st == null:
@@ -658,7 +1114,25 @@ func play_sfx(key: String, volume_db: float = -2.0, pitch: float = 1.0) -> void:
 
 var _last_btr_exp_ms: int = 0
 var _last_landing_ms: int = 0
+var _last_susp_bump_ms: int = 0
 var _last_prop_hit_ms: int = 0
+var _last_prop_fall_ms: int = 0
+var _last_wreck_fall_ms: int = 0
+
+func play_suspension_bump(intensity: float = 0.5, heavy_vehicle: bool = false) -> void:
+	if _muted or _sfx_pool.is_empty():
+		return
+	var now := Time.get_ticks_msec()
+	if now - _last_susp_bump_ms < 135:
+		return
+	_last_susp_bump_ms = now
+	var t_int: float = clampf(intensity, 0.20, 1.25)
+	var keys: Array[String] = ["susp_bump_1", "susp_bump_2", "susp_bump_3"]
+	var st := _streams.get(keys[randi() % keys.size()]) as AudioStream
+	if st:
+		var vol_db: float = lerpf(-14.0, -5.5, clampf((t_int - 0.20) / 1.05, 0.0, 1.0))
+		var pitch: float = randf_range(0.82, 0.94) if heavy_vehicle else randf_range(0.95, 1.08)
+		_play_pool_slot(st, BUS_VEHICLES, vol_db, pitch)
 
 func play_car_landing(intensity: float = 1.0, heavy_vehicle: bool = false) -> void:
 	if _muted or _sfx_pool.is_empty():
@@ -668,17 +1142,28 @@ func play_car_landing(intensity: float = 1.0, heavy_vehicle: bool = false) -> vo
 		return
 	_last_landing_ms = now
 	var t_int: float = clampf(intensity, 0.35, 1.5)
-	var use_heavy: bool = heavy_vehicle or t_int >= 0.68
-	var primary_key: String = "car_landing_heavy" if use_heavy else "car_landing_light"
-	var primary_st := _streams.get(primary_key, _streams.get("zombie_car_thump_2")) as AudioStream
-	if primary_st:
-		var vol_db: float = lerpf(-7.5, -1.8, clampf((t_int - 0.35) / 1.15, 0.0, 1.0))
-		var pitch: float = randf_range(0.76, 0.88) if heavy_vehicle else randf_range(0.92, 1.06)
-		_play_pool_slot(primary_st, BUS_VEHICLES, vol_db, pitch)
-	if t_int > 1.15:
+	var t01: float = clampf((t_int - 0.35) / 1.15, 0.0, 1.0)
+	var c_key: String = "susp_land_cushion_1" if (randi() % 2) == 0 else "susp_land_cushion_2"
+	var cushion_st := _streams.get(c_key) as AudioStream
+	if cushion_st:
+		var vol_db: float = lerpf(-7.5, -2.0, t01)
+		var pitch: float = randf_range(0.80, 0.92) if heavy_vehicle else randf_range(0.94, 1.08)
+		_play_pool_slot(cushion_st, BUS_VEHICLES, vol_db, pitch)
+	var old_key: String = "car_landing_heavy" if (t_int >= 0.72 or heavy_vehicle) else "car_landing_light"
+	var old_st := _streams.get(old_key) as AudioStream
+	if old_st:
+		var old_db: float = lerpf(-8.5, -2.2, t01)
+		var old_pitch: float = randf_range(0.82, 0.96) if heavy_vehicle else randf_range(0.94, 1.08)
+		_play_pool_slot(old_st, BUS_VEHICLES, old_db, old_pitch)
+	if t_int > 0.88:
+		var hard_t: float = clampf((t_int - 0.88) / 0.62, 0.0, 1.0)
+		var sc_key: String = "landing_scrape_soft_1" if (randi() % 2) == 0 else "landing_scrape_soft_2"
+		var scrape_st := _streams.get(sc_key) as AudioStream
+		if scrape_st:
+			_play_pool_slot(scrape_st, BUS_SFX, lerpf(-11.0, -7.0, hard_t), randf_range(0.90, 1.12))
 		var metal_st := _streams.get("crash_metal") as AudioStream
 		if metal_st:
-			_play_pool_slot(metal_st, BUS_SFX, -13.5, randf_range(0.92, 1.06))
+			_play_pool_slot(metal_st, BUS_SFX, lerpf(-13.5, -8.0, hard_t), randf_range(0.78, 0.94))
 
 func play_prop_impact(prop_material: String, speed_mps: float = 15.0) -> void:
 	if _muted or _sfx_pool.is_empty():
@@ -705,7 +1190,53 @@ func play_prop_impact(prop_material: String, speed_mps: float = 15.0) -> void:
 		if thump_st:
 			_play_pool_slot(thump_st, BUS_VEHICLES, -13.5, randf_range(1.10, 1.25))
 
+func play_prop_fall(mat_kind: String, impact_speed: float, world_pos: Vector3, is_heavy_wreck: bool = false) -> void:
+	if _muted or _sfx_pool.is_empty():
+		return
+	var dist_db: float = 0.0
+	var vp := get_viewport()
+	var cam := vp.get_camera_3d() if vp != null else null
+	if is_instance_valid(cam):
+		var dist: float = cam.global_position.distance_to(world_pos)
+		if dist > 72.0:
+			return
+		dist_db = lerpf(0.0, -24.0, clampf((dist - 5.0) / 62.0, 0.0, 1.0))
+
+	var now := Time.get_ticks_msec()
+	if is_heavy_wreck or mat_kind == "wreck":
+		if now - _last_wreck_fall_ms < 95:
+			return
+		_last_wreck_fall_ms = now
+	else:
+		if now - _last_prop_fall_ms < 50:
+			return
+		_last_prop_fall_ms = now
+
+	var suffix: String = "1" if (randi() % 2) == 0 else "2"
+	var key: String = "prop_fall_metal_" + suffix
+	var extra_key: String = "prop_clang_metal"
+	if is_heavy_wreck or mat_kind == "wreck":
+		key = "wreck_fall_heavy_" + suffix
+		extra_key = "crash_metal"
+	elif mat_kind == "wood":
+		key = "prop_fall_wood_" + suffix
+		extra_key = "prop_snap_wood"
+	elif mat_kind == "concrete":
+		key = "prop_fall_concrete_" + suffix
+		extra_key = "prop_crumble_concrete"
+
+	var st := _streams.get(key) as AudioStream
+	if st:
+		var spd_t: float = clampf((impact_speed - 2.0) / 16.0, 0.0, 1.0)
+		var base_db: float = lerpf(-12.5, -2.0, spd_t) if (is_heavy_wreck or mat_kind == "wreck") else lerpf(-13.5, -4.5, spd_t)
+		_play_pool_slot(st, BUS_SFX, base_db + dist_db, randf_range(0.86, 1.14))
+	if impact_speed > 7.5:
+		var extra_st := _streams.get(extra_key) as AudioStream
+		if extra_st:
+			_play_pool_slot(extra_st, BUS_SFX, -11.0 + dist_db, randf_range(0.85, 1.10))
+
 func stop_transient_sfx() -> void:
+	_in_gameplay_biome = false
 	for p in _sfx_pool:
 		if is_instance_valid(p):
 			p.stop()
@@ -717,6 +1248,9 @@ func stop_transient_sfx() -> void:
 			p3.stop()
 	_target_rain_db = -60.0
 	_target_tornado_db = -60.0
+	_target_tornado_sub_db = -60.0
+	_target_biome_env_db = -60.0
+	_target_biome_fire_db = -60.0
 	set_speed_wind(0.0, false)
 
 func _play_user_hit_slot(st: AudioStream, volume_db: float, pitch: float) -> void:
@@ -809,6 +1343,12 @@ func set_weather_audio(rain_level: float, tornado_level: float) -> void:
 	var tor: float = clampf(tornado_level, 0.0, 1.0)
 	_target_rain_db = lerpf(-34.0, -10.5, r) if r > 0.02 else -60.0
 	_target_tornado_db = lerpf(-30.0, -5.5, tor) if tor > 0.02 else -60.0
+	_target_tornado_sub_db = lerpf(-26.0, -4.5, tor) if tor > 0.02 else -60.0
+	if tor > 0.02:
+		if is_instance_valid(_weather_tornado_player) and _weather_tornado_player.stream != null and not _weather_tornado_player.playing:
+			_weather_tornado_player.play()
+		if is_instance_valid(_tornado_sub_player) and _tornado_sub_player.stream != null and not _tornado_sub_player.playing:
+			_tornado_sub_player.play()
 
 func play_thunder(volume_db: float = -2.5) -> void:
 	if _muted or _sfx_pool.is_empty():
@@ -927,3 +1467,182 @@ func play_zombie_sound(world_pos: Vector3, is_snarl: bool = false, archetype: in
 			p3.pitch_scale = randf_range(pitch_min, pitch_max)
 			p3.play()
 			return
+
+
+func _build_env_biome_loop_wav(kind: String, seed_val: int) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 2.4
+	var samples: int = int(float(mix_rate) * duration)
+	var fade_len: int = int(float(mix_rate) * 0.18)
+	var total_samples: int = samples + fade_len
+	var buf := PackedFloat32Array()
+	buf.resize(total_samples)
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var lp1: float = 0.0
+	var lp2: float = 0.0
+	var lp3: float = 0.0
+	var lp4: float = 0.0
+	var crackle_env: float = 0.0
+	var crackle_sign: float = 1.0
+	var bubble_t: float = -1.0
+	var bubble_f0: float = 190.0
+
+	for i: int in range(total_samples):
+		var t: float = float(i % samples) / float(mix_rate)
+		var wn: float = rng.randf_range(-1.0, 1.0)
+		lp1 = lerpf(lp1, wn, 0.24)
+		lp2 = lerpf(lp2, lp1, 0.11)
+		lp3 = lerpf(lp3, lp2, 0.05)
+		lp4 = lerpf(lp4, lp3, 0.018)
+
+		var s: float = 0.0
+		match kind:
+			"desert":
+				var gust: float = 0.58 + 0.42 * sin(TAU * (1.0 / duration) * t)
+				var whistle_f: float = 285.0 + 48.0 * sin(TAU * (2.0 / duration) * t)
+				var dry_band: float = (lp1 - lp3) * (0.45 + 0.55 * gust)
+				var howl: float = sin(TAU * whistle_f * t) * (0.045 + 0.040 * gust)
+				s = dry_band * 0.65 + lp4 * 0.28 + howl
+			"city":
+				var hollow: float = (sin(TAU * 62.0 * t) * 0.07 + sin(TAU * 94.0 * t) * 0.05)
+				var draft: float = 0.55 + 0.45 * cos(TAU * (2.0 / duration) * t)
+				var grit: float = (lp2 - lp4) * (0.45 + 0.50 * draft)
+				s = hollow + grit * 0.72 + (wn - lp1) * 0.06
+			"forest":
+				var swell: float = 0.52 + 0.48 * sin(TAU * (2.0 / duration) * t + 0.7)
+				var foliage: float = (wn - lp2) * (0.14 + 0.16 * swell)
+				var canopy: float = (lp2 - lp4) * 0.55
+				s = foliage + canopy + lp4 * 0.22
+			"winter":
+				var gale_mod: float = 0.55 + 0.45 * sin(TAU * (2.0 / duration) * t + 0.4)
+				var gale_f: float = 470.0 + 170.0 * sin(TAU * (1.0 / duration) * t)
+				var frost_hiss: float = (wn - lp2) * (0.20 + 0.16 * gale_mod)
+				var whistle: float = sin(TAU * gale_f * t) * (0.055 + 0.050 * gale_mod)
+				s = frost_hiss + (lp1 - lp3) * 0.48 + whistle
+			"toxic":
+				var sub: float = sin(TAU * 48.0 * t) * 0.10 + sin(TAU * 73.0 * t) * 0.06
+				var murk: float = (lp2 - lp4) * 0.58 + lp4 * 0.35
+				if bubble_t < 0.0 and rng.randf() < 0.00028:
+					bubble_t = 0.0
+					bubble_f0 = rng.randf_range(160.0, 310.0)
+				var b_sig: float = 0.0
+				if bubble_t >= 0.0:
+					bubble_t += 1.0 / float(mix_rate)
+					var bt_n: float = bubble_t / 0.11
+					if bt_n >= 1.0:
+						bubble_t = -1.0
+					else:
+						var bf: float = bubble_f0 + bt_n * 380.0
+						b_sig = sin(TAU * bf * bubble_t) * sin(PI * bt_n) * 0.20
+				s = sub + murk + (wn - lp1) * 0.07 + b_sig
+			"fire":
+				var flame_mod: float = 0.65 + 0.35 * sin(TAU * (3.0 / duration) * t)
+				if rng.randf() < 0.0045:
+					crackle_env = rng.randf_range(0.35, 0.95)
+					crackle_sign = -1.0 if rng.randf() < 0.5 else 1.0
+				var crackle: float = crackle_env * crackle_sign * (0.45 + 0.55 * wn)
+				crackle_env *= 0.91
+				var roar: float = lp3 * 0.85 + (lp1 - lp3) * (0.62 * flame_mod)
+				s = roar + crackle * 0.34
+			_: # tornado
+				var shear: float = 0.58 + 0.42 * sin(TAU * (3.0 / duration) * t) + 0.16 * cos(TAU * (5.0 / duration) * t)
+				var vortex_sub: float = (sin(TAU * 38.0 * t) * 0.20 + sin(TAU * 57.0 * t) * 0.13) * (0.7 + 0.3 * shear)
+				var rush: float = (lp1 - lp4) * (0.72 * shear) + lp4 * 0.95
+				s = vortex_sub + rush
+
+		buf[i] = clampf(s * 0.78, -0.95, 0.95)
+
+	for k: int in range(fade_len):
+		var alpha: float = float(k) / float(fade_len)
+		buf[k] = buf[k] * alpha + buf[samples + k] * (1.0 - alpha)
+
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+	for j: int in range(samples):
+		data.encode_s16(j * 2, clampi(int(buf[j] * 32767.0), -32768, 32767))
+
+	var st := AudioStreamWAV.new()
+	st.format = AudioStreamWAV.FORMAT_16_BITS
+	st.mix_rate = mix_rate
+	st.stereo = false
+	st.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	st.loop_begin = 0
+	st.loop_end = samples
+	st.data = data
+	return st
+
+
+func _build_env_detail_wav(kind: String, seed_val: int) -> AudioStreamWAV:
+	var mix_rate: int = 22050
+	var duration: float = 0.85
+	match kind:
+		"fire_pop":
+			duration = 0.38
+		"acid_bubble":
+			duration = 0.42
+		"crow":
+			duration = 0.78
+		"metal_creak":
+			duration = 0.90
+		_:
+			duration = 0.85
+	var samples: int = int(float(mix_rate) * duration)
+	var data := PackedByteArray()
+	data.resize(samples * 2)
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_val
+	var lp: float = 0.0
+
+	for i: int in range(samples):
+		var t: float = float(i) / float(mix_rate)
+		var n: float = t / duration
+		var wn: float = rng.randf_range(-1.0, 1.0)
+		lp = lerpf(lp, wn, 0.18)
+		var env: float = clampf(n / 0.08, 0.0, 1.0) * pow(1.0 - n, 1.8)
+		var s: float = 0.0
+		match kind:
+			"fire_pop":
+				var snap: float = sin(TAU * 135.0 * t * exp(-t * 14.0)) * exp(-t * 28.0) * 0.65
+				var fizz: float = (wn - lp) * exp(-t * 9.5) * 0.45
+				s = snap + fizz
+			"crow":
+				var caw1: float = 1.0 if (t >= 0.04 and t <= 0.28) else 0.0
+				var caw2: float = 1.0 if (t >= 0.38 and t <= 0.66) else 0.0
+				var p1: float = clampf((t - 0.04) / 0.24, 0.0, 1.0)
+				var p2: float = clampf((t - 0.38) / 0.28, 0.0, 1.0)
+				var w_env: float = caw1 * sin(PI * p1) + caw2 * sin(PI * p2) * 0.88
+				var freq: float = lerpf(640.0, 430.0, p1 if caw1 > 0.0 else p2)
+				var rasp: float = sin(TAU * freq * t + sin(TAU * 92.0 * t) * 1.45)
+				var overtone: float = sin(TAU * freq * 2.04 * t) * 0.35
+				s = (rasp + overtone + wn * 0.12) * w_env * 0.48
+			"metal_creak":
+				var f_base: float = 242.0 - 42.0 * n + 14.0 * sin(TAU * 9.0 * t)
+				var tone: float = sin(TAU * f_base * t) * 0.42 + sin(TAU * f_base * 1.53 * t) * 0.30
+				var grind: float = (wn - lp) * (0.18 + 0.18 * sin(TAU * 14.0 * t))
+				s = (tone + grind) * env * 0.62
+			"acid_bubble":
+				var b1_t: float = clampf((t - 0.02) / 0.14, 0.0, 1.0)
+				var b2_t: float = clampf((t - 0.20) / 0.16, 0.0, 1.0)
+				var b1_on: float = 1.0 if (t >= 0.02 and t <= 0.16) else 0.0
+				var b2_on: float = 1.0 if (t >= 0.20 and t <= 0.36) else 0.0
+				var s1: float = sin(TAU * lerpf(185.0, 540.0, b1_t) * t) * sin(PI * b1_t) * b1_on
+				var s2: float = sin(TAU * lerpf(235.0, 690.0, b2_t) * t) * sin(PI * b2_t) * b2_on * 0.82
+				s = (s1 + s2) * 0.55 + (lp * 0.06 * (1.0 - n))
+			_: # ice_gust
+				var arch: float = sin(PI * n)
+				var sweep_f: float = 420.0 + 280.0 * arch
+				var crystal: float = sin(TAU * sweep_f * t) * 0.12
+				s = ((wn - lp) * 0.45 + lp * 0.28 + crystal) * arch
+
+		data.encode_s16(i * 2, clampi(int(clampf(s * 0.80, -0.95, 0.95) * 32767.0), -32768, 32767))
+
+	var st := AudioStreamWAV.new()
+	st.format = AudioStreamWAV.FORMAT_16_BITS
+	st.mix_rate = mix_rate
+	st.stereo = false
+	st.loop_mode = AudioStreamWAV.LOOP_DISABLED
+	st.data = data
+	return st

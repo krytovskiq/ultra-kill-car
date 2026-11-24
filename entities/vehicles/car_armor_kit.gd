@@ -51,6 +51,10 @@ static func apply_staged_kits(vehicle: Node3D, engine_id: String, stages: Dictio
 
 	var kit := Node3D.new()
 	kit.name = "FullUpgradeArmorKit"
+	var vs_val: Variant = vehicle.get("vehicle_body_scale")
+	var vs: float = float(vs_val) if vs_val != null else 1.0
+	if not is_equal_approx(vs, 1.0):
+		kit.scale = Vector3.ONE * vs
 	vehicle.add_child(kit)
 
 	match engine_id:

@@ -62,6 +62,7 @@ func _init() -> void:
 	wheelbase_m = 2.74
 	steering_scrub_drag = 0.11
 	hull_half_extents = Vector2(0.98, 2.36)
+	vehicle_body_scale = 0.92
 	idle_fuel_per_sec = 0.24
 	crash_death_speed_mps = 26.0
 	engine_sound_id = "barracuda"
@@ -97,7 +98,10 @@ func _assemble_barracuda_visuals() -> void:
 	if model_root == null:
 		return
 	model_root.name = "BarracudaModelRoot"
-	model_root.position = Vector3(0.0, 0.02, 0.0)
+	var vs: float = vehicle_body_scale
+	model_root.position = Vector3(0.0, 0.02, 0.0) * vs
+	model_root.scale = Vector3.ONE * vs
+	_visuals_prescaled = true
 	add_child(model_root)
 	GlbVehicleHelper.apply_material_overrides(model_root, {
 		"exterior.011": {

@@ -11,9 +11,14 @@ config_version=5
 [application]
 
 config/name="UltraKillCar"
-run/main_scene="uid://cb3frsqskfmc0"
+run/main_scene="res://ui/boot_loader.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.025, 0.028, 0.035, 1)
+boot_splash/show_image=true
+boot_splash/image="res://assets/textures/ui/boot_splash.png"
+boot_splash/fullsize=true
+boot_splash/use_filter=true
 
 [autoload]
 
