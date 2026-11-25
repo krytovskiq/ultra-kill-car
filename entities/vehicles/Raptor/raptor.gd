@@ -16,7 +16,7 @@ func _init() -> void:
 	drive_type = "AWD"                  ## Тип привода: "AWD" (полный 4x4), "RWD" (задний), "FWD" (передний)
 	awd_front_torque_split = 0.40       ## Доля тяги на переднюю ось для полного привода
 	engine_force_value = 9800           ## Мощность / тяга мотора
-	MAX_SPEED_KMH = 192                 ## Максимальная скорость в стоке (км/ч)
+	MAX_SPEED_KMH = 210                 ## Максимальная скорость в стоке (км/ч)
 	throttle_response = 3.6             ## Отзывчивость педали газа W (как на GMC 2500)
 	launch_wheelspin_intensity = 5.40   ## Пробуксовка колёс при старте с места в пол
 	brake_force = 100.0                 ## Сила тормозов

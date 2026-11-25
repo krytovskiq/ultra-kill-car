@@ -83,6 +83,8 @@ static func apply_staged_kits(vehicle: Node3D, engine_id: String, stages: Dictio
 		_:
 			_build_pikap_kit(kit, st_engine, st_armor, st_chassis)
 
+	KMF.optimize_kit_meshes(kit)
+
 	if vehicle.has_method("refresh_armor_kit_refs"):
 		vehicle.call("refresh_armor_kit_refs")
 
@@ -136,11 +138,12 @@ static func _restore_body_patina(vehicle: Node3D) -> void:
 	if typeof(saved) == TYPE_DICTIONARY:
 		for k in (saved as Dictionary).keys():
 			var rec: Array = (saved as Dictionary)[k]
+			if rec.size() < 3 or not is_instance_valid(rec[0]):
+				continue
 			var mi: MeshInstance3D = rec[0] as MeshInstance3D
 			var s: int = int(rec[1])
 			var orig_m: Material = rec[2] as Material
-			if is_instance_valid(mi):
-				mi.set_surface_override_material(s, orig_m)
+			mi.set_surface_override_material(s, orig_m)
 	vehicle.remove_meta("_max_patina_originals")
 
 static func _build_pikap_kit(kit: Node3D, st_engine: bool, st_armor: bool, st_chassis: bool) -> void:
@@ -381,6 +384,7 @@ static func _build_btr_kit(vehicle: Node3D, kit: Node3D, st_engine: bool, st_arm
 			KMF._add_box(t_kit, Vector3(0.0, 2.7, -4.8), Vector3(6.2, 1.5, 0.45), Vector3(-22.0, 0.0, 0.0), grille, "TurretMantletScreen")
 			KMF._add_box(t_kit, Vector3(-3.4, 2.9, -4.1), Vector3(2.0, 0.65, 0.42), Vector3(-22.0, 10.0, 0.0), hazard, "TurretTrimL")
 			KMF._add_box(t_kit, Vector3(3.4, 2.9, -4.1), Vector3(2.0, 0.65, 0.42), Vector3(-22.0, -10.0, 0.0), hazard, "TurretTrimR")
+			KMF.optimize_kit_meshes(t_kit)
 
 	if st_engine:
 		KMF._add_box(kit, Vector3(cx, 1.01, -2.32), Vector3(1.18, 0.24, 0.05), Vector3(-34.0, 0.0, 0.0), grille, "GlacisCage")

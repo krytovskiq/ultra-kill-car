@@ -559,6 +559,9 @@ func _apply_vehicle_body_scale() -> void:
 
 func _ready() -> void:
 	_apply_vehicle_body_scale()
+	_collect_wheels()
+	_rebuild_accurate_vehicle_collision()
+	GlbVehicleHelper.optimize_static_body_meshes(self)
 	apply_car_upgrades()
 	var kill_zone := get_node_or_null("Area3D") as Area3D
 	if kill_zone:
@@ -591,8 +594,6 @@ func _ready() -> void:
 	current_hp = health
 	current_fuel = float(max_fuel)
 
-	_collect_wheels()
-	_rebuild_accurate_vehicle_collision()
 	_hud_hp = get_node_or_null("Hud/HpBar") as ProgressBar
 	_hud_fuel = get_node_or_null("Hud/FuelBar") as ProgressBar
 	_hud_speed = get_node_or_null("Hud/speed") as Label

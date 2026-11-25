@@ -268,3 +268,361 @@ static func apply_material_overrides(root_node: Node, rules: Dictionary) -> void
 					mi.set_surface_override_material(s, dup)
 		for ch in cur.get_children():
 			stack.append(ch)
+
+
+const _BODY_SKIP_NODE_NAMES := [
+	"look", "VisualLightsRig", "LightsRig", "FullUpgradeArmorKit",
+	"TurretArmorMount", "Turret_Gun", "base_gun", "PropTriggerArea",
+	"EngineDamageFire", "MuzzleFlashRig", "MuzzleVFX",
+	"ShadowBlob", "ShadowBlobMesh", "HeadlightProj", "TaillightProj",
+	"HeadlightGroundProjection", "TaillightGroundProjection"
+]
+const _MAX_BATCH_VERTS_PER_SURF := 20000
+
+
+static func _tex_key(tex: Texture2D) -> String:
+	if tex == null:
+		return "0"
+	if not tex.resource_path.is_empty():
+		return tex.resource_path
+	return str(tex.get_instance_id())
+
+
+static func _color_key(c: Color) -> String:
+	return "%d,%d,%d,%d" % [roundi(c.r * 1000.0), roundi(c.g * 1000.0), roundi(c.b * 1000.0), roundi(c.a * 1000.0)]
+
+
+static func _material_signature(mat: Material) -> String:
+	if mat == null:
+		return "null"
+	if not (mat is StandardMaterial3D):
+		return "id:" + str(mat.get_instance_id())
+	var m := mat as StandardMaterial3D
+	var parts := PackedStringArray([
+		_color_key(m.albedo_color),
+		_tex_key(m.albedo_texture),
+		str(roundi(m.metallic * 1000.0)),
+		str(roundi(m.metallic_specular * 1000.0)),
+		_tex_key(m.metallic_texture),
+		str(m.metallic_texture_channel),
+		str(roundi(m.roughness * 1000.0)),
+		_tex_key(m.roughness_texture),
+		str(m.roughness_texture_channel),
+		"n1" if m.normal_enabled else "n0",
+		str(roundi(m.normal_scale * 1000.0)),
+		_tex_key(m.normal_texture),
+		"e1" if m.emission_enabled else "e0",
+		_color_key(m.emission),
+		str(roundi(m.emission_energy_multiplier * 1000.0)),
+		_tex_key(m.emission_texture),
+		"ao1" if m.ao_enabled else "ao0",
+		_tex_key(m.ao_texture),
+		str(m.transparency),
+		str(roundi(m.alpha_scissor_threshold * 1000.0)),
+		str(m.cull_mode),
+		str(m.depth_draw_mode),
+		str(m.shading_mode),
+		"cc1" if m.clearcoat_enabled else "cc0",
+		str(roundi(m.clearcoat * 1000.0)),
+		str(roundi(m.clearcoat_roughness * 1000.0)),
+		"d1" if m.detail_enabled else "d0",
+		_tex_key(m.detail_albedo),
+		_tex_key(m.detail_normal),
+		str(m.detail_uv_layer),
+		str(m.detail_blend_mode),
+		"%d,%d,%d" % [roundi(m.uv1_scale.x * 1000.0), roundi(m.uv1_scale.y * 1000.0), roundi(m.uv1_scale.z * 1000.0)],
+		"%d,%d,%d" % [roundi(m.uv1_offset.x * 1000.0), roundi(m.uv1_offset.y * 1000.0), roundi(m.uv1_offset.z * 1000.0)],
+		"tri1" if m.uv1_triplanar else "tri0",
+		"vc1" if m.vertex_color_use_as_albedo else "vc0",
+		"ns1" if m.disable_receive_shadows else "ns0",
+	])
+	return "|".join(parts)
+
+
+static func _should_skip_body_node(node: Node, base_gun_node: Node) -> bool:
+	if node == base_gun_node:
+		return true
+	if node is RaycastWheel or node is VehicleWheel3D or node is CPUParticles3D:
+		return true
+	var nname: String = node.name
+	if nname in _BODY_SKIP_NODE_NAMES:
+		return true
+	if nname.begins_with("Camera") or nname.begins_with("KitStage_"):
+		return true
+	return false
+
+
+static func _append_surface_chunk(
+	entries: Array[Dictionary],
+	mat: Material,
+	out_mesh: ArrayMesh
+) -> void:
+	if entries.is_empty():
+		return
+	var need_uv2 := false
+	var need_col := false
+	var need_tan := false
+	for e in entries:
+		var m: Mesh = e["mesh"] as Mesh
+		var s := int(e["surf"])
+		var s_arr := m.surface_get_arrays(s)
+		if s_arr.size() > Mesh.ARRAY_TEX_UV2 and s_arr[Mesh.ARRAY_TEX_UV2] != null:
+			need_uv2 = true
+		if s_arr.size() > Mesh.ARRAY_COLOR and s_arr[Mesh.ARRAY_COLOR] != null:
+			need_col = true
+		if s_arr.size() > Mesh.ARRAY_TANGENT and s_arr[Mesh.ARRAY_TANGENT] != null:
+			need_tan = true
+	if mat is StandardMaterial3D:
+		var smat := mat as StandardMaterial3D
+		if not smat.normal_enabled and not (smat.detail_enabled and smat.detail_normal != null):
+			need_tan = false
+		if not smat.vertex_color_use_as_albedo:
+			need_col = false
+
+	var verts := PackedVector3Array()
+	var norms := PackedVector3Array()
+	var uvs := PackedVector2Array()
+	var uv2s := PackedVector2Array()
+	var cols := PackedColorArray()
+	var tans := PackedFloat32Array()
+	var indices := PackedInt32Array()
+
+	for e in entries:
+		var m := e["mesh"] as Mesh
+		var s := int(e["surf"])
+		var xf := e["xf"] as Transform3D
+		var arr := m.surface_get_arrays(s)
+		if arr.is_empty():
+			continue
+		var s_verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+		if s_verts.is_empty():
+			continue
+		var s_norms_v: Variant = arr[Mesh.ARRAY_NORMAL]
+		var s_uvs_v: Variant = arr[Mesh.ARRAY_TEX_UV]
+		var s_uv2s_v: Variant = arr[Mesh.ARRAY_TEX_UV2]
+		var s_cols_v: Variant = arr[Mesh.ARRAY_COLOR]
+		var s_tans_v: Variant = arr[Mesh.ARRAY_TANGENT]
+		var s_idx_v: Variant = arr[Mesh.ARRAY_INDEX]
+
+		var s_norms: PackedVector3Array = s_norms_v if s_norms_v is PackedVector3Array else PackedVector3Array()
+		var s_uvs: PackedVector2Array = s_uvs_v if s_uvs_v is PackedVector2Array else PackedVector2Array()
+		var s_uv2s: PackedVector2Array = s_uv2s_v if s_uv2s_v is PackedVector2Array else PackedVector2Array()
+		var s_cols: PackedColorArray = s_cols_v if s_cols_v is PackedColorArray else PackedColorArray()
+		var s_tans: PackedFloat32Array = s_tans_v if s_tans_v is PackedFloat32Array else PackedFloat32Array()
+
+		var v_base := verts.size()
+		var n_xf := xf.basis.inverse().transposed()
+		var t_xf := xf.basis.orthonormalized()
+		var det_neg := xf.basis.determinant() < 0.0
+
+		for i in range(s_verts.size()):
+			verts.append(xf * s_verts[i])
+			if i < s_norms.size():
+				norms.append((n_xf * s_norms[i]).normalized())
+			else:
+				norms.append(Vector3.UP)
+			if i < s_uvs.size():
+				uvs.append(s_uvs[i])
+			else:
+				uvs.append(Vector2.ZERO)
+			if need_uv2:
+				if i < s_uv2s.size():
+					uv2s.append(s_uv2s[i])
+				elif i < s_uvs.size():
+					uv2s.append(s_uvs[i])
+				else:
+					uv2s.append(Vector2.ZERO)
+			if need_col:
+				if i < s_cols.size():
+					cols.append(s_cols[i])
+				else:
+					cols.append(Color.WHITE)
+			if need_tan:
+				var ti := i * 4
+				if ti + 3 < s_tans.size():
+					var tv := (t_xf * Vector3(s_tans[ti], s_tans[ti + 1], s_tans[ti + 2])).normalized()
+					tans.append(tv.x)
+					tans.append(tv.y)
+					tans.append(tv.z)
+					tans.append(s_tans[ti + 3])
+				else:
+					tans.append(t_xf.x.x)
+					tans.append(t_xf.x.y)
+					tans.append(t_xf.x.z)
+					tans.append(1.0)
+
+		if s_idx_v is PackedInt32Array and not (s_idx_v as PackedInt32Array).is_empty():
+			var s_idx: PackedInt32Array = s_idx_v
+			if det_neg:
+				var k := 0
+				while k + 2 < s_idx.size():
+					indices.append(v_base + s_idx[k])
+					indices.append(v_base + s_idx[k + 2])
+					indices.append(v_base + s_idx[k + 1])
+					k += 3
+			else:
+				for idx_val in s_idx:
+					indices.append(v_base + idx_val)
+		else:
+			var k := 0
+			while k + 2 < s_verts.size():
+				if det_neg:
+					indices.append(v_base + k)
+					indices.append(v_base + k + 2)
+					indices.append(v_base + k + 1)
+				else:
+					indices.append(v_base + k)
+					indices.append(v_base + k + 1)
+					indices.append(v_base + k + 2)
+				k += 3
+
+	if verts.is_empty() or indices.is_empty():
+		return
+	var surf_arr := []
+	surf_arr.resize(Mesh.ARRAY_MAX)
+	surf_arr[Mesh.ARRAY_VERTEX] = verts
+	surf_arr[Mesh.ARRAY_NORMAL] = norms
+	surf_arr[Mesh.ARRAY_TEX_UV] = uvs
+	if need_uv2:
+		surf_arr[Mesh.ARRAY_TEX_UV2] = uv2s
+	if need_col:
+		surf_arr[Mesh.ARRAY_COLOR] = cols
+	if need_tan:
+		surf_arr[Mesh.ARRAY_TANGENT] = tans
+	surf_arr[Mesh.ARRAY_INDEX] = indices
+	var s_new := out_mesh.get_surface_count()
+	out_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surf_arr)
+	if mat != null:
+		out_mesh.surface_set_material(s_new, mat)
+
+
+static func _build_chunked_body_mesh(entries: Array[Dictionary]) -> ArrayMesh:
+	var out_mesh := ArrayMesh.new()
+	var groups: Dictionary = {} # mat_sig -> Array[Dictionary]
+	var group_mats: Dictionary = {} # mat_sig -> Material
+	for e in entries:
+		var sig: String = e["sig"] as String
+		if not groups.has(sig):
+			var arr: Array[Dictionary] = []
+			groups[sig] = arr
+			group_mats[sig] = e["mat"] as Material
+		(groups[sig] as Array[Dictionary]).append(e)
+
+	for sig in groups.keys():
+		var list: Array[Dictionary] = groups[sig] as Array[Dictionary]
+		var mat: Material = group_mats[sig] as Material
+		var chunk: Array[Dictionary] = []
+		var chunk_verts := 0
+		for e in list:
+			var m: Mesh = e["mesh"] as Mesh
+			var s := int(e["surf"])
+			var s_arr_v: PackedVector3Array = m.surface_get_arrays(s)[Mesh.ARRAY_VERTEX] as PackedVector3Array
+			var sv: int = s_arr_v.size()
+			if not chunk.is_empty() and chunk_verts + sv > _MAX_BATCH_VERTS_PER_SURF:
+				_append_surface_chunk(chunk, mat, out_mesh)
+				chunk.clear()
+				chunk_verts = 0
+			chunk.append(e)
+			chunk_verts += sv
+		if not chunk.is_empty():
+			_append_surface_chunk(chunk, mat, out_mesh)
+	return out_mesh
+
+
+static func optimize_static_body_meshes(vehicle: Node3D) -> void:
+	if vehicle == null or not is_instance_valid(vehicle):
+		return
+	var base_gun_val: Variant = vehicle.get("base_gun")
+	var base_gun_node: Node = base_gun_val as Node if base_gun_val is Node else null
+
+	var shadow_entries: Array[Dictionary] = []
+	var noshadow_entries: Array[Dictionary] = []
+	var replaced_nodes: Array[MeshInstance3D] = []
+
+	var stack: Array[Dictionary] = []
+	for ch in vehicle.get_children():
+		if _should_skip_body_node(ch, base_gun_node):
+			continue
+		var xf := (ch as Node3D).transform if ch is Node3D else Transform3D.IDENTITY
+		stack.append({"node": ch, "xf": xf})
+
+	while not stack.is_empty():
+		var item: Dictionary = stack.pop_back() as Dictionary
+		var cur: Node = item["node"] as Node
+		var cur_xf: Transform3D = item["xf"] as Transform3D
+		if _should_skip_body_node(cur, base_gun_node):
+			continue
+		if cur is MeshInstance3D:
+			var mi := cur as MeshInstance3D
+			if mi.visible and mi.mesh != null and mi.skin == null:
+				var all_supported := true
+				var surf_count := mi.mesh.get_surface_count()
+				for s in range(surf_count):
+					if mi.mesh is ArrayMesh and (mi.mesh as ArrayMesh).surface_get_primitive_type(s) != Mesh.PRIMITIVE_TRIANGLES:
+						all_supported = false
+						break
+					var m_check := mi.get_active_material(s)
+					if m_check is ShaderMaterial:
+						all_supported = false
+						break
+				if all_supported and surf_count > 0:
+					var base_cast_sh := mi.cast_shadow != GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+					for s in range(surf_count):
+						var mat := mi.get_active_material(s)
+						var is_translucent := false
+						if mat is StandardMaterial3D:
+							var sm := mat as StandardMaterial3D
+							if sm.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED and sm.transparency != BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR:
+								is_translucent = true
+						var entry := {
+							"mesh": mi.mesh,
+							"surf": s,
+							"xf": cur_xf,
+							"mat": mat,
+							"sig": _material_signature(mat),
+						}
+						if base_cast_sh and not is_translucent:
+							shadow_entries.append(entry)
+						else:
+							noshadow_entries.append(entry)
+					replaced_nodes.append(mi)
+
+		for ch in cur.get_children():
+			if _should_skip_body_node(ch, base_gun_node):
+				continue
+			var next_xf := cur_xf
+			if ch is Node3D:
+				next_xf = cur_xf * (ch as Node3D).transform
+			stack.append({"node": ch, "xf": next_xf})
+
+	if replaced_nodes.size() <= 2:
+		return
+
+	if not shadow_entries.is_empty():
+		var sh_mesh := _build_chunked_body_mesh(shadow_entries)
+		if sh_mesh.get_surface_count() > 0:
+			var sh_mi := MeshInstance3D.new()
+			sh_mi.name = "BodyBatchedShadow"
+			sh_mi.mesh = sh_mesh
+			sh_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+			vehicle.add_child(sh_mi)
+
+	if not noshadow_entries.is_empty():
+		var nsh_mesh := _build_chunked_body_mesh(noshadow_entries)
+		if nsh_mesh.get_surface_count() > 0:
+			var nsh_mi := MeshInstance3D.new()
+			nsh_mi.name = "BodyBatchedNoShadow"
+			nsh_mi.mesh = nsh_mesh
+			nsh_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			vehicle.add_child(nsh_mi)
+
+	for old_mi in replaced_nodes:
+		if not is_instance_valid(old_mi):
+			continue
+		if old_mi.get_child_count() == 0:
+			old_mi.queue_free()
+		else:
+			old_mi.mesh = null
+			old_mi.material_override = null
+			old_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+

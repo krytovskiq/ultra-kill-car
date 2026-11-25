@@ -843,3 +843,252 @@ static func add_tactical_lightbar(parent: Node3D, pos: Vector3, width: float, po
 		var lx := t * (width * 0.72)
 		_add_box(bar, Vector3(lx, 0.068, -0.052), Vector3(0.165, 0.068, 0.024), Vector3.ZERO, chrome, "LedBezel")
 		_add_box(bar, Vector3(lx, 0.068, -0.064), Vector3(0.140, 0.050, 0.014), Vector3.ZERO, lens, "LedEmitter")
+
+
+const _NO_SHADOW_PREFIXES := [
+	"FlangeBolt", "PulleyBolt", "BlowerFin", "SideRivet", "TowShackle", "TowHook",
+	"StackClamp", "LedBezel", "LedEmitter", "InjectorBarrelBore",
+	"ScoopDeepBackplate", "ScoopDividerWeb", "ScoopInnerTrim", "HoodCutoutVoid",
+	"WingEndplate", "BlowerDriveShaft", "ScoopLip", "TubeEndCap"
+]
+
+
+static func _is_tiny_detail_name(node_name: String) -> bool:
+	for p: String in _NO_SHADOW_PREFIXES:
+		if node_name.begins_with(p):
+			return true
+	return false
+
+
+static func _xform_surface_into(
+	mesh: Mesh,
+	surf_idx: int,
+	rel_xf: Transform3D,
+	dst_verts: PackedVector3Array,
+	dst_norms: PackedVector3Array,
+	dst_uvs: PackedVector2Array,
+	dst_uv2s: PackedVector2Array,
+	dst_tans: PackedFloat32Array,
+	dst_indices: PackedInt32Array,
+	use_uv2: bool,
+	use_tan: bool
+) -> void:
+	var arr := mesh.surface_get_arrays(surf_idx)
+	if arr.is_empty():
+		return
+	var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+	if verts.is_empty():
+		return
+	var norms_v: Variant = arr[Mesh.ARRAY_NORMAL]
+	var uvs_v: Variant = arr[Mesh.ARRAY_TEX_UV]
+	var uv2s_v: Variant = arr[Mesh.ARRAY_TEX_UV2]
+	var tans_v: Variant = arr[Mesh.ARRAY_TANGENT]
+	var idx_v: Variant = arr[Mesh.ARRAY_INDEX]
+
+	var norms: PackedVector3Array = norms_v if norms_v is PackedVector3Array else PackedVector3Array()
+	var uvs: PackedVector2Array = uvs_v if uvs_v is PackedVector2Array else PackedVector2Array()
+	var uv2s: PackedVector2Array = uv2s_v if uv2s_v is PackedVector2Array else PackedVector2Array()
+	var tans: PackedFloat32Array = tans_v if tans_v is PackedFloat32Array else PackedFloat32Array()
+
+	var v_base := dst_verts.size()
+	var n_xf := rel_xf.basis.inverse().transposed()
+	var t_xf := rel_xf.basis.orthonormalized()
+	var det_neg := rel_xf.basis.determinant() < 0.0
+
+	for i in range(verts.size()):
+		dst_verts.append(rel_xf * verts[i])
+		if i < norms.size():
+			dst_norms.append((n_xf * norms[i]).normalized())
+		else:
+			dst_norms.append(Vector3.UP)
+		if i < uvs.size():
+			dst_uvs.append(uvs[i])
+		else:
+			dst_uvs.append(Vector2.ZERO)
+		if use_uv2:
+			if i < uv2s.size():
+				dst_uv2s.append(uv2s[i])
+			elif i < uvs.size():
+				dst_uv2s.append(uvs[i])
+			else:
+				dst_uv2s.append(Vector2.ZERO)
+		if use_tan:
+			var t_idx := i * 4
+			if t_idx + 3 < tans.size():
+				var tv := (t_xf * Vector3(tans[t_idx], tans[t_idx + 1], tans[t_idx + 2])).normalized()
+				dst_tans.append(tv.x)
+				dst_tans.append(tv.y)
+				dst_tans.append(tv.z)
+				dst_tans.append(tans[t_idx + 3])
+			else:
+				dst_tans.append(t_xf.x.x)
+				dst_tans.append(t_xf.x.y)
+				dst_tans.append(t_xf.x.z)
+				dst_tans.append(1.0)
+
+	if idx_v is PackedInt32Array and not (idx_v as PackedInt32Array).is_empty():
+		var src_idx: PackedInt32Array = idx_v
+		if det_neg:
+			var k := 0
+			while k + 2 < src_idx.size():
+				dst_indices.append(v_base + src_idx[k])
+				dst_indices.append(v_base + src_idx[k + 2])
+				dst_indices.append(v_base + src_idx[k + 1])
+				k += 3
+		else:
+			for id_val in src_idx:
+				dst_indices.append(v_base + id_val)
+	else:
+		var k := 0
+		while k + 2 < verts.size():
+			if det_neg:
+				dst_indices.append(v_base + k)
+				dst_indices.append(v_base + k + 2)
+				dst_indices.append(v_base + k + 1)
+			else:
+				dst_indices.append(v_base + k)
+				dst_indices.append(v_base + k + 1)
+				dst_indices.append(v_base + k + 2)
+			k += 3
+
+
+static func _build_batched_mesh_from_entries(entries: Array[Dictionary]) -> ArrayMesh:
+	var out := ArrayMesh.new()
+	var buckets: Dictionary = {} # mat_key -> Array[Dictionary]
+	var bucket_mats: Dictionary = {} # mat_key -> Material
+	for entry in entries:
+		var mat: Material = entry["mat"] as Material
+		var m_key: int = mat.get_instance_id() if mat != null else 0
+		if not buckets.has(m_key):
+			var arr: Array[Dictionary] = []
+			buckets[m_key] = arr
+			bucket_mats[m_key] = mat
+		(buckets[m_key] as Array[Dictionary]).append(entry)
+
+	for m_key in buckets.keys():
+		var list: Array[Dictionary] = buckets[m_key] as Array[Dictionary]
+		var mat: Material = bucket_mats[m_key] as Material
+		var need_uv2 := false
+		var need_tan := false
+		for entry in list:
+			var mesh: Mesh = entry["mesh"] as Mesh
+			var s_idx: int = int(entry["surf"])
+			var s_arr := mesh.surface_get_arrays(s_idx)
+			if s_arr.size() > Mesh.ARRAY_TEX_UV2 and s_arr[Mesh.ARRAY_TEX_UV2] != null:
+				need_uv2 = true
+			if s_arr.size() > Mesh.ARRAY_TANGENT and s_arr[Mesh.ARRAY_TANGENT] != null:
+				need_tan = true
+		if mat is StandardMaterial3D:
+			var smat := mat as StandardMaterial3D
+			if not smat.normal_enabled and not (smat.detail_enabled and smat.detail_normal != null):
+				need_tan = false
+
+		var verts := PackedVector3Array()
+		var norms := PackedVector3Array()
+		var uvs := PackedVector2Array()
+		var uv2s := PackedVector2Array()
+		var tans := PackedFloat32Array()
+		var indices := PackedInt32Array()
+		for entry in list:
+			_xform_surface_into(
+				entry["mesh"] as Mesh,
+				int(entry["surf"]),
+				entry["xf"] as Transform3D,
+				verts, norms, uvs, uv2s, tans, indices,
+				need_uv2, need_tan
+			)
+		if verts.is_empty() or indices.is_empty():
+			continue
+		var surf_arr := []
+		surf_arr.resize(Mesh.ARRAY_MAX)
+		surf_arr[Mesh.ARRAY_VERTEX] = verts
+		surf_arr[Mesh.ARRAY_NORMAL] = norms
+		surf_arr[Mesh.ARRAY_TEX_UV] = uvs
+		if need_uv2:
+			surf_arr[Mesh.ARRAY_TEX_UV2] = uv2s
+		if need_tan:
+			surf_arr[Mesh.ARRAY_TANGENT] = tans
+		surf_arr[Mesh.ARRAY_INDEX] = indices
+		var s_new := out.get_surface_count()
+		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surf_arr)
+		if mat != null:
+			out.surface_set_material(s_new, mat)
+	return out
+
+
+static func optimize_kit_meshes(kit_root: Node3D) -> void:
+	if kit_root == null or not is_instance_valid(kit_root):
+		return
+	var root_inv := Transform3D.IDENTITY
+	var shadow_entries: Array[Dictionary] = []
+	var noshadow_entries: Array[Dictionary] = []
+	var to_free: Array[MeshInstance3D] = []
+
+	var stack: Array[Dictionary] = [{"node": kit_root, "xf": root_inv}]
+	while not stack.is_empty():
+		var item: Dictionary = stack.pop_back() as Dictionary
+		var cur: Node = item["node"] as Node
+		var cur_xf: Transform3D = item["xf"] as Transform3D
+		if cur != kit_root:
+			if cur.name == "SuperchargerPulley" or cur.name == "SuperchargerButterflies" or cur is Marker3D:
+				continue
+			if cur is MeshInstance3D:
+				var mi := cur as MeshInstance3D
+				if mi.mesh != null and mi.visible:
+					var cast_sh: bool = mi.cast_shadow != GeometryInstance3D.SHADOW_CASTING_SETTING_OFF and not _is_tiny_detail_name(mi.name)
+					if cast_sh:
+						var sz := mi.mesh.get_aabb().size
+						var sc := cur_xf.basis.get_scale()
+						var max_dim := maxf(sz.x * absf(sc.x), maxf(sz.y * absf(sc.y), sz.z * absf(sc.z)))
+						if max_dim < 0.085:
+							cast_sh = false
+					for s in range(mi.mesh.get_surface_count()):
+						if mi.mesh is ArrayMesh and (mi.mesh as ArrayMesh).surface_get_primitive_type(s) != Mesh.PRIMITIVE_TRIANGLES:
+							continue
+						var mat: Material = mi.get_active_material(s)
+						var is_transparent := false
+						if mat is StandardMaterial3D:
+							var smat := mat as StandardMaterial3D
+							if smat.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED and smat.transparency != BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR:
+								is_transparent = true
+						var entry := {"mesh": mi.mesh, "surf": s, "xf": cur_xf, "mat": mat}
+						if cast_sh and not is_transparent:
+							shadow_entries.append(entry)
+						else:
+							noshadow_entries.append(entry)
+					to_free.append(mi)
+				elif mi.get_child_count() == 0:
+					to_free.append(mi)
+		for ch in cur.get_children():
+			var next_xf := cur_xf
+			if ch is Node3D:
+				next_xf = cur_xf * (ch as Node3D).transform
+			stack.append({"node": ch, "xf": next_xf})
+
+	if not shadow_entries.is_empty():
+		var sh_mesh := _build_batched_mesh_from_entries(shadow_entries)
+		if sh_mesh.get_surface_count() > 0:
+			var sh_mi := MeshInstance3D.new()
+			sh_mi.name = "KitBatchedShadow"
+			sh_mi.mesh = sh_mesh
+			sh_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+			kit_root.add_child(sh_mi)
+
+	if not noshadow_entries.is_empty():
+		var nsh_mesh := _build_batched_mesh_from_entries(noshadow_entries)
+		if nsh_mesh.get_surface_count() > 0:
+			var nsh_mi := MeshInstance3D.new()
+			nsh_mi.name = "KitBatchedNoShadow"
+			nsh_mi.mesh = nsh_mesh
+			nsh_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			kit_root.add_child(nsh_mi)
+
+	for old_mi in to_free:
+		if is_instance_valid(old_mi):
+			if old_mi.get_child_count() == 0:
+				old_mi.queue_free()
+			else:
+				old_mi.mesh = null
+				old_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				old_mi.visible = true
+

@@ -1,6 +1,6 @@
-[gd_scene format=4]
+[gd_scene format=3 uid="uid://ce08a72qdig1m"]
 
-[ext_resource type="Script" path="res://entities/vehicles/DeLorean/delorean.gd" id="1_raptor_gd"]
+[ext_resource type="Script" uid="uid://0qhkxvtojo7" path="res://entities/vehicles/DeLorean/delorean.gd" id="1_raptor_gd"]
 [ext_resource type="PackedScene" uid="uid://dyolsb8cihih5" path="res://entities/vehicles/deadparticles.tscn" id="2_ojd4x"]
 [ext_resource type="Shader" uid="uid://baa1v3ttxc68m" path="res://entities/vehicles/Death_shader.gdshader" id="6_sir0b"]
 [ext_resource type="Texture2D" uid="uid://dflunt5pvepti" path="res://entities/vehicles/texture/Brake.png" id="7_oxjpv"]
@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://du5lan442km8" path="res://entities/vehicles/texture/fuel.png" id="10_naguo"]
 [ext_resource type="PackedScene" uid="uid://20fvn6sc06vd" path="res://ui/pause.tscn" id="11_8277n"]
 [ext_resource type="PackedScene" uid="uid://8sl5gmdd6o6w" path="res://entities/camera/camera_3d.tscn" id="13_0ecat"]
-[ext_resource type="Script" path="res://entities/vehicles/raycast_wheel.gd" id="14_rcwhl"]
+[ext_resource type="Script" uid="uid://dq0g0awqtu4c8" path="res://entities/vehicles/raycast_wheel.gd" id="14_rcwhl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_death"]
 shader = ExtResource("6_sir0b")
@@ -27,7 +27,7 @@ size = Vector3(2.08, 1.05, 1.38)
 [sub_resource type="BoxShape3D" id="BoxShape3D_delorean_hull"]
 size = Vector3(1.88, 0.86, 4.14)
 
-[node name="DeLorean" type="RigidBody3D"]
+[node name="DeLorean" type="RigidBody3D" unique_id=1788620128]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 collision_mask = 517
 mass = 1380.0
@@ -39,10 +39,10 @@ max_contacts_reported = 24
 script = ExtResource("1_raptor_gd")
 DeadParticles = ExtResource("2_ojd4x")
 
-[node name="Hud" type="CanvasLayer" parent="."]
+[node name="Hud" type="CanvasLayer" parent="." unique_id=1572972580]
 layer = 2
 
-[node name="ColorRect" type="ColorRect" parent="Hud"]
+[node name="ColorRect" type="ColorRect" parent="Hud" unique_id=487743906]
 visible = false
 material = SubResource("ShaderMaterial_death")
 anchors_preset = 15
@@ -52,7 +52,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="VirtualJoystick" type="VirtualJoystick" parent="Hud"]
+[node name="VirtualJoystick" type="VirtualJoystick" parent="Hud" unique_id=1695323203]
 visible = false
 offset_left = 2.0
 offset_top = 344.0
@@ -64,26 +64,26 @@ initial_offset_ratio = Vector2(0.5, 0.67)
 action_left = &"A"
 action_right = &"D"
 
-[node name="Brake" type="TouchScreenButton" parent="Hud"]
+[node name="Brake" type="TouchScreenButton" parent="Hud" unique_id=318129069]
 position = Vector2(780, 460)
 scale = Vector2(0.35, 0.35)
 texture_normal = ExtResource("7_oxjpv")
 action = "S"
 
-[node name="Gas" type="TouchScreenButton" parent="Hud"]
+[node name="Gas" type="TouchScreenButton" parent="Hud" unique_id=689587602]
 position = Vector2(960, 420)
 scale = Vector2(0.35, 0.35)
 texture_normal = ExtResource("8_0ecat")
 action = "W"
 
-[node name="speed" type="Label" parent="Hud"]
+[node name="speed" type="Label" parent="Hud" unique_id=553597834]
 offset_left = 478.0
 offset_top = 568.0
 offset_right = 682.0
 offset_bottom = 638.0
 text = "0 KM/H"
 
-[node name="HpBar" type="ProgressBar" parent="Hud"]
+[node name="HpBar" type="ProgressBar" parent="Hud" unique_id=2011570638]
 offset_left = 54.0
 offset_top = 54.0
 offset_right = 238.0
@@ -92,7 +92,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_hp")
 value = 100.0
 show_percentage = false
 
-[node name="FuelBar" type="ProgressBar" parent="Hud"]
+[node name="FuelBar" type="ProgressBar" parent="Hud" unique_id=158056503]
 offset_left = 54.0
 offset_top = 12.0
 offset_right = 238.0
@@ -101,79 +101,69 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_fuel")
 value = 100.0
 show_percentage = false
 
-[node name="Metr" type="Label" parent="Hud"]
+[node name="Metr" type="Label" parent="Hud" unique_id=360020960]
 offset_left = 920.0
 offset_top = 18.0
 offset_right = 1120.0
 offset_bottom = 62.0
 text = "0 M"
 
-[node name="Check" type="Sprite2D" parent="Hud"]
+[node name="Check" type="Sprite2D" parent="Hud" unique_id=1435653176]
 position = Vector2(28, 67)
 scale = Vector2(0.08, 0.08)
 texture = ExtResource("9_ojd4x")
 
-[node name="Fuel" type="Sprite2D" parent="Hud"]
+[node name="Fuel" type="Sprite2D" parent="Hud" unique_id=1021473279]
 position = Vector2(25, 26)
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("10_naguo")
 
-[node name="Pause" parent="Hud" instance=ExtResource("11_8277n")]
+[node name="Pause" parent="Hud" unique_id=878334103 instance=ExtResource("11_8277n")]
 visible = false
 
-[node name="VehicleWheelFL" type="RayCast3D" parent="."]
+[node name="VehicleWheelFL" type="RayCast3D" parent="." unique_id=1786870274]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.77, 0.29, -1.24)
 script = ExtResource("14_rcwhl")
-is_front = true
-is_left = true
-use_as_steering = true
-use_as_traction = true
 wheel_radius = 0.31
 rest_length = 0.14
 
-[node name="VehicleWheelFR" type="RayCast3D" parent="."]
+[node name="VehicleWheelFR" type="RayCast3D" parent="." unique_id=770861816]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.77, 0.29, -1.24)
 script = ExtResource("14_rcwhl")
-is_front = true
 is_left = false
-use_as_steering = true
-use_as_traction = true
 wheel_radius = 0.31
 rest_length = 0.14
 
-[node name="VehicleWheelRL" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.77, 0.33, 1.20)
+[node name="VehicleWheelRL" type="RayCast3D" parent="." unique_id=2015363055]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.77, 0.33, 1.2)
 script = ExtResource("14_rcwhl")
 is_front = false
-is_left = true
 use_as_steering = false
-use_as_traction = true
 wheel_radius = 0.31
 rest_length = 0.14
 
-[node name="VehicleWheelRR" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.77, 0.33, 1.20)
+[node name="VehicleWheelRR" type="RayCast3D" parent="." unique_id=1491053764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.77, 0.33, 1.2)
 script = ExtResource("14_rcwhl")
 is_front = false
 is_left = false
 use_as_steering = false
-use_as_traction = true
 wheel_radius = 0.31
 rest_length = 0.14
 
-[node name="Area3D" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, -1.80)
+[node name="Area3D" type="Area3D" parent="." unique_id=1714663860]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, -1.8)
 collision_layer = 0
 collision_mask = 13
 
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D"]
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Area3D" unique_id=636951641]
 shape = SubResource("BoxShape3D_delorean_kill")
 
-[node name="CollisionShape3D3" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=1800051077]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68, 0)
 shape = SubResource("BoxShape3D_delorean_hull")
 
-[node name="look" type="Node3D" parent="."]
+[node name="look" type="Node3D" parent="." unique_id=193357327]
 
-[node name="Camera3D" parent="look" instance=ExtResource("13_0ecat")]
+[node name="Camera3D" parent="look" unique_id=1257369161 instance=ExtResource("13_0ecat")]
 transform = Transform3D(-0.999809, 0, -0.0195464, 0, 1, 0, 0.0195464, 0, -0.999809, 0, 1.98, -4.45)

@@ -1,12 +1,12 @@
 shader_type sky;
 
-uniform vec4 sky_top_color : source_color = vec4(0.32, 0.42, 0.54, 1.0);
-uniform vec4 sky_horizon_color : source_color = vec4(0.62, 0.61, 0.58, 1.0);
+uniform vec4 sky_top_color : source_color = vec4(0.55, 0.06, 0.06, 1.0);
+uniform vec4 sky_horizon_color : source_color = vec4(0.90, 0.20, 0.08, 1.0);
 uniform vec4 ground_horizon_color : source_color = vec4(0.48, 0.46, 0.43, 1.0);
 uniform vec4 ground_bottom_color : source_color = vec4(0.22, 0.21, 0.19, 1.0);
 uniform vec4 cloud_lit_color : source_color = vec4(0.86, 0.85, 0.82, 1.0);
 uniform vec4 cloud_shadow_color : source_color = vec4(0.40, 0.44, 0.50, 1.0);
-uniform vec4 sun_glow_color : source_color = vec4(1.0, 0.88, 0.72, 1.0);
+uniform vec4 sun_glow_color : source_color = vec4(1.0, 0.30, 0.08, 1.0);
 uniform vec3 sun_direction = vec3(0.38, 0.48, 0.78);
 uniform vec3 moon_direction = vec3(-0.18, 0.34, 0.92);
 uniform float night_factor : hint_range(0.0, 1.0) = 0.0;
